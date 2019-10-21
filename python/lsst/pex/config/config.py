@@ -38,6 +38,7 @@ __all__ = (
 import copy
 import importlib
 import io
+import itertools
 import logging
 import math
 import numbers
@@ -267,9 +268,9 @@ class ConfigMeta(type):
             for b in bases:
                 fields.update(getFields(b))
 
-            for k, v in classtype.__dict__.items():
-                if isinstance(v, Field):
-                    fields[k] = v
+            field_dict = {k: v for k, v in classtype.__dict__.items() if isinstance(v, Field)}
+            for k, v in sorted(field_dict.items(), key=lambda x: x[1]._creation_order):
+                fields[k] = v
             return fields
 
         fields = getFields(cls)
@@ -439,6 +440,8 @@ class Field(Generic[FieldTypeVar]):
     """Supported data types for field values (`set` of types).
     """
 
+    _counter = itertools.count()
+
     @staticmethod
     def _parseTypingArgs(
         params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
@@ -560,6 +563,8 @@ class Field(Generic[FieldTypeVar]):
         """The stack frame where this field is defined (`list` of
         `~lsst.pex.config.callStack.StackFrame`).
         """
+
+        self._creation_order = next(Field._counter)
 
     def rename(self, instance):
         r"""Rename the field in a `~lsst.pex.config.Config` (for internal use
