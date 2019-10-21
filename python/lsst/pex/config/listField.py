@@ -307,6 +307,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
     deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
         If not `None`, the string is appended to the docstring for this Field.
+    single : `bool`, optional
+        If ``single`` is `True`, a single object of ``dtype`` rather than a
+        list is okay.
 
     See Also
     --------
@@ -333,6 +336,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         minLength=None,
         maxLength=None,
         deprecated=None,
+        single=False,
     ):
         if dtype is None:
             raise ValueError(
@@ -365,9 +369,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             raise ValueError("'itemCheck' must be callable")
 
         source = getStackFrame()
+        if single:
+            dtype_setup = (List,) + dtype if isinstance(dtype, tuple) else (List, dtype)
+        else:
+            dtype_setup = List
         self._setup(
             doc=doc,
-            dtype=List,
+            dtype=dtype_setup,
             default=default,
             check=None,
             optional=optional,
@@ -403,6 +411,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         to disable checking the list's maximum length).
         """
 
+        self.single = single
+        """Control whether a single object of dtype is okay."""
+
     def validate(self, instance):
         """Validate the field.
 
@@ -428,7 +439,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         """
         Field.validate(self, instance)
         value = self.__get__(instance)
-        if value is not None:
+        if not self.single and value is not None:
             lenValue = len(value)
             if self.length is not None and not lenValue == self.length:
                 msg = f"Required list length={self.length}, got length={lenValue}"
@@ -457,7 +468,14 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             at = getCallStack()
 
         if value is not None:
-            value = List(instance, self, value, at, label)
+            if not self.single or isinstance(value, list | tuple):
+                value = List(instance, self, value, at, label)
+            else:
+                value = _autocast(value, self.dtype)
+                try:
+                    self._validateValue(value)
+                except BaseException as e:
+                    raise FieldValidationError(self, instance, str(e)) from None
         else:
             history = instance._history.setdefault(self.name, [])
             history.append((value, at, label))
@@ -480,7 +498,10 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             Plain `list` of items, or `None` if the field is not set.
         """
         value = self.__get__(instance)
-        return list(value) if value is not None else None
+        if isinstance(value, List):
+            return list(value)
+        else:
+            return value
 
     def _copy_storage(self, old: Config, new: Config) -> List[FieldTypeVar] | None:
         value: List[FieldTypeVar] | None = old._storage[self.name]
@@ -531,6 +552,11 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             return compareScalars(name, l1, l2, output=output)
         if not compareScalars(f"{name} (len)", len(l1), len(l2), output=output):
             return False
+        if not isinstance(l1, List):
+            if not isinstance(l2, List):
+                return compareScalars(name, l1, l2, dtype=self.dtype[1], rtol=rtol, atol=atol, output=output)
+            else:
+                return False
         equal = True
         for n, v1, v2 in zip(range(len(l1)), l1, l2, strict=True):
             result = compareScalars(
