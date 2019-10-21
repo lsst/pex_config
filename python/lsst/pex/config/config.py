@@ -25,6 +25,7 @@ from builtins import object
 from past.builtins import long
 from past.builtins import basestring
 from past.builtins import unicode
+from collections import OrderedDict
 
 import os
 import io
@@ -33,6 +34,7 @@ import math
 import copy
 import tempfile
 import shutil
+import itertools
 
 from .comparison import getComparisonName, compareScalars, compareConfigs
 from .callStack import getStackFrame, getCallStack
@@ -101,19 +103,19 @@ class ConfigMeta(type):
     """
     def __init__(self, name, bases, dict_):
         type.__init__(self, name, bases, dict_)
-        self._fields = {}
+        self._fields = OrderedDict()
         self._source = getStackFrame()
 
         def getFields(classtype):
-            fields = {}
+            fields = OrderedDict()
             bases = list(classtype.__bases__)
             bases.reverse()
             for b in bases:
                 fields.update(getFields(b))
 
-            for k, v in classtype.__dict__.items():
-                if isinstance(v, Field):
-                    fields[k] = v
+            field_dict = {k: v for k, v in classtype.__dict__.items() if isinstance(v, Field)}
+            for k, v in sorted(field_dict.items(), key=lambda x: x[1]._creation_order):
+                fields[k] = v
             return fields
 
         fields = getFields(self)
@@ -165,6 +167,7 @@ class Field(object):
     # code will pass in a future str type on Python 2
     supportedTypes = set((str, unicode, basestring, oldStringType, bool, float,
                           int, complex, AstroData))
+    _counter = itertools.count()
 
     def __init__(self, doc, dtype, default=None, check=None, optional=False):
         """Initialize a Field.
@@ -200,6 +203,7 @@ class Field(object):
         self.check = check
         self.optional = optional
         self.source = source
+        self._creation_order = next(Field._counter)
 
     def rename(self, instance):
         """
@@ -658,7 +662,7 @@ class Config(with_metaclass(ConfigMeta, object)):
         Correct behavior is dependent on proper implementation of  Field.toDict. If implementing a new
         Field type, you may need to implement your own toDict method.
         """
-        dict_ = {}
+        dict_ = OrderedDict()
         for name, field in self._fields.items():
             dict_[name] = field.toDict(self)
         return dict_
