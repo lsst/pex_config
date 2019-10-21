@@ -146,11 +146,13 @@ class FieldValidationError(ValueError):
         self.history = config.history.setdefault(field.name, [])
         self.fieldSource = field.source
         self.configSource = config._source
-        error = "%s '%s' failed validation: %s\n"\
-                "For more information read the Field definition at:\n%s"\
-                "And the Config definition at:\n%s" % \
-            (self.fieldType.__name__, self.fullname, msg,
-             self.fieldSource.format(), self.configSource.format())
+        #error = "%s '%s' failed validation: %s\n"\
+        #        "For more information read the Field definition at:\n%s"\
+        #        "And the Config definition at:\n%s" % \
+        #    (self.fieldType.__name__, self.fullname, msg,
+        #     self.fieldSource.format(), self.configSource.format())
+        error = ("{} '{}' ({}) failed validation: {}".
+                 format(self.fieldType.__name__, self.fullname, field.doc, msg))
         ValueError.__init__(self, error)
 
 
