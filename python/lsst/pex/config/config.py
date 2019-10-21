@@ -67,12 +67,19 @@ def _autocast(x, dtype):
     If appropriate perform type casting of value x to type dtype,
     otherwise return the original value x
     """
-    if dtype == float and isinstance(x, int):
+    if isinstance(x, int) and (dtype == float or (isinstance(dtype, tuple)
+                               and float in dtype and int not in dtype)):
         return float(x)
-    if dtype == int and isinstance(x, long):
+    if isinstance(x, long) and (dtype == int or (isinstance(dtype, tuple)
+                                                 and int in dtype)):
         return int(x)
-    if isinstance(x, str):
-        return oldStringType(x)
+    if isinstance(x, str) or isinstance(x, oldStringType):
+        for type in (int, float, bool, oldStringType):
+            if dtype == type or (isinstance(dtype, tuple) and type in dtype):
+                try:
+                    return type(x)
+                except ValueError:  # Carry on and try a different coercion
+                    pass
     return x
 
 
@@ -168,7 +175,7 @@ class Field(object):
     # Must be able to support str and future str as we can not guarantee that
     # code will pass in a future str type on Python 2
     supportedTypes = set((str, unicode, basestring, oldStringType, bool, float,
-                          int, complex, AstroData))
+                          int, complex, tuple, AstroData))
     _counter = itertools.count()
 
     def __init__(self, doc, dtype, default=None, check=None, optional=False):
@@ -183,12 +190,19 @@ class Field(object):
                      method; this will be ignored if set to None.
         optional --- When False, Config validate() will fail if value is None
         """
-        if dtype not in self.supportedTypes:
+        if isinstance(dtype, list):
+            dtype = tuple(dtype)
+        if isinstance(dtype, tuple):
+            if any([x not in self.supportedTypes for x in dtype]):
+                raise ValueError("Unsupported Field dtype in %s" % repr(dtype))
+        elif dtype not in self.supportedTypes:
             raise ValueError("Unsupported Field dtype %s" % _typeStr(dtype))
 
         # Use standard string type if we are given a future str
         if dtype == str:
             dtype = oldStringType
+        elif isinstance(dtype, tuple):
+            dtype = tuple(oldStringType if dt==str else dt for dt in dtype)
 
         source = getStackFrame()
         self._setup(doc=doc, dtype=dtype, default=default, check=check, optional=optional, source=source)
@@ -252,8 +266,12 @@ class Field(object):
             return
 
         if not isinstance(value, self.dtype):
-            msg = "Value %s is of incorrect type %s. Expected type %s" % \
-                (value, _typeStr(value), _typeStr(self.dtype))
+            if isinstance(self.dtype, tuple):
+                msg = "Value %s is of incorrect type %s. Expected types %s" % \
+                  ( value, _typeStr(value), [_typeStr(dt) for dt in self.dtype])
+            else:
+                msg = "Value %s is of incorrect type %s. Expected type %s" % \
+                    (value, _typeStr(value), _typeStr(self.dtype))
             raise TypeError(msg)
         if self.check is not None and not self.check(value):
             msg = "Value %s is not a valid value" % str(value)
