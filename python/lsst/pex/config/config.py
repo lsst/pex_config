@@ -149,10 +149,19 @@ def _autocast(x, dtype):
     -----
     Will convert numpy scalar types to the standard Python equivalents.
     """
-    if dtype is float and isinstance(x, numbers.Real):
+    if isinstance(x, numbers.Real) and (
+        dtype is float or (isinstance(dtype, tuple) and float in dtype and int not in dtype)
+    ):
         return float(x)
     if dtype is int and isinstance(x, numbers.Integral):
         return int(x)
+    if isinstance(x, str):
+        for type in (int, float, bool):
+            if dtype == type or (isinstance(dtype, tuple) and type in dtype):
+                try:
+                    return type(x)
+                except ValueError:  # Carry on and try a different coercion
+                    pass
     return x
 
 
@@ -411,7 +420,7 @@ class Field(Generic[FieldTypeVar]):
     Class.
     """
 
-    supportedTypes = {str, bool, float, int, complex, AstroData}
+    supportedTypes = {str, bool, float, int, complex, tuple, AstroData}
     """Supported data types for field values (`set` of types).
     """
 
@@ -480,7 +489,12 @@ class Field(Generic[FieldTypeVar]):
             raise ValueError(
                 "dtype must either be supplied as an argument or as a type argument to the class"
             )
-        if dtype not in self.supportedTypes:
+        if isinstance(dtype, list):
+            dtype = tuple(dtype)
+        if isinstance(dtype, tuple):
+            if any(x not in self.supportedTypes for x in dtype):
+                raise ValueError(f"Unsupported Field dtype in {_typeStr(dtype)}")
+        elif dtype not in self.supportedTypes:
             raise ValueError(f"Unsupported Field dtype {_typeStr(dtype)}")
 
         source = getStackFrame()
@@ -628,9 +642,16 @@ class Field(Generic[FieldTypeVar]):
             return
 
         if not isinstance(value, self.dtype):
-            msg = (
-                f"Value {value} is of incorrect type {_typeStr(value)}. Expected type {_typeStr(self.dtype)}"
-            )
+            if isinstance(self.dtype, tuple):
+                msg = (
+                    f"Value {value} is of incorrect type {_typeStr(value)}. "
+                    f"Expected types {[_typeStr(dt) for dt in self.dtype]}"
+                )
+            else:
+                msg = (
+                    f"Value {value} is of incorrect type {_typeStr(value)}. "
+                    f"Expected type {_typeStr(self.dtype)}"
+                )
             raise TypeError(msg)
         if self.check is not None and not self.check(value):
             msg = f"Value {value} is not a valid value"
