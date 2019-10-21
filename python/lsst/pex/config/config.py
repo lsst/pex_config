@@ -328,7 +328,7 @@ class FieldValidationError(ValueError):
 
         self.configSource = config._source
         error = (
-            f"{self.fieldType.__name__} '{self.fullname}' failed validation: {msg}\n"
+            f"{self.fieldType.__name__} '{self.fullname}' ({field.doc}) failed validation: {msg}\n"
             f"For more information see the Field definition at:\n{self.fieldSource.format()}"
             f" and the Config definition for {_typeStr(config)} at:\n{self.configSource.format()}"
         )
