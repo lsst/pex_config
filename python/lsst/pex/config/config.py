@@ -38,6 +38,8 @@ from .comparison import getComparisonName, compareScalars, compareConfigs
 from .callStack import getStackFrame, getCallStack
 from future.utils import with_metaclass
 
+from astrodata import AstroData
+
 __all__ = ("Config", "Field", "FieldValidationError")
 
 
@@ -161,7 +163,8 @@ class Field(object):
     """
     # Must be able to support str and future str as we can not guarantee that
     # code will pass in a future str type on Python 2
-    supportedTypes = set((str, unicode, basestring, oldStringType, bool, float, int, complex))
+    supportedTypes = set((str, unicode, basestring, oldStringType, bool, float,
+                          int, complex, AstroData))
 
     def __init__(self, doc, dtype, default=None, check=None, optional=False):
         """Initialize a Field.
@@ -337,9 +340,9 @@ class Field(object):
                 raise FieldValidationError(self, instance, str(e))
 
         instance._storage[self.name] = value
-        if at is None:
-            at = getCallStack()
-        history.append((value, at, label))
+        # We don't want to put an actual AD object here, so just the filename
+        value_to_append = value.filename if isinstance(value, AstroData) else value
+        history.append((value_to_append, at, label))
 
     def __delete__(self, instance, at=None, label='deletion'):
         """
@@ -689,14 +692,14 @@ class Config(with_metaclass(ConfigMeta, object)):
         for field in self._fields.values():
             field.validate(self)
 
-    def formatHistory(self, name, **kwargs):
+    def formatHistory(self, name=None, **kwargs):
         """!Format the specified config field's history to a more human-readable format
 
         @param[in] name  name of field whose history is wanted
         @param[in] kwargs  keyword arguments for lsst.pex.config.history.format
         @return a string containing the formatted history
         """
-        import lsst.pex.config.history as pexHist
+        from . import history as pexHist
         return pexHist.format(self, name, **kwargs)
 
     """
