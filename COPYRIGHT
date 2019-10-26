@@ -2,3 +2,8 @@ Copyright 2008-2014 LSST Corporation
 Copyright 2016, 2017, 2019 Association of Universities for Research in Astronomy
 Copyright 2015, 2017, 2018, 2019 The Trustees of Princeton University
 Copyright 2015, 2018, 2019 University of Washington
+
+This software is dual licensed under the GNU General Public License, either
+version 3 or (at your option) any later version, and also under a 3-clause
+BSD license. Recipients may choose which of these licenses to use; please see
+the files gpl-3.0.txt and/or bsd_license.txt, respectively.
