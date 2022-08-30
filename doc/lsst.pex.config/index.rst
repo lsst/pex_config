@@ -10,6 +10,17 @@ The ``lsst.pex.config`` module provides a configuration system for the LSST Scie
 The `lsst.pex.config.Config` class is an integral part of the task framework (see :ref:`lsst.pipe.base`), though ``lsst.pex.config`` is also useful on its own.
 Configuration parameters can be validated, documented, and even record the history of their values for provenance.
 
+.. _lsst.pex.config-changes:
+
+Changes
+=======
+
+.. toctree::
+   :maxdepth: 1
+
+   CHANGES.rst
+
+
 Using lsst.pex.config
 =====================
 
