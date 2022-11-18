@@ -20,8 +20,12 @@ The `Config.formatHistory` method displays the history of a given `Field` in a m
 Docstrings
 ----------
 
-Each `Field` instance is required to have a doc string that describes the contents of the field.
-Doc strings can be verbose and should give users of the `Config` object a good understanding of what the field is and how it will be interpreted and used.
-A doc string should also be provided for the class as a whole.
+Each `Field` instance is required to have a ``doc`` attribute that describes the contents of the field.
+These ``doc`` strings should be complete sentences and should give users of the `Config` object a good understanding of what the field is and how it will be interpreted and used.
+Multi-sentence ``doc`` strings should have an explicit newline character (``"\n"``) after each sentence;
+single newlines here do not affect the rendered HTML docs, but they improve the readability of the persisted `Config` object (as produced by `Config.save`).
+`Field` ``doc`` strings are treated as reStructuredText when rendered, but we do not recommend using anything more than very simple formatting in them, to balance the formatting of the rendered HTML and the persisted `Config` (which just passes through the ``doc`` string as-is).
+
+A class docstring can also be provided for the `Config` class as a whole, although this may be redundant with the class name.
 
 You can use the built-in `help` function or :command:`pydoc` command to inspect a `Config` instance's doc strings as well as those of its `Field` attributes.
