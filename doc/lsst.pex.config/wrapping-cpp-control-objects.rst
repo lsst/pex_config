@@ -15,7 +15,7 @@ For example, here is a C++ control object:
     struct FooControl {
         LSST_CONTROL_FIELD(bar, int, "documentation for field 'bar'");
         LSST_CONTROL_FIELD(baz, double, "documentation for field 'baz'");
-        
+
         FooControl() : bar(0), baz(0.0) {}
     };
 

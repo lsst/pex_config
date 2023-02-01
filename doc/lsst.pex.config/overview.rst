@@ -38,7 +38,7 @@ Here is a config class that includes five fields:
 .. code-block:: python
 
    import lsst.pex.config as pexConfig
-   
+
    class IsrTaskConfig(pexConfig.Config):
        doWrite = pexConfig.Field(
            doc="Write output?",

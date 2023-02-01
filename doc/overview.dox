@@ -3,7 +3,7 @@
 
 \section secConfigIntro Overview
 
-The lsst::pex::config package provides for configurations for the LSST 
+The lsst::pex::config package provides for configurations for the LSST
 Data Management System.
 
 Configurations are hierarchical trees of parameters used to control the
@@ -85,7 +85,7 @@ Configurations are *not* input data.  They should not be used in place of functi
 A  Config subclass is instantiated to create a configuration object.  If any default  Field values need to be overridden, they can be set by assignment to the object's  Field attributes (e.g. `config.param1 = 3.14`), often in a parent  Config.setDefaults() method, or by loading from an external file.  The code then uses the configuration values by accessing the object's  Field attributes (e.g., `x = config.param1`).
 
 The  Config object can also be frozen; attempting to change the field
-values of a frozen object will raise an exception. This is useful to 
+values of a frozen object will raise an exception. This is useful to
 expose bugs that change configuration values after none should happen.
 
 Finally, the contents of  Config objects may easily be dumped, for
@@ -239,12 +239,12 @@ C++ control objects defined using the LSST_CONTROL_FIELD macro in lsst/pex/confi
     struct FooControl {
         LSST_CONTROL_FIELD(bar, int, "documentation for field 'bar'");
         LSST_CONTROL_FIELD(baz, double, "documentation for field 'baz'");
-        
+
         FooControl() : bar(0), baz(0.0) {}
     };
 \endcode
 
-Note that only  bool,  int,  double, and  std::string fields, along with  std::list and  std::vector containers of those types, are fully supported. 
+Note that only  bool,  int,  double, and  std::string fields, along with  std::list and  std::vector containers of those types, are fully supported.
 
 Nested control objects are not supported.
 
