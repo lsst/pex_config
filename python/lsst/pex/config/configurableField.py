@@ -188,7 +188,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         raise UnexpectedProxyUsageError(
             f"Proxy object for config field {self._field.name} cannot "
             "be pickled; it should be converted to a normal `Config` instance "
-            f"via the `value` property before being assigned to other objects "
+            "via the `value` property before being assigned to other objects "
             "or variables."
         )
 
@@ -276,8 +276,8 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
                 raise AttributeError("'target' must define attribute 'ConfigClass'")
         if not issubclass(ConfigClass, Config):
             raise TypeError(
-                "'ConfigClass' is of incorrect type %s."
-                "'ConfigClass' must be a subclass of Config" % _typeStr(ConfigClass)
+                "'ConfigClass' is of incorrect type %s.'ConfigClass' must be a subclass of Config"
+                % _typeStr(ConfigClass)
             )
         if not hasattr(target, "__call__"):
             raise ValueError("'target' must be callable")

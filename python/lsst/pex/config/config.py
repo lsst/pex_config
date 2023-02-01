@@ -743,9 +743,7 @@ class Field(Generic[FieldTypeVar]):
                     return self
                 else:
                     raise AttributeError(
-                        f"Config {instance} is missing "
-                        "_storage attribute, likely"
-                        " incorrectly initialized"
+                        f"Config {instance} is missing _storage attribute, likely incorrectly initialized"
                     )
 
     def __set__(
@@ -1690,7 +1688,7 @@ def _classFromPython(config_py):
     if not matches:
         first_line, second_line, _ = config_py.split("\n", 2)
         raise ValueError(
-            "First two lines did not match expected form. Got:\n" f" - {first_line}\n" f" - {second_line}"
+            f"First two lines did not match expected form. Got:\n - {first_line}\n - {second_line}"
         )
 
     module_name = matches.group(1)

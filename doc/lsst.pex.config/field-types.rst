@@ -44,7 +44,7 @@ Examples of `ChoiceField` and `ConfigField` and the use of the `Config` object's
 .. code-block:: python
 
     class InitialPsfConfig(pexConfig.Config):
-        """A config that describes the initial PSF used 
+        """A config that describes the initial PSF used
         for detection and measurement (before PSF
         determination is done).
         """
