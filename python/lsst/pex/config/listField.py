@@ -346,8 +346,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
                 raise ValueError("'maxLength' (%d) must be positive" % maxLength)
             if minLength is not None and maxLength is not None and minLength > maxLength:
                 raise ValueError(
-                    "'maxLength' (%d) must be at least"
-                    " as large as 'minLength' (%d)" % (maxLength, minLength)
+                    "'maxLength' (%d) must be at least as large as 'minLength' (%d)" % (maxLength, minLength)
                 )
 
         if listCheck is not None and not hasattr(listCheck, "__call__"):
