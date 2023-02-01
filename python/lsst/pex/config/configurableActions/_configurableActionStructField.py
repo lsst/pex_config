@@ -43,7 +43,6 @@ from types import GenericAlias
 from lsst.pex.config.config import Config, Field, FieldValidationError, _typeStr, _joinNamePath
 from lsst.pex.config.comparison import compareConfigs, compareScalars, getComparisonName
 from lsst.pex.config.callStack import StackFrame, getCallStack, getStackFrame
-#from lsst.pipe.base import Struct
 
 from . import ConfigurableAction, ActionTypeVar
 

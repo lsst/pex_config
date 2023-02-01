@@ -50,9 +50,9 @@ class ConfigurableAction(Config):
     """
 
     identity: str | None = None
-    """If a configurable action is assigned to a `ConfigurableActionField`, or a
-    `ConfigurableActionStructField` the name of the field will be bound to this
-    variable when it is retrieved.
+    """If a configurable action is assigned to a `ConfigurableActionField`, or
+    a `ConfigurableActionStructField` the name of the field will be bound to
+    this variable when it is retrieved.
     """
 
     def __setattr__(self, attr, value, at=None, label="assignment"):
