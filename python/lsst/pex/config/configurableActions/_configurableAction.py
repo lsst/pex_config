@@ -26,8 +26,7 @@ from typing import Any, TypeVar
 
 from lsst.pex.config.config import Config
 
-
-ActionTypeVar = TypeVar("ActionTypeVar", bound='ConfigurableAction')
+ActionTypeVar = TypeVar("ActionTypeVar", bound="ConfigurableAction")
 
 
 class ConfigurableAction(Config):
@@ -56,7 +55,7 @@ class ConfigurableAction(Config):
     """
 
     def __setattr__(self, attr, value, at=None, label="assignment"):
-        if attr == 'identity':
+        if attr == "identity":
             return object.__setattr__(self, attr, value)
         return super().__setattr__(attr, value, at, label)
 

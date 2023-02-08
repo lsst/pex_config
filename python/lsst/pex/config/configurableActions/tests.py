@@ -30,9 +30,10 @@ __all__ = (
 )
 
 from lsst.pex.config import Config, Field
+
 from ._configurableAction import ConfigurableAction
-from ._configurableActionStructField import ConfigurableActionStructField
 from ._configurableActionField import ConfigurableActionField
+from ._configurableActionStructField import ConfigurableActionStructField
 
 
 class ActionTest1(ConfigurableAction):
@@ -42,7 +43,7 @@ class ActionTest1(ConfigurableAction):
         return self.var
 
     def validate(self):
-        assert(self.var is not None)
+        assert self.var is not None
 
 
 class ActionTest2(ConfigurableAction):
@@ -52,7 +53,7 @@ class ActionTest2(ConfigurableAction):
         return self.var
 
     def validate(self):
-        assert(self.var is not None)
+        assert self.var is not None
 
 
 class ActionTest3(ConfigurableAction):
@@ -62,7 +63,7 @@ class ActionTest3(ConfigurableAction):
         return self.var
 
     def validate(self):
-        assert(self.var is not None)
+        assert self.var is not None
 
 
 class TestDivideAction(ConfigurableAction):
@@ -73,7 +74,7 @@ class TestDivideAction(ConfigurableAction):
         return self.colA(arg) / self.colB(arg)
 
     def validate(self):
-        assert(self.colA is not None and self.colB is not None)
+        assert self.colA is not None and self.colB is not None
 
 
 class TestSingleColumnAction(ConfigurableAction):

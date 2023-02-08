@@ -23,16 +23,15 @@ import unittest
 from io import StringIO
 from types import SimpleNamespace
 
+from lsst.pex.config import FieldValidationError
 from lsst.pex.config.configurableActions.tests import (
     ActionTest1,
     ActionTest2,
     ActionTest3,
+    TestConfig,
     TestDivideAction,
     TestSingleColumnAction,
-    TestConfig,
 )
-
-from lsst.pex.config import FieldValidationError
 
 
 class ConfigurableActionsTestCase(unittest.TestCase):
@@ -45,6 +44,7 @@ class ConfigurableActionsTestCase(unittest.TestCase):
                         setattr(self.actions, k, v)
                 if singleDefault is not None:
                     self.singleAction = singleDefault
+
         return NewTestConfig
 
     def testConfigInstantiation(self):
@@ -111,14 +111,16 @@ class ConfigurableActionsTestCase(unittest.TestCase):
             config.actions.update = {"9leading_number": ActionTest2}
 
         # Test remove "assignment" using the remove accessor
-        configClass = self._createConfig(default={"test1": ActionTest1, "test2": ActionTest2,
-                                                  "test3": ActionTest3})
+        configClass = self._createConfig(
+            default={"test1": ActionTest1, "test2": ActionTest2, "test3": ActionTest3}
+        )
         config = configClass()
         config.actions.remove = ("test1", "test2")
-        self.assertEqual(tuple(config.actions.fieldNames), ("test3", ))
+        self.assertEqual(tuple(config.actions.fieldNames), ("test3",))
 
-        configClass = self._createConfig(default={"test1": ActionTest1, "test2": ActionTest2,
-                                                  "test3": ActionTest3})
+        configClass = self._createConfig(
+            default={"test1": ActionTest1, "test2": ActionTest2, "test3": ActionTest3}
+        )
         config = configClass()
         config.actions.remove = "test1"
         self.assertEqual(tuple(config.actions.fieldNames), ("test2", "test3"))
@@ -137,8 +139,9 @@ class ConfigurableActionsTestCase(unittest.TestCase):
 
         # Verify that ConfigurableActionStructField can be assigned to with
         # a ConfigurableActionStruct, SimpleNamespace
-        otherConfigClass = self._createConfig(default={"test1": ActionTest1(var=1),
-                                                       "test2": ActionTest2(var=2)})
+        otherConfigClass = self._createConfig(
+            default={"test1": ActionTest1(var=1), "test2": ActionTest2(var=2)}
+        )
         assignSource1 = otherConfigClass().actions
         assignSource2 = SimpleNamespace(test1=ActionTest1(var=1), test2=ActionTest2(var=2))
 
@@ -163,14 +166,17 @@ class ConfigurableActionsTestCase(unittest.TestCase):
             config.actions = {}
 
     def testValidate(self):
-        configClass = self._createConfig(default={"test1": ActionTest1, "test2": ActionTest2,
-                                                  "test3": ActionTest3}, singleDefault=ActionTest1)
+        configClass = self._createConfig(
+            default={"test1": ActionTest1, "test2": ActionTest2, "test3": ActionTest3},
+            singleDefault=ActionTest1,
+        )
         config = configClass()
         config.validate()
 
     def testFreeze(self):
-        configClass = self._createConfig(default={"test1": ActionTest1, "test2": ActionTest2},
-                                         singleDefault=ActionTest1)
+        configClass = self._createConfig(
+            default={"test1": ActionTest1, "test2": ActionTest2}, singleDefault=ActionTest1
+        )
         config = configClass()
         config.freeze()
 
@@ -190,8 +196,9 @@ class ConfigurableActionsTestCase(unittest.TestCase):
             config.singleAction.var = 3
 
     def testCompare(self):
-        configClass = self._createConfig(default={"test1": ActionTest1, "test2": ActionTest2},
-                                         singleDefault=ActionTest1)
+        configClass = self._createConfig(
+            default={"test1": ActionTest1, "test2": ActionTest2}, singleDefault=ActionTest1
+        )
         config = configClass()
         config2 = configClass()
 
@@ -244,10 +251,9 @@ class ConfigurableActionsTestCase(unittest.TestCase):
 
     def testToDict(self):
         """Test the toDict interface"""
-        configClass = self._createConfig(default={"test1": ActionTest1},
-                                         singleDefault=ActionTest1)
+        configClass = self._createConfig(default={"test1": ActionTest1}, singleDefault=ActionTest1)
         config = configClass()
-        self.assertEqual(config.toDict(), {'actions': {'test1': {'var': 0}}, 'singleAction': {'var': 0}})
+        self.assertEqual(config.toDict(), {"actions": {"test1": {"var": 0}}, "singleAction": {"var": 0}})
 
 
 if __name__ == "__main__":

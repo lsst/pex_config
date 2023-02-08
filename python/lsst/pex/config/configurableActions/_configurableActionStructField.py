@@ -22,31 +22,29 @@ from __future__ import annotations
 
 __all__ = ("ConfigurableActionStructField", "ConfigurableActionStruct")
 
-from types import SimpleNamespace
+import weakref
+from types import GenericAlias, SimpleNamespace
 from typing import (
-    Iterable,
-    Mapping,
-    Optional,
-    TypeVar,
-    Union,
-    Type,
-    Tuple,
-    List,
     Any,
     Dict,
-    Iterator,
     Generic,
-    overload
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
 )
-from types import GenericAlias
 
-from lsst.pex.config.config import Config, Field, FieldValidationError, _typeStr, _joinNamePath
-from lsst.pex.config.comparison import compareConfigs, compareScalars, getComparisonName
 from lsst.pex.config.callStack import StackFrame, getCallStack, getStackFrame
+from lsst.pex.config.comparison import compareConfigs, compareScalars, getComparisonName
+from lsst.pex.config.config import Config, Field, FieldValidationError, _joinNamePath, _typeStr
 
-from . import ConfigurableAction, ActionTypeVar
-
-import weakref
+from . import ActionTypeVar, ConfigurableAction
 
 
 class ConfigurableActionStructUpdater:
@@ -55,8 +53,12 @@ class ConfigurableActionStructUpdater:
     useful in the context of setting configuration through pipelines or on
     the command line.
     """
-    def __set__(self, instance: ConfigurableActionStruct,
-                value: Union[Mapping[str, ConfigurableAction], ConfigurableActionStruct]) -> None:
+
+    def __set__(
+        self,
+        instance: ConfigurableActionStruct,
+        value: Union[Mapping[str, ConfigurableAction], ConfigurableActionStruct],
+    ) -> None:
         if isinstance(value, Mapping):
             pass
         elif isinstance(value, ConfigurableActionStruct):
@@ -64,8 +66,9 @@ class ConfigurableActionStructUpdater:
             # internal dictionary
             value = value._attrs
         else:
-            raise ValueError("Can only update a ConfigurableActionStruct with an instance of such, or a "
-                             "mapping")
+            raise ValueError(
+                "Can only update a ConfigurableActionStruct with an instance of such, or a " "mapping"
+            )
         for name, action in value.items():
             setattr(instance, name, action)
 
@@ -86,13 +89,13 @@ class ConfigurableActionStructRemover:
         Raised if an attribute specified for removal does not exist in the
         ConfigurableActionStruct
     """
-    def __set__(self, instance: ConfigurableActionStruct,
-                value: Union[str, Iterable[str]]) -> None:
+
+    def __set__(self, instance: ConfigurableActionStruct, value: Union[str, Iterable[str]]) -> None:
         # strings are iterable, but not in the way that is intended. If a
         # single name is specified, turn it into a tuple before attempting
         # to remove the attribute
         if isinstance(value, str):
-            value = (value, )
+            value = (value,)
         for name in value:
             delattr(instance, name)
 
@@ -132,6 +135,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     raised. Any attributes in the Iterable prior to the name which raises will
     have been removed from the `ConfigurableActionStruct`
     """
+
     # declare attributes that are set with __setattr__
     _config_: weakref.ref
     _attrs: Dict[str, ActionTypeVar]
@@ -142,12 +146,18 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     update = ConfigurableActionStructUpdater()
     remove = ConfigurableActionStructRemover()
 
-    def __init__(self, config: Config, field: ConfigurableActionStructField,
-                 value: Mapping[str, ConfigurableAction], at: Any, label: str):
-        object.__setattr__(self, '_config_', weakref.ref(config))
-        object.__setattr__(self, '_attrs', {})
-        object.__setattr__(self, '_field', field)
-        object.__setattr__(self, '_history', [])
+    def __init__(
+        self,
+        config: Config,
+        field: ConfigurableActionStructField,
+        value: Mapping[str, ConfigurableAction],
+        at: Any,
+        label: str,
+    ):
+        object.__setattr__(self, "_config_", weakref.ref(config))
+        object.__setattr__(self, "_attrs", {})
+        object.__setattr__(self, "_field", field)
+        object.__setattr__(self, "_history", [])
 
         self.history.append(("Struct initialized", at, label))
 
@@ -160,7 +170,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         # Config Fields should never outlive their config class instance
         # assert that as such here
         value = self._config_()
-        assert(value is not None)
+        assert value is not None
         return value
 
     @property
@@ -171,12 +181,16 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     def fieldNames(self) -> Iterable[str]:
         return self._attrs.keys()
 
-    def __setattr__(self, attr: str, value: Union[ActionTypeVar, Type[ActionTypeVar]],
-                    at=None, label='setattr', setHistory=False) -> None:
-
-        if hasattr(self._config, '_frozen') and self._config._frozen:
-            msg = "Cannot modify a frozen Config. "\
-                  f"Attempting to set item {attr} to value {value}"
+    def __setattr__(
+        self,
+        attr: str,
+        value: Union[ActionTypeVar, Type[ActionTypeVar]],
+        at=None,
+        label="setattr",
+        setHistory=False,
+    ) -> None:
+        if hasattr(self._config, "_frozen") and self._config._frozen:
+            msg = "Cannot modify a frozen Config. " f"Attempting to set item {attr} to value {value}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # verify that someone has not passed a string with a space or leading
@@ -198,7 +212,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
             super().__setattr__(attr, value)
 
     def __getattr__(self, attr) -> Any:
-        if attr in object.__getattribute__(self, '_attrs'):
+        if attr in object.__getattribute__(self, "_attrs"):
             result = self._attrs[attr]
             result.identity = attr
             return result
@@ -245,26 +259,43 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     name: str
     default: Optional[Mapping[str, ConfigurableAction]]
 
-    def __init__(self, doc: str, default: Optional[Mapping[str, ConfigurableAction]] = None,
-                 optional: bool = False,
-                 deprecated=None):
+    def __init__(
+        self,
+        doc: str,
+        default: Optional[Mapping[str, ConfigurableAction]] = None,
+        optional: bool = False,
+        deprecated=None,
+    ):
         source = getStackFrame()
-        self._setup(doc=doc, dtype=self.__class__, default=default, check=None,
-                    optional=optional, source=source, deprecated=deprecated)
+        self._setup(
+            doc=doc,
+            dtype=self.__class__,
+            default=default,
+            check=None,
+            optional=optional,
+            source=source,
+            deprecated=deprecated,
+        )
 
     def __class_getitem__(cls, params):
         return GenericAlias(cls, params)
 
-    def __set__(self, instance: Config,
-                value: Union[None, Mapping[str, ConfigurableAction],
-                             SimpleNamespace,
-                             ConfigurableActionStruct,
-                             ConfigurableActionStructField,
-                             Type[ConfigurableActionStructField]],
-                at: Iterable[StackFrame] = None, label: str = 'assigment'):
+    def __set__(
+        self,
+        instance: Config,
+        value: Union[
+            None,
+            Mapping[str, ConfigurableAction],
+            SimpleNamespace,
+            ConfigurableActionStruct,
+            ConfigurableActionStructField,
+            Type[ConfigurableActionStructField],
+        ],
+        at: Iterable[StackFrame] = None,
+        label: str = "assigment",
+    ):
         if instance._frozen:
-            msg = "Cannot modify a frozen Config. "\
-                  "Attempting to set field to value %s" % value
+            msg = "Cannot modify a frozen Config. " "Attempting to set field to value %s" % value
             raise FieldValidationError(self, instance, msg)
 
         if at is None:
@@ -284,8 +315,10 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
                 value = self.StructClass(instance, self, vars(value), at=at, label=label)
 
             elif type(value) == ConfigurableActionStructField:
-                raise ValueError("ConfigurableActionStructFields can only be used in a class body declaration"
-                                 f"Use a {self.StructClass}, SimpleNamespace or Struct")
+                raise ValueError(
+                    "ConfigurableActionStructFields can only be used in a class body declaration"
+                    f"Use a {self.StructClass}, SimpleNamespace or Struct"
+                )
             else:
                 raise ValueError(f"Unrecognized value {value}, cannot be assigned to this field")
 
@@ -293,37 +326,24 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
             history.append((value, at, label))
 
         if not isinstance(value, ConfigurableActionStruct):
-            raise FieldValidationError(self, instance,
-                                       "Can only assign things that are subclasses of Configurable Action")
+            raise FieldValidationError(
+                self, instance, "Can only assign things that are subclasses of Configurable Action"
+            )
         instance._storage[self.name] = value
 
     @overload
     def __get__(
-        self,
-        instance: None,
-        owner: Any = None,
-        at: Any = None,
-        label: str = 'default'
+        self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
     ) -> ConfigurableActionStruct[ActionTypeVar]:
         ...
 
     @overload
     def __get__(
-        self,
-        instance: Config,
-        owner: Any = None,
-        at: Any = None,
-        label: str = 'default'
+        self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
     ) -> ConfigurableActionStruct[ActionTypeVar]:
         ...
 
-    def __get__(
-        self,
-        instance,
-        owner=None,
-        at=None,
-        label='default'
-    ):
+    def __get__(self, instance, owner=None, at=None, label="default"):
         if instance is None or not isinstance(instance, Config):
             return self
         else:
@@ -364,7 +384,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
             return
 
         for _, v in sorted(actionStruct.items()):
-            outfile.write(u"{}={}()\n".format(v._name, _typeStr(v)))
+            outfile.write("{}={}()\n".format(v._name, _typeStr(v)))
             v._save(outfile)
 
     def freeze(self, instance):
@@ -411,16 +431,16 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         d1: ConfigurableActionStruct = getattr(instance1, self.name)
         d2: ConfigurableActionStruct = getattr(instance2, self.name)
         name = getComparisonName(
-            _joinNamePath(instance1._name, self.name),
-            _joinNamePath(instance2._name, self.name)
+            _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
         if not compareScalars(f"keys for {name}", set(d1.fieldNames), set(d2.fieldNames), output=output):
             return False
         equal = True
         for k, v1 in d1.items():
             v2 = getattr(d2, k)
-            result = compareConfigs(f"{name}.{k}", v1, v2, shortcut=shortcut,
-                                    rtol=rtol, atol=atol, output=output)
+            result = compareConfigs(
+                f"{name}.{k}", v1, v2, shortcut=shortcut, rtol=rtol, atol=atol, output=output
+            )
             if not result and shortcut:
                 return False
             equal = equal and result

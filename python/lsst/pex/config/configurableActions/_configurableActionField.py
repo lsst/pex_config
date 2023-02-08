@@ -24,11 +24,11 @@ __all__ = ("ConfigurableActionField",)
 
 from typing import Any, overload
 
-from lsst.pex.config import ConfigField, FieldValidationError, Config
-from lsst.pex.config.config import _typeStr, _joinNamePath
+from lsst.pex.config import Config, ConfigField, FieldValidationError
 from lsst.pex.config.callStack import getCallStack
+from lsst.pex.config.config import _joinNamePath, _typeStr
 
-from . import ConfigurableAction, ActionTypeVar
+from . import ActionTypeVar, ConfigurableAction
 
 
 class ConfigurableActionField(ConfigField[ActionTypeVar]):
@@ -40,6 +40,7 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
     Any configuration that is done prior to reasignment to a new
     `ConfigurableAction` is forgotten.
     """
+
     # These attributes are dynamically assigned when constructing the base
     # classes
     name: str
@@ -49,11 +50,10 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
         instance: Config,
         value: ActionTypeVar | type[ActionTypeVar],
         at: Any = None,
-        label: str = "assignment"
+        label: str = "assignment",
     ) -> None:
         if instance._frozen:
-            raise FieldValidationError(self, instance,
-                                       "Cannot modify a frozen Config")
+            raise FieldValidationError(self, instance, "Cannot modify a frozen Config")
         name = _joinNamePath(prefix=instance._name, name=self.name)
 
         if not isinstance(value, self.dtype) and not issubclass(value, self.dtype):
@@ -64,8 +64,7 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
             at = getCallStack()
 
         if isinstance(value, self.dtype):
-            instance._storage[self.name] = type(value)(__name=name, __at=at,
-                                                       __label=label, **value._storage)
+            instance._storage[self.name] = type(value)(__name=name, __at=at, __label=label, **value._storage)
         else:
             instance._storage[self.name] = value(__name=name, __at=at, __label=label)
         history = instance._history.setdefault(self.name, [])
@@ -78,9 +77,7 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
         ...
 
     @overload
-    def __get__(
-        self, instance: "Config", owner: Any = None, at: Any = None, label: str = "default"
-    ) -> Any:
+    def __get__(self, instance: "Config", owner: Any = None, at: Any = None, label: str = "default") -> Any:
         ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
