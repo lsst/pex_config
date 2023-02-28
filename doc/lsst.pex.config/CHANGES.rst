@@ -1,3 +1,12 @@
+lsst-pex-config v25.0.0 (2023-02-28)
+====================================
+
+Other Changes and Additions
+---------------------------
+
+- Some sorting now happens when saving config files (via DM-33027). (`DM-35060 <https://jira.lsstcorp.org/browse/DM-35060>`_)
+
+
 lsst-pex-config v24.0.0 (2022-08-30)
 ====================================
 
