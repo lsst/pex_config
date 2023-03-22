@@ -1,4 +1,4 @@
-# This file is part of pipe_tasks.
+# This file is part of pex_config.
 #
 # Developed for the LSST Data Management System.
 # This product includes software developed by the LSST Project
@@ -34,7 +34,7 @@ class ConfigurableAction(Config):
     `lsst.pex.config.Config` class to include a `__call__` method.
 
     This interface is designed to create an action that can be used at
-    runtime with state that is determined during the configuration stage. A
+    runtime with a state that is determined during the configuration stage. A
     single action thus may be assigned multiple times, each with different
     configurations.
 

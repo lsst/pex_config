@@ -1,4 +1,4 @@
-# This file is part of pipe_tasks.
+# This file is part of pex_config.
 #
 # Developed for the LSST Data Management System.
 # This product includes software developed by the LSST Project
@@ -33,12 +33,12 @@ from . import ActionTypeVar, ConfigurableAction
 
 class ConfigurableActionField(ConfigField[ActionTypeVar]):
     """`ConfigurableActionField` is a subclass of `~lsst.pex.config.Field` that
-    allows a single `ConfigurableAction` (or a subclass of thus) to be
-    assigned to it. The `ConfigurableAction` is then accessed through this
-    field for further configuration.
+    allows a single `ConfigurableAction` (or a subclass) to be assigned to it.
+    The `ConfigurableAction` is then accessed through this field for further
+    configuration.
 
-    Any configuration that is done prior to reasignment to a new
-    `ConfigurableAction` is forgotten.
+    Any configuration of this field that is done prior to having a new
+    `ConfigurableAction` assigned to it is forgotten.
     """
 
     # These attributes are dynamically assigned when constructing the base

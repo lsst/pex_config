@@ -7,7 +7,7 @@ Types of configuration fields
 .. TODO: improve this page to summarize the purpose of each field, and then have a dedicated section for each field. https://jira.lsstcorp.org/browse/DM-17196
 
 Attributes of the configuration object must be subclasses of `Field`.
-A number of these are predefined: `Field`, `RangeField`, `ChoiceField`, `ListField`, `ConfigField`, `ConfigChoiceField`, `RegistryField` and `ConfigurableField`.
+A number of these are predefined: `Field`, `RangeField`, `ChoiceField`, `ListField`, `ConfigField`, `ConfigChoiceField`, `RegistryField`, `ConfigurableField`, `ConfigurableActionField`, and `ConfigurableActionStructField`.
 
 Example of `RangeField`:
 
@@ -78,3 +78,43 @@ Examples of `ChoiceField` and `ConfigField` and the use of the `Config` object's
             if self.doComputeApCorr and not self.doPsf:
                 raise ValueError("Cannot compute aperture correction "
                                  "without doing PSF determination.")
+
+Examples of `ConfigurableActionField` and `ConfigurableActionStructField` making use of `ConfigurableAction`\ s in a `Config` object.
+
+.. code-block:: python
+
+    class ExampleAction(pexConfig.configurableActions.ConfigurableAction):
+        """A ConfigurableAction that performs a simple calculation"""
+
+        numerator = pexConfig.Field[float](doc="Numerator for division operation")
+        divisor = pexConfig.Field[float](doc="Divisor for division operation")
+
+        def __call__(self, **kwargs):
+            return self.numerator / self.divisor
+
+
+    class ExampleConfig(pexConfig.Config):
+        """An example Config class which contains multiple `ConfigurableAction`\ s."""
+
+        divideAction = pexConfig.configurableActions.ConfigurableActionField(
+            doc="A field which points to a single action"
+            default=ExampleAction
+        )
+
+        multipleDivisionActions = pexConfig.configurableActions.ConfigurableActionStructField(
+            doc="A field which acts as a struct, referring to multiple ConfigurableActions"
+        )
+
+        def setDefaults(self):
+            """Example of setting multiple default configurations with `ConfigurableAction`\ s.
+            """
+            self.divideAction.numerator = 1
+            self.divideAction.divisor = 2
+
+            self.multipleDivisionActions.subDivide1 = ExampleAction()
+            self.multipleDivisionActions.subDivide1.numerator = 5
+            self.multipleDivisionActions.subDivide1.divisor = 10
+
+            self.multipleDivisionActions.subDivide2 = ExampleAction()
+            self.multipleDivisionActions.subDivide2.numerator = 7
+            self.multipleDivisionActions.subDivide2.divisor = 8

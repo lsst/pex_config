@@ -1,4 +1,4 @@
-# This file is part of pipe_tasks.
+# This file is part of pex_config.
 #
 # Developed for the LSST Data Management System.
 # This product includes software developed by the LSST Project
@@ -78,7 +78,7 @@ class ConfigurableActionStructUpdater:
 
 
 class ConfigurableActionStructRemover:
-    """This descriptor exists to abstract the logic of removing an interable
+    """This descriptor exists to abstract the logic of removing an iterable
     of action names from a ConfigurableActionStruct at one time using
     attribute assignment. This is useful in the context of setting
     configuration through pipelines or on the command line.
@@ -120,15 +120,15 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     Each action is then available to be individually configured as a normal
     `lsst.pex.config.Config` object.
 
-    ConfigurableActionStruct supports two special convenance attributes.
+    ConfigurableActionStruct supports two special convenience attributes.
 
-    The first is `update`. You may assign a dict of `ConfigurableActions` or
+    The first is ``update``. You may assign a dict of `ConfigurableActions` or
     a `ConfigurableActionStruct` to this attribute which will update the
     `ConfigurableActionStruct` on which the attribute is invoked such that it
     will be updated to contain the entries specified by the structure on the
     right hand side of the equals sign.
 
-    The second convenience attribute is named remove. You may assign an
+    The second convenience attribute is named ``remove``. You may assign an
     iterable of strings which correspond to attribute names on the
     `ConfigurableActionStruct`. All of the corresponding attributes will then
     be removed. If any attribute does not exist, an `AttributeError` will be
@@ -246,9 +246,9 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     `~lsst.pex.config.Config` class in a manner similar to how a
     `~lsst.pipe.base.Struct` works.
 
-    This class implements a `ConfigurableActionStruct` as an intermediary
-    object to organize the `ConfigurableActions`. See it's documentation for
-    futher information.
+    This class uses a `ConfigurableActionStruct` as an intermediary
+    object to organize the `ConfigurableActions`. See its documentation for
+    further information.
     """
     # specify StructClass to make this more generic for potential future
     # inheritance
