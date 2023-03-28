@@ -44,8 +44,22 @@ import re
 import shutil
 import sys
 import tempfile
+import types
 import warnings
-from typing import Any, ForwardRef, Generic, Mapping, Optional, TypeVar, Union, cast, overload
+from types import UnionType
+from typing import (
+    Any,
+    ForwardRef,
+    Generic,
+    Mapping,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+    overload,
+)
 
 try:
     from types import GenericAlias
@@ -463,10 +477,23 @@ class Field(Generic[FieldTypeVar]):
             if result is None:
                 raise ValueError("Could not deduce type from input")
             unpackedParams = cast(type, result)
-        if "dtype" in kwds and kwds["dtype"] != unpackedParams:
-            raise ValueError("Conflicting definition for dtype")
-        elif "dtype" not in kwds:
-            kwds = {**kwds, **{"dtype": unpackedParams}}
+
+        match get_args(unpackedParams):
+            case [types.NoneType, annotated_dtype] if get_origin(unpackedParams) is UnionType:
+                annotated_optional = True
+            case [annotated_dtype, types.NoneType] if get_origin(unpackedParams) is UnionType:
+                annotated_optional = True
+            case ():
+                annotated_dtype = unpackedParams
+                annotated_optional = False
+            case _:
+                raise ValueError("Unsupported type annotation for Field.")
+
+        kwds = dict(kwds)
+        if kwds.setdefault("dtype", annotated_dtype) != annotated_dtype:
+            raise ValueError("Type annotation and 'dtype' argument are not consistent.")
+        if kwds.setdefault("optional", annotated_optional) != annotated_optional:
+            raise ValueError("Type annotation and 'optional' argument are not consistent.")
         return kwds
 
     def __class_getitem__(cls, params: Union[tuple[type, ...], type, ForwardRef]):

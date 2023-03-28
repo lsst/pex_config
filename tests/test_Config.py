@@ -136,6 +136,52 @@ class ConfigTest(unittest.TestCase):
         testField = pexConfig.Field[int](doc="", dtype=int)
         self.assertEqual(testField.dtype, int)
 
+        # check interplay between optional=True and Unions.
+        testField = pexConfig.Field[int | None](doc="")
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        testField = pexConfig.Field[None | int](doc="")
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        testField = pexConfig.Field[int | None](doc="", optional=True)
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        testField = pexConfig.Field[None | int](doc="", optional=True)
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        testField = pexConfig.Field[int | None](doc="", dtype=int, optional=True)
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        testField = pexConfig.Field[None | int](doc="", dtype=int, optional=True)
+        self.assertEqual(testField.dtype, int)
+        self.assertTrue(testField.optional)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[int | None](doc="", dtype=int, optional=False)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[None | int](doc="", dtype=int, optional=False)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[int | None](doc="", optional=False)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[None | int](doc="", optional=False)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[int](doc="", optional=True)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[int](doc="", dtype=int, optional=True)
+
+        with self.assertRaises(ValueError):
+            pexConfig.Field[int | str](doc="")
+
     def testInit(self):
         self.assertIsNone(self.simple.i)
         self.assertEqual(self.simple.f, 3.0)
