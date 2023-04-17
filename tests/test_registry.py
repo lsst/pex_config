@@ -150,6 +150,21 @@ class ConfigTest(unittest.TestCase):
 
         self.assertRaises(pexConfig.FieldValidationError, fail, "bar")
 
+    def test_on_none(self):
+        """Test the on_none callback argument to RegistryField."""
+
+        def on_none_callback(config_dict, *args, **kwargs):
+            return config_dict.apply_with("foo1", *args, **kwargs)
+
+        class C1(pexConfig.Config):
+            r = self.registry.makeField(
+                "registry field with callback default", default=None, optional=True, on_none=on_none_callback
+            )
+
+        c = C1()
+        self.assertIsNone(c.r.name)
+        self.assertIsInstance(c.r.apply(), self.fooAlg1Class)
+
 
 if __name__ == "__main__":
     unittest.main()
