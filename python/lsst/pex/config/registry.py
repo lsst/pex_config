@@ -179,7 +179,7 @@ class Registry(collections.abc.Mapping):
     def __contains__(self, key):
         return key in self._dict
 
-    def makeField(self, doc, default=None, optional=False, multi=False):
+    def makeField(self, doc, default=None, optional=False, multi=False, on_none=None):
         """Create a `RegistryField` configuration field from this registry.
 
         Parameters
@@ -194,13 +194,18 @@ class Registry(collections.abc.Mapping):
         multi : `bool`, optional
             A flag to allow multiple selections in the `RegistryField` if
             `True`.
+        on_none: `Callable`, optional
+            A callable that should be invoked when ``apply`` is called but the
+            selected name or names is `None`.  Will be passed the field
+            attribute proxy (`RegistryInstanceDict`) and then all positional
+            and keyword arguments passed to ``apply``.
 
         Returns
         -------
         field : `lsst.pex.config.RegistryField`
             `~lsst.pex.config.RegistryField` Configuration field.
         """
-        return RegistryField(doc, self, default, optional, multi)
+        return RegistryField(doc, self, default, optional, multi, on_none=on_none)
 
 
 class RegistryAdaptor(collections.abc.Mapping):
@@ -262,24 +267,63 @@ class RegistryInstanceDict(ConfigInstanceDict):
 
     targets = property(_getTargets)
 
-    def apply(self, *args, **kw):
-        """Call the active target(s) with the active config as a keyword arg
+    def apply(self, *args, **kwargs):
+        """Call the active target(s) with the active config as a keyword arg.
 
-        If this is a multi-selection field, return a list obtained by calling
-        each active target with its corresponding active config.
+        Parameters
+        ----------
+        selection : `str` or `~collections.abc.Iterable` [ `str` ]
+            Name or names of targets, depending on whether ``multi=True``.
+        *args, **kwargs
+            Additional arguments will be passed on to the configurable
+            target(s).
 
-        Additional arguments will be passed on to the configurable target(s)
+        Returns
+        -------
+        result
+            If this is a single-selection field, the return value from calling
+            the target. If this is a multi-selection field, a list thereof.
         """
         if self.active is None:
+            if self._field._on_none is not None:
+                return self._field._on_none(self, *args, **kwargs)
             msg = "No selection has been made.  Options: %s" % " ".join(self.types.registry.keys())
             raise FieldValidationError(self._field, self._config, msg)
+        return self.apply_with(self._selection, *args, **kwargs)
+
+    def apply_with(self, selection, *args, **kwargs):
+        """Call named target(s) with the corresponding config as a keyword
+        arg.
+
+        Parameters
+        ----------
+        selection : `str` or `~collections.abc.Iterable` [ `str` ]
+            Name or names of targets, depending on whether ``multi=True``.
+        *args, **kwargs
+            Additional arguments will be passed on to the configurable
+            target(s).
+
+        Returns
+        -------
+        result
+            If this is a single-selection field, the return value from calling
+            the target. If this is a multi-selection field, a list thereof.
+
+        Notes
+        -----
+        This method ignores the current selection in the ``name`` or ``names``
+        attribute, which is usually not what you want.  This method is most
+        useful in ``on_none`` callbacks provided at field construction, which
+        allow a context-dependent default to be used when no selection is
+        configured.
+        """
         if self._field.multi:
             retvals = []
-            for c in self._selection:
-                retvals.append(self.types.registry[c](*args, config=self[c], **kw))
+            for c in selection:
+                retvals.append(self.types.registry[c](*args, config=self[c], **kwargs))
             return retvals
         else:
-            return self.types.registry[self.name](*args, config=self[self.name], **kw)
+            return self.types.registry[selection](*args, config=self[selection], **kwargs)
 
     def __setattr__(self, attr, value):
         if attr == "registry":
@@ -305,6 +349,11 @@ class RegistryField(ConfigChoiceField):
     multi : `bool`, optional
         If `True`, the field allows multiple selections. The default is
         `False`.
+    on_none: `Callable`, optional
+        A callable that should be invoked when ``apply`` is called but the
+        selected name or names is `None`.  Will be passed the field attribute
+        proxy (`RegistryInstanceDict`) and then all positional and keyword
+        arguments passed to ``apply``.
 
     See also
     --------
@@ -323,9 +372,10 @@ class RegistryField(ConfigChoiceField):
     """Class used to hold configurable instances in the field.
     """
 
-    def __init__(self, doc, registry, default=None, optional=False, multi=False):
+    def __init__(self, doc, registry, default=None, optional=False, multi=False, on_none=None):
         types = RegistryAdaptor(registry)
         self.registry = registry
+        self._on_none = on_none
         ConfigChoiceField.__init__(self, doc, types, default, optional, multi)
 
     def __deepcopy__(self, memo):
@@ -340,6 +390,7 @@ class RegistryField(ConfigChoiceField):
             default=copy.deepcopy(self.default),
             optional=self.optional,
             multi=self.multi,
+            on_none=self._on_none,
         )
         other.source = self.source
         return other
