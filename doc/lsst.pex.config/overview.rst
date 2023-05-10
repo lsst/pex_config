@@ -49,7 +49,7 @@ Here is a config class that includes five fields:
            dtype=float,
            default=1.0)
        saturatedMaskName = pexConfig.Field(
-           doc="Name of mask plane to use in saturation detection",
+           doc="Name of the mask plane to use in saturation detection.",
            dtype=str,
            default="SAT")
        flatScalingType = pexConfig.ChoiceField(
@@ -62,7 +62,7 @@ Here is a config class that includes five fields:
                "MEDIAN": "Scale by the inverse of the median",
            })
        keysToRemoveFromAssembledCcd = pexConfig.ListField(
-           doc="fields to remove from the metadata of the assembled ccd.",
+           doc="Fields to remove from the metadata of the assembled ccd.",
            dtype=str,
            default=[])
 
