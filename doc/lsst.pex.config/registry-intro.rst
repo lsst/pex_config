@@ -6,21 +6,21 @@ Registry and RegistryField for configuring subtasks
 
 Example of a `RegistryField` created from a `Registry` object and use of both the `Registry.register` method and the `registerConfigurable` decorator::
 
-    psfDeterminerRegistry = pexConfig.makeRegistry("""A registry of PSF determiner factories""")
+    psfDeterminerRegistry = pexConfig.makeRegistry("""A registry of PSF determiner factories.""")
 
     class PcaPsfDeterminerConfig(pexConfig.Config):
         spatialOrder = pexConfig.Field(
-                "spatial order for PSF kernel creation", int, 2)
+                "Spatial order for PSF kernel creation.", int, 2)
         [...]
 
     @pexConfig.registerConfigurable("pca", psfDeterminerRegistry)
     class PcaPsfDeterminer(object):
         ConfigClass = PcaPsfDeterminerConfig
-            # associate this Configurable class with its Config class for use
-            # by the registry
-        def __init__(self, config, schema=None):
+            # Associate this Configurable class with its Config class for use
+            # by the registry.
+        def __init__(self, config, schema=None, **kwargs):
             [...]
-        def determinePsf(self, exposure, psfCandidateList, metadata=None):
+        def determinePsf(self, exposure, psfCandidateList, metadata=None, **kwargs):
             [...]
 
     psfDeterminerRegistry.register("shapelet", ShapeletPsfDeterminer)

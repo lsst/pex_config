@@ -17,7 +17,7 @@ Example of `RangeField`:
         """Parameters for controlling background estimation.
         """
         binSize = pexConfig.RangeField(
-            doc=("How large a region of the sky should be "
+            doc=("Define the region of the sky size "
                  "used for each background point."),
             dtype=int, default=256, min=10
         )
@@ -31,7 +31,7 @@ Example of `ListField` and `Config` inheritance:
         """
         subregionSize = pexConfig.ListField(
             dtype=int,
-            doc=("width, height of stack subregion size; make "
+            doc=("Width and height of stack subregion size. Make the values "
                  "small enough that a full stack of images will "
                  "fit into memory at once."),
             length=2,
@@ -97,12 +97,12 @@ Examples of `ConfigurableActionField` and `ConfigurableActionStructField` making
         """An example Config class which contains multiple `ConfigurableAction`\ s."""
 
         divideAction = pexConfig.configurableActions.ConfigurableActionField(
-            doc="A field which points to a single action"
+            doc="A field which points to a single action."
             default=ExampleAction
         )
 
         multipleDivisionActions = pexConfig.configurableActions.ConfigurableActionStructField(
-            doc="A field which acts as a struct, referring to multiple ConfigurableActions"
+            doc="A field which acts as a struct, referring to multiple ConfigurableActions."
         )
 
         def setDefaults(self):
