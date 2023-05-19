@@ -117,23 +117,23 @@ class ConfigTest(unittest.TestCase):
 
     def testFieldTypeAnnotationRuntime(self):
         # test parsing type annotation for runtime dtype
-        testField = pexConfig.Field[str](doc="")
+        testField = pexConfig.Field[str](doc="test")
         self.assertEqual(testField.dtype, str)
 
         # verify that forward references work correctly
-        testField = pexConfig.Field["float"](doc="")
+        testField = pexConfig.Field["float"](doc="test")
         self.assertEqual(testField.dtype, float)
 
         # verify that Field rejects multiple types
         with self.assertRaises(ValueError):
-            pexConfig.Field[str, int](doc="")  # type: ignore
+            pexConfig.Field[str, int](doc="test")  # type: ignore
 
         # verify that Field raises in conflict with dtype:
         with self.assertRaises(ValueError):
-            pexConfig.Field[str](doc="", dtype=int)
+            pexConfig.Field[str](doc="test", dtype=int)
 
         # verify that Field does not raise if dtype agrees
-        testField = pexConfig.Field[int](doc="", dtype=int)
+        testField = pexConfig.Field[int](doc="test", dtype=int)
         self.assertEqual(testField.dtype, int)
 
     def testInit(self):
@@ -225,14 +225,16 @@ class ConfigTest(unittest.TestCase):
     def testRangeFieldConstructor(self):
         """Test RangeField constructor's checking of min, max"""
         val = 3
-        self.assertRaises(ValueError, pexConfig.RangeField, "", int, default=val, min=val, max=val - 1)
-        self.assertRaises(ValueError, pexConfig.RangeField, "", float, default=val, min=val, max=val - 1e-15)
+        self.assertRaises(ValueError, pexConfig.RangeField, "test", int, default=val, min=val, max=val - 1)
+        self.assertRaises(
+            ValueError, pexConfig.RangeField, "test", float, default=val, min=val, max=val - 1e-15
+        )
         for inclusiveMin, inclusiveMax in itertools.product((False, True), (False, True)):
             if inclusiveMin and inclusiveMax:
                 # should not raise
                 class Cfg1(pexConfig.Config):
                     r1 = pexConfig.RangeField(
-                        doc="",
+                        doc="test",
                         dtype=int,
                         default=val,
                         min=val,
@@ -241,7 +243,7 @@ class ConfigTest(unittest.TestCase):
                         inclusiveMax=inclusiveMax,
                     )
                     r2 = pexConfig.RangeField(
-                        doc="",
+                        doc="test",
                         dtype=float,
                         default=val,
                         min=val,
@@ -257,7 +259,7 @@ class ConfigTest(unittest.TestCase):
                 self.assertRaises(
                     ValueError,
                     pexConfig.RangeField,
-                    doc="",
+                    doc="test",
                     dtype=int,
                     default=val,
                     min=val,
@@ -268,7 +270,7 @@ class ConfigTest(unittest.TestCase):
                 self.assertRaises(
                     ValueError,
                     pexConfig.RangeField,
-                    doc="",
+                    doc="test",
                     dtype=float,
                     default=val,
                     min=val,
@@ -290,7 +292,7 @@ class ConfigTest(unittest.TestCase):
 
             class Cfg1(pexConfig.Config):
                 r = pexConfig.RangeField(
-                    doc="",
+                    doc="test",
                     dtype=int,
                     default=val,
                     min=minVal,
@@ -301,7 +303,7 @@ class ConfigTest(unittest.TestCase):
 
             class Cfg2(pexConfig.Config):
                 r2 = pexConfig.RangeField(
-                    doc="",
+                    doc="test",
                     dtype=float,
                     default=val,
                     min=minVal,
