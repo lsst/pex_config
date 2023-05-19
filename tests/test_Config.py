@@ -175,6 +175,26 @@ class ConfigTest(unittest.TestCase):
         self.deprecation.saveToStream(stream)
         self.assertIn("config.old=5\n", stream.getvalue())
 
+    def testDocstring(self):
+        """Test that the docstring is not allowed to be empty."""
+        with self.assertRaises(ValueError):
+            pexConfig.Field("", int, default=1)
+
+        with self.assertRaises(ValueError):
+            pexConfig.RangeField("", int, default=3, min=3, max=4)
+
+        with self.assertRaises(ValueError):
+            pexConfig.DictField("", str, str, default={"key": "value"})
+
+        with self.assertRaises(ValueError):
+            pexConfig.ListField("", int, default=[1, 2, 3])
+
+        with self.assertRaises(ValueError):
+            pexConfig.ConfigField("", InnerConfig)
+
+        with self.assertRaises(ValueError):
+            pexConfig.ConfigChoiceField("", typemap=GLOBAL_REGISTRY, default="AAA")
+
     def testValidate(self):
         self.simple.validate()
 
