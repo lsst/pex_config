@@ -82,28 +82,28 @@ class DictFieldTest(unittest.TestCase):
 
     def testFieldTypeAnnotationRuntime(self):
         # test parsing type annotation for runtime keytype, itemtype
-        testField = pexConfig.DictField[str, int](doc="")
+        testField = pexConfig.DictField[str, int](doc="test")
         self.assertEqual(testField.keytype, str)
         self.assertEqual(testField.itemtype, int)
 
         # verify that forward references work correctly
-        testField = pexConfig.DictField["float", "int"](doc="")
+        testField = pexConfig.DictField["float", "int"](doc="test")
         self.assertEqual(testField.keytype, float)
         self.assertEqual(testField.itemtype, int)
 
         # verify that Field rejects single types
         with self.assertRaises(ValueError):
-            pexConfig.DictField[int](doc="")  # type: ignore
+            pexConfig.DictField[int](doc="test")  # type: ignore
 
         # verify that Field raises in conflict with keytype, itemtype
         with self.assertRaises(ValueError):
-            pexConfig.DictField[str, int](doc="", keytype=int)
+            pexConfig.DictField[str, int](doc="test", keytype=int)
 
         with self.assertRaises(ValueError):
-            pexConfig.DictField[str, int](doc="", itemtype=str)
+            pexConfig.DictField[str, int](doc="test", itemtype=str)
 
         # verify that Field does not raise if dtype agrees
-        testField = pexConfig.DictField[int, str](doc="", keytype=int, itemtype=str)
+        testField = pexConfig.DictField[int, str](doc="test", keytype=int, itemtype=str)
         self.assertEqual(testField.keytype, int)
         self.assertEqual(testField.itemtype, str)
 

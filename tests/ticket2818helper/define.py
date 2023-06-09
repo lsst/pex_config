@@ -43,4 +43,4 @@ class TestConfigurable:
 
 
 class BaseConfig(Config):
-    test = ConfigurableField(target=TestConfigurable, doc="")
+    test = ConfigurableField(target=TestConfigurable, doc="test")

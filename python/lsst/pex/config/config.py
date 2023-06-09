@@ -497,6 +497,9 @@ class Field(Generic[FieldTypeVar]):
         """Data type for the field.
         """
 
+        if not doc:
+            raise ValueError("Docstring is empty.")
+
         # append the deprecation message to the docstring.
         if deprecated is not None:
             doc = f"{doc} Deprecated: {deprecated}"
