@@ -1164,7 +1164,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         lsst.pex.config.Config.saveToStream
         lsst.pex.config.Config.saveToString
         """
-        with open(filename, "r") as f:
+        with open(filename) as f:
             code = compile(f.read(), filename=filename, mode="exec")
             self.loadFromString(code, root=root, filename=filename)
 
