@@ -348,7 +348,7 @@ class ConfigTest(unittest.TestCase):
         with open("roundtrip.test", "w") as outfile:
             self.comp.saveToStream(outfile)
         roundTrip = Complex()
-        with open("roundtrip.test", "r") as infile:
+        with open("roundtrip.test") as infile:
             roundTrip.loadFromStream(infile)
         os.remove("roundtrip.test")
         self.assertEqual(self.comp.c.f, roundTrip.c.f)
