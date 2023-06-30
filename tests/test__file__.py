@@ -34,6 +34,8 @@ TESTDIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class FileConfig(pexConf.Config):
+    """Config used for testing __file__."""
+
     number = pexConf.Field("FileConfig.number", int, default=0)
     filename = pexConf.Field("FileConfig.filename", str, default=None)
 

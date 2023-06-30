@@ -50,6 +50,8 @@ GLOBAL_REGISTRY = {}
 
 
 class Simple(pexConfig.Config):
+    """A simple config used for testing."""
+
     i = pexConfig.Field("integer test", int, optional=True)
     f = pexConfig.Field("float test", float, default=3.0)
     b = pexConfig.Field("boolean test", bool, default=False, optional=False)
@@ -70,6 +72,8 @@ GLOBAL_REGISTRY["AAA"] = Simple
 
 
 class InnerConfig(pexConfig.Config):
+    """Inner config used for testing."""
+
     f = pexConfig.Field("Inner.f", float, default=0.0, check=lambda x: x >= 0, optional=False)
 
 
@@ -77,6 +81,8 @@ GLOBAL_REGISTRY["BBB"] = InnerConfig
 
 
 class OuterConfig(InnerConfig, pexConfig.Config):
+    """Outer config used for testing."""
+
     i = pexConfig.ConfigField("Outer.i", InnerConfig)
 
     def __init__(self):
@@ -90,6 +96,8 @@ class OuterConfig(InnerConfig, pexConfig.Config):
 
 
 class Complex(pexConfig.Config):
+    """A complex config for testing."""
+
     c = pexConfig.ConfigField("an inner config", InnerConfig)
     r = pexConfig.ConfigChoiceField(
         "a registry field", typemap=GLOBAL_REGISTRY, default="AAA", optional=False
@@ -98,10 +106,14 @@ class Complex(pexConfig.Config):
 
 
 class Deprecation(pexConfig.Config):
+    """A test config with a deprecated field."""
+
     old = pexConfig.Field("Something.", int, default=10, deprecated="not used!")
 
 
 class ConfigTest(unittest.TestCase):
+    """Tests of basic Config functionality."""
+
     def setUp(self):
         self.simple = Simple()
         self.inner = InnerConfig()

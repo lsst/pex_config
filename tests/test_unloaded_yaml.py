@@ -77,6 +77,8 @@ serialized = """
 
 
 class UnloadedYaml(unittest.TestCase):
+    """Test YAML loading."""
+
     @unittest.skipIf(yaml is None, "pyyaml not available")
     def testLoadUnloaded(self):
         loaded = yaml.safe_load(serialized)

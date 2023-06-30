@@ -303,8 +303,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
 
 
 def wrap(ctrl):
-    """Decorator that adds fields from a C++ control class to a
-    `lsst.pex.config.Config` class.
+    """Add fields from a C++ control class to a `lsst.pex.config.Config` class.
 
     Parameters
     ----------

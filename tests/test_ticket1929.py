@@ -31,20 +31,28 @@ import lsst.pex.config as pexConf
 
 
 class Config1(pexConf.Config):
+    """First test config."""
+
     f = pexConf.Field("Config1.f", float, default=4)
 
 
 class Config2(Config1):
+    """Second test config."""
+
     def setDefaults(self):
         self.f = 5
 
 
 class Config3(Config1):
+    """Third test config."""
+
     def __init__(self, **kw):
         self.f = 6
 
 
 class SquashingDefaultsTest(unittest.TestCase):
+    """Tests for squashing defaults."""
+
     def test(self):
         c1 = Config1()
         self.assertEqual(c1.f, 4)

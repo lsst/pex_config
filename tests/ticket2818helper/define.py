@@ -29,10 +29,12 @@ from lsst.pex.config import Config, ConfigurableField
 
 
 class TestConfig(Config):
-    pass
+    """Test config."""
 
 
 class TestConfigurable:
+    """Test configurable field target class."""
+
     ConfigClass = TestConfig
 
     def __init__(self, config):
@@ -43,4 +45,6 @@ class TestConfigurable:
 
 
 class BaseConfig(Config):
+    """Test config with configurable field."""
+
     test = ConfigurableField(target=TestConfigurable, doc="test")

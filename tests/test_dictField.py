@@ -32,6 +32,8 @@ import lsst.pex.config as pexConfig
 
 
 class Config1(pexConfig.Config):
+    """First test config."""
+
     d1 = pexConfig.DictField("d1", keytype=str, itemtype=int, default={"hi": 4}, itemCheck=lambda x: x > 0)
     d2 = pexConfig.DictField("d2", keytype=str, itemtype=str, default=None)
     d3 = pexConfig.DictField("d3", keytype=float, itemtype=float, optional=True, itemCheck=lambda x: x > 0)
@@ -39,6 +41,8 @@ class Config1(pexConfig.Config):
 
 
 class DictFieldTest(unittest.TestCase):
+    """Test DictField."""
+
     def testConstructor(self):
         try:
 

@@ -33,6 +33,8 @@ import lsst.pex.config as pexConfig
 
 
 class Config1(pexConfig.Config):
+    """The first test config."""
+
     f = pexConfig.Field(doc="Config1.f", dtype=int, default=4)
 
     def validate(self):
@@ -42,6 +44,8 @@ class Config1(pexConfig.Config):
 
 
 class Config2(pexConfig.Config):
+    """The second test config."""
+
     f = pexConfig.Field(doc="Config2.f", dtype=float, default=0.5, check=lambda x: x > 0)
 
 
@@ -49,6 +53,8 @@ TYPEMAP = {"AAA": Config1, "BBB": Config2, "CCC": Config1}
 
 
 class Config3(pexConfig.Config):
+    """A test config with choice fields."""
+
     a = pexConfig.ConfigChoiceField(
         doc="single non-optional", typemap=TYPEMAP, default="AAA", multi=False, optional=False
     )
@@ -64,6 +70,8 @@ class Config3(pexConfig.Config):
 
 
 class ConfigChoiceFieldTest(unittest.TestCase):
+    """Tests for ConfigChoiceField."""
+
     def setUp(self):
         self.config = Config3()
 

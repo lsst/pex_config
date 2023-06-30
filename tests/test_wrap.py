@@ -37,6 +37,8 @@ import pickle
 
 @unittest.skipIf(testLib is None, "C++ tests disabled")
 class WrapTest(unittest.TestCase):
+    """Test C++ wrappgin."""
+
     def testMakeControl(self):
         """Test making a C++ Control object from a Config object."""
         config = testLib.ConfigObject()
@@ -74,6 +76,8 @@ class WrapTest(unittest.TestCase):
 
 @unittest.skipIf(testLib is None, "C++ tests disabled")
 class NestedWrapTest(unittest.TestCase):
+    """Test of nested C++ test."""
+
     def testMakeControl(self):
         """Test making a C++ Control object from a Config object."""
         config = testLib.OuterConfigObject()

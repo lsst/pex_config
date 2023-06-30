@@ -419,8 +419,7 @@ def makeRegistry(doc, configBaseType=Config):
 
 
 def registerConfigurable(name, registry, ConfigClass=None):
-    """A decorator that adds a class as a configurable in a `Registry`
-    instance.
+    """Add a class as a configurable in a `Registry` instance.
 
     Parameters
     ----------
@@ -449,8 +448,8 @@ def registerConfigurable(name, registry, ConfigClass=None):
 
 
 def registerConfig(name, registry, target):
-    """Decorator that adds a class as a ``ConfigClass`` in a `Registry` and
-    associates it with the given configurable.
+    """Add a class as a ``ConfigClass`` in a `Registry` and
+    associate it with the given configurable.
 
     Parameters
     ----------

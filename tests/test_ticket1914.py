@@ -32,18 +32,26 @@ import lsst.pex.config as pexConf
 
 
 class Config1(pexConf.Config):
+    """First test config."""
+
     f = pexConf.Field("Config1.f", float, default=4)
 
 
 class Config2(pexConf.Config):
+    """Second test config."""
+
     r = pexConf.ConfigChoiceField("Config2.r", {"c1": Config1}, default="c1")
 
 
 class Config3(pexConf.Config):
+    """Third test config."""
+
     c = pexConf.ConfigField("Config3.c", Config2)
 
 
 class FieldNameReportingTest(unittest.TestCase):
+    """Field name reporting tests."""
+
     def test(self):
         c3 = Config3()
         test_dir = os.path.dirname(os.path.abspath(__file__))

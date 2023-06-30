@@ -35,6 +35,8 @@ from lsst.pex.config.configurableActions.tests import (
 
 
 class ConfigurableActionsTestCase(unittest.TestCase):
+    """Test fo ConfigurableActions."""
+
     def _createConfig(self, default=None, singleDefault=None):
         class NewTestConfig(TestConfig):
             def setDefaults(self):

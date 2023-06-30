@@ -413,7 +413,7 @@ class Field(Generic[FieldTypeVar]):
     def _parseTypingArgs(
         params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
-        """Parses type annotations into keyword constructor arguments.
+        """Parse type annotations into keyword constructor arguments.
 
         This is a special private method that interprets type arguments (i.e.
         Field[str]) into keyword arguments to be passed on to the constructor.
@@ -634,7 +634,7 @@ class Field(Generic[FieldTypeVar]):
             raise ValueError(msg)
 
     def _collectImports(self, instance, imports):
-        """This function should call the _collectImports method on all config
+        """Call the _collectImports method on all config
         objects the field may own, and union them with the supplied imports
         set.
 
@@ -900,7 +900,10 @@ class RecordingImporter:
         sys.meta_path = self.origMetaPath
 
     def find_module(self, fullname, path=None):
-        """Called as part of the ``import`` chain of events."""
+        """Find a module.
+
+        Called as part of the ``import`` chain of events.
+        """
         self._modules.add(fullname)
         # Return None because we don't do any importing.
         return None
@@ -1388,9 +1391,11 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             field.save(outfile, self)
 
     def _collectImports(self):
-        """Adds module containing self to the list of things to import and
+        """Add module containing self to the list of things to import and
         then loops over all the fields in the config calling a corresponding
-        collect method. The field method will call _collectImports on any
+        collect method.
+
+        The field method will call _collectImports on any
         configs it may own and return the set of things to import. This
         returned set will be merged with the set of imports for this config
         class.

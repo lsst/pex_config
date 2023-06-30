@@ -33,10 +33,14 @@ import lsst.pex.config as pexConf
 
 
 class Config1(pexConf.Config):
+    """First test config."""
+
     f = pexConf.Field("f", dtype=float, default=5, check=lambda x: x > 0)
 
 
 class Target1:
+    """First target class."""
+
     ConfigClass = Config1
 
     def __init__(self, config):
@@ -44,15 +48,20 @@ class Target1:
 
 
 def Target2(config):
+    """Second target class."""
     return config.f
 
 
 class Config2(pexConf.Config):
+    """Second test config."""
+
     c1 = pexConf.ConfigurableField("c1", target=Target1)
     c2 = pexConf.ConfigurableField("c2", target=Target2, ConfigClass=Config1, default=Config1(f=3))
 
 
 class ConfigurableFieldTest(unittest.TestCase):
+    """Test of ConfigurableField."""
+
     def testConstructor(self):
         try:
 

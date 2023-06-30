@@ -32,6 +32,8 @@ import lsst.pex.config as pexConfig
 
 
 class Config1(pexConfig.Config):
+    """First test config."""
+
     f = pexConfig.Field("f", float, default=3.0)
 
     def _collectImports(self):
@@ -40,14 +42,20 @@ class Config1(pexConfig.Config):
 
 
 class Config2(pexConfig.Config):
+    """Second test config."""
+
     d1 = pexConfig.ConfigDictField("d1", keytype=str, itemtype=Config1, itemCheck=lambda x: x.f > 0)
 
 
 class Config3(pexConfig.Config):
+    """Third test config."""
+
     field1 = pexConfig.ConfigDictField(keytype=str, itemtype=pexConfig.Config, default={}, doc="doc")
 
 
 class ConfigDictFieldTest(unittest.TestCase):
+    """Test of ConfigDictField."""
+
     def testConstructor(self):
         try:
 

@@ -350,7 +350,9 @@ class ConfigInstanceDict(*_bases):
             raise FieldValidationError(self._field, self._config, msg)
 
     def freeze(self):
-        """Invoking this freeze method will create a local copy of the field
+        """Freeze the config.
+
+        Invoking this freeze method will create a local copy of the field
         attribute's typemap. This decouples this instance dict from the
         underlying objects type map ensuring that and subsequent changes to the
         typemap will not be reflected in this instance (i.e imports adding

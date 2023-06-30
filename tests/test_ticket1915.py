@@ -31,18 +31,26 @@ import lsst.pex.config as pexConf
 
 
 class Config1(pexConf.Config):
+    """First test config."""
+
     f = pexConf.Field("Config1.f", float, default=4)
 
 
 class Config2(pexConf.Config):
+    """Second test config."""
+
     c = pexConf.ConfigField("Config2.c", Config1)
 
 
 class Config3(pexConf.Config):
+    """Third test config."""
+
     r = pexConf.ConfigChoiceField("Config3.r", {"c1": Config1, "c2": Config2}, default="c1")
 
 
 class HistoryMergeTest(unittest.TestCase):
+    """Test history merging."""
+
     def test(self):
         a = Config2()
         b = Config2()

@@ -32,10 +32,14 @@ import lsst.pex.config.history as pexConfigHistory
 
 
 class PexTestConfig(pexConfig.Config):
+    """Simple test config."""
+
     a = pexConfig.Field("Parameter A", float, default=1.0)
 
 
 class HistoryTest(unittest.TestCase):
+    """Test history recording."""
+
     def testHistory(self):
         b = PexTestConfig()
         b.update(a=4.0)

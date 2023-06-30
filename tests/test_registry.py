@@ -31,6 +31,8 @@ import lsst.pex.config as pexConfig
 
 
 class ConfigTest(unittest.TestCase):
+    """Test registry."""
+
     def setUp(self):
         """Note: the classes are defined here in order to test the register
         decorator.

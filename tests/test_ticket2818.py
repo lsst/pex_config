@@ -32,6 +32,8 @@ from ticket2818helper.define import BaseConfig
 
 
 class ImportTest(unittest.TestCase):
+    """Import tests."""
+
     def test(self):
         from ticket2818helper.another import AnotherConfigurable  # noqa F401 imported but unused
 

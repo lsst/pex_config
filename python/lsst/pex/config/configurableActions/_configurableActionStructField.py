@@ -48,10 +48,11 @@ from . import ActionTypeVar, ConfigurableAction
 
 
 class ConfigurableActionStructUpdater:
-    """This descriptor exists to abstract the logic of using a dictionary to
-    update a ConfigurableActionStruct through attribute assignment. This is
-    useful in the context of setting configuration through pipelines or on
-    the command line.
+    """Abstract the logic of using a dictionary to update a
+    `ConfigurableActionStruct` through attribute assignment.
+
+    This is useful in the context of setting configuration through pipelines
+    or on the command line.
     """
 
     def __set__(
@@ -78,10 +79,11 @@ class ConfigurableActionStructUpdater:
 
 
 class ConfigurableActionStructRemover:
-    """This descriptor exists to abstract the logic of removing an iterable
-    of action names from a ConfigurableActionStruct at one time using
-    attribute assignment. This is useful in the context of setting
-    configuration through pipelines or on the command line.
+    """Abstract the logic of removing an iterable of action names from a
+    `ConfigurableActionStruct` at one time using attribute assignment.
+
+    This is useful in the context of setting configuration through pipelines
+    or on the command line.
 
     Raises
     ------
