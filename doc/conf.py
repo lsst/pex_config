@@ -26,6 +26,7 @@ nitpick_ignore = [
     ("py:obj", "RegistryInstanceDict"),  # Private class.
     ("py:class", "lsst.pex.config.dictField.Dict"),
     ("py:class", "lsst.pex.config.listField.List"),
+    ("py:class", "ActionTypeVar"),
 ]
 nitpick_ignore_regex = [
     ("py:class", "a set-like.*"),  # collections.abc.Mapping inheritance.
