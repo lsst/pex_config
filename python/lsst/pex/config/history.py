@@ -134,7 +134,6 @@ class Color:
 
             Only strings written to a terminal are colorized.
         """
-
         if val is not None:
             Color._colorize = val
 
@@ -191,7 +190,6 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
     verbose : `bool`, optional
         Default is `False`.
     """
-
     if name is None:
         for i, name in enumerate(config.history.keys()):
             if i > 0:

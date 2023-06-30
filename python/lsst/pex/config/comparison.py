@@ -89,7 +89,7 @@ def compareScalars(name, v1, v2, output, rtol=1e-8, atol=1e-8, dtype=None):
     areEqual : `bool`
         `True` if the values are equal, `False` if they are not.
 
-    See also
+    See Also
     --------
     lsst.pex.config.compareConfigs
 
@@ -138,7 +138,7 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
         `True` when the two `lsst.pex.config.Config` instances are equal.
         `False` if there is an inequality.
 
-    See also
+    See Also
     --------
     lsst.pex.config.compareScalars
 

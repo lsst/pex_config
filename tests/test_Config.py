@@ -223,7 +223,7 @@ class ConfigTest(unittest.TestCase):
         self.comp.validate()
 
     def testRangeFieldConstructor(self):
-        """Test RangeField constructor's checking of min, max"""
+        """Test RangeField constructor's checking of min, max."""
         val = 3
         self.assertRaises(ValueError, pexConfig.RangeField, "test", int, default=val, min=val, max=val - 1)
         self.assertRaises(
@@ -280,7 +280,7 @@ class ConfigTest(unittest.TestCase):
                 )
 
     def testRangeFieldDefault(self):
-        """Test RangeField's checking of the default value"""
+        """Test RangeField's checking of the default value."""
         minVal = 3
         maxVal = 4
         for val, inclusiveMin, inclusiveMax, shouldRaise in (
@@ -573,7 +573,6 @@ except ImportError:
         Also check that we have the right number of keys, and as they are
         all known to be valid we know that we got them all.
         """
-
         names = self.simple.names()
         self.assertEqual(len(names), 8)
         for name in names:

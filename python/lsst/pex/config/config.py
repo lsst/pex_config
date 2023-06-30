@@ -196,7 +196,7 @@ if yaml:
         return dumper.represent_scalar("lsst.pex.config.Config", config_py, style="|")
 
     def _yaml_config_constructor(loader, node):
-        """Construct a config from YAML"""
+        """Construct a config from YAML."""
         config_py = loader.construct_scalar(node)
         return Config._fromPython(config_py)
 
@@ -337,7 +337,7 @@ class Field(Generic[FieldTypeVar]):
         Raised when the ``dtype`` parameter is not one of the supported types
         (see `Field.supportedTypes`).
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -725,7 +725,7 @@ class Field(Generic[FieldTypeVar]):
     def __get__(self, instance, owner=None, at=None, label="default"):
         """Define how attribute access should occur on the Config instance
         This is invoked by the owning config object and should not be called
-        directly
+        directly.
 
         When the field attribute is accessed on a Config class object, it
         returns the field object itself in order to allow inspection of
@@ -854,7 +854,7 @@ class Field(Generic[FieldTypeVar]):
         -----
         This method must be overridden by more complex `Field` subclasses.
 
-        See also
+        See Also
         --------
         lsst.pex.config.compareScalars
         """
@@ -980,7 +980,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         names : `dict_keys`
             List of `lsst.pex.config.Field` names.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.iterkeys
         """
@@ -1010,7 +1010,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         return self._storage.items()
 
     def __contains__(self, name):
-        """!Return True if the specified field exists in this config
+        """!Return True if the specified field exists in this config.
 
         @param[in] name  field name to test for
         """
@@ -1155,7 +1155,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
             Then this config's field ``myField`` is set to ``5``.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.loadFromStream
         lsst.pex.config.Config.loadFromString
@@ -1196,7 +1196,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         and code objects as well as file-like objects.  New code should use
         `loadFromString` instead for most of these types.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.load
         lsst.pex.config.Config.loadFromString
@@ -1234,7 +1234,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             Name of the configuration file, or `None` if unknown or contained
             in the stream. Used for error reporting.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.load
         lsst.pex.config.Config.loadFromStream
@@ -1265,7 +1265,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             Name to use for the root config variable. The same value must be
             used when loading (see `lsst.pex.config.Config.load`).
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.saveToStream
         lsst.pex.config.Config.saveToString
@@ -1303,7 +1303,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         code : `str`
             A code string readable by `loadFromString`.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.save
         lsst.pex.config.Config.saveToStream
@@ -1332,7 +1332,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             this is to support human-oriented output from ``pipetask`` where
             additional clutter is not useful.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Config.save
         lsst.pex.config.Config.saveToString
@@ -1400,7 +1400,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             Dictionary with keys that are `~lsst.pex.config.Field` names.
             Values are `~lsst.pex.config.Field` values.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Field.toDict
 
@@ -1460,7 +1460,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         `lsst.pex.config.Field` subclasses may need to implement a ``rename``
         method for *this* method to work.
 
-        See also
+        See Also
         --------
         lsst.pex.config.Field.rename
         """
@@ -1509,7 +1509,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         history : `str`
             A string containing the formatted history.
 
-        See also
+        See Also
         --------
         lsst.pex.config.history.format
         """
@@ -1615,7 +1615,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             `True` when the two `lsst.pex.config.Config` instances are equal.
             `False` if there is an inequality.
 
-        See also
+        See Also
         --------
         lsst.pex.config.compareConfigs
 
@@ -1731,7 +1731,7 @@ def unreduceConfig(cls, stream):
     config : `lsst.pex.config.Config`
         Config instance.
 
-    See also
+    See Also
     --------
     lsst.pex.config.Config.loadFromStream
     """

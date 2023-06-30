@@ -250,6 +250,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     object to organize the `ConfigurableActions`. See its documentation for
     further information.
     """
+
     # specify StructClass to make this more generic for potential future
     # inheritance
     StructClass = ConfigurableActionStruct

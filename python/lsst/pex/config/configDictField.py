@@ -127,7 +127,7 @@ class ConfigDictField(DictField):
           (members of `ConfigDictField.supportedTypes`.
         - ``dictCheck`` or ``itemCheck`` is not a callable function.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField

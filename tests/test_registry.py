@@ -108,13 +108,14 @@ class ConfigTest(unittest.TestCase):
         self.assertIsInstance(foo21, self.fooAlg2Class)
 
     def testReplace(self):
-        """Test replacement in registry (should always fail)"""
+        """Test replacement in registry (should always fail)."""
         self.assertRaises(Exception, self.registry.register, "foo1", self.fooAlg2Class)
         self.assertEqual(self.registry["foo1"], self.fooAlg1Class)
 
     def testNesting(self):
         """Make sure nesting a config with a RegistryField doesn't deep-copy
-        the registry."""
+        the registry.
+        """
 
         class MidConfig(pexConfig.Config):
             field = self.registry.makeField("docs for registry field")

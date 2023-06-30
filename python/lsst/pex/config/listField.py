@@ -119,7 +119,6 @@ class List(*_bases):
             appropriate type for this field or does not pass the field's
             `ListField.itemCheck` method.
         """
-
         if not isinstance(x, self._field.itemtype) and x is not None:
             msg = "Item at position %d with value %s is of incorrect type %s. Expected %s" % (
                 i,
@@ -304,7 +303,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField

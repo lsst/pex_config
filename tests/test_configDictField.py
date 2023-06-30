@@ -151,7 +151,7 @@ class ConfigDictFieldTest(unittest.TestCase):
         self.assertRaises(pexConfig.FieldValidationError, setattr, c.d1, "should", "fail")
 
     def testEquality(self):
-        """Test ConfigDictField.__eq__
+        """Test ConfigDictField.__eq__.
 
         We create two configs, with the keys explicitly added in a different
         order and test their equality.

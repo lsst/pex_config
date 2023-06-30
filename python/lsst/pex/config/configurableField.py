@@ -127,7 +127,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         return self.target(*args, config=self.value, **kw)
 
     def retarget(self, target, ConfigClass=None, at=None, label="retarget"):
-        """Target a new configurable and ConfigClass"""
+        """Target a new configurable and ConfigClass."""
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 
@@ -171,7 +171,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         """
         Pretend to be an isntance of  ConfigClass.
         Attributes defiend by ConfigurableInstance will shadow those defined
-        in ConfigClass
+        in ConfigClass.
         """
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
@@ -224,7 +224,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField

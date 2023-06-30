@@ -355,7 +355,7 @@ class RegistryField(ConfigChoiceField):
         proxy (`RegistryInstanceDict`) and then all positional and keyword
         arguments passed to ``apply``.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -432,7 +432,7 @@ def registerConfigurable(name, registry, ConfigClass=None):
         Config class associated with the configurable. If `None`, the class's
         ``ConfigClass`` attribute is used instead.
 
-    See also
+    See Also
     --------
     registerConfig
 
@@ -461,7 +461,7 @@ def registerConfig(name, registry, target):
     target : obj
         A configurable type, such as a subclass of `lsst.pipe.base.Task`.
 
-    See also
+    See Also
     --------
     registerConfigurable
 

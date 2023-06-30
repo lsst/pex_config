@@ -250,7 +250,7 @@ class ConfigurableActionsTestCase(unittest.TestCase):
         self.assertEqual(string1, ioObject2.getvalue())
 
     def testToDict(self):
-        """Test the toDict interface"""
+        """Test the toDict interface."""
         configClass = self._createConfig(default={"test1": ActionTest1}, singleDefault=ActionTest1)
         config = configClass()
         self.assertEqual(config.toDict(), {"actions": {"test1": {"var": 0}}, "singleAction": {"var": 0}})

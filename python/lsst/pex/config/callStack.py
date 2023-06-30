@@ -97,7 +97,7 @@ class StackFrame:
     stack trace by the fact that it does not look up the source code until it
     is absolutely necessary, reducing the I/O.
 
-    See also
+    See Also
     --------
     getStackFrame
     """

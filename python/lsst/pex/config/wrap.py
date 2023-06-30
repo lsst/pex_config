@@ -146,7 +146,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
     ``std::int64_t``, ``double``, and ``std::string`` fields, along with
     ``std::list`` and ``std::vectors`` of those types.
 
-    See also
+    See Also
     --------
     wrap
     """
@@ -325,7 +325,7 @@ def wrap(ctrl):
         class MyConfigClass(Config):
             pass
 
-    See also
+    See Also
     --------
     makeConfigClass
     """

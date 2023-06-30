@@ -59,7 +59,7 @@ class ConfigField(Field[FieldTypeVar]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField

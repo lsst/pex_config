@@ -151,7 +151,7 @@ class DictFieldTest(unittest.TestCase):
         self.assertRaises(pexConfig.FieldValidationError, setattr, c.d1, "should", "fail")
 
     def testEquality(self):
-        """Test DictField.__eq__
+        """Test DictField.__eq__.
 
         We create two dicts, with the keys explicitly added in a different
         order and test their equality.

@@ -47,7 +47,8 @@ class WrapTest(unittest.TestCase):
 
     def testReadControl(self):
         """Test reading the values from a C++ Control object into a Config
-        object."""
+        object.
+        """
         control = testLib.ControlObject()
         control.foo = 3
         control.bar = ["zot", "yox"]
@@ -57,13 +58,14 @@ class WrapTest(unittest.TestCase):
 
     def testDefaults(self):
         """Test that C++ Control object defaults are correctly used as defaults
-        for Config objects."""
+        for Config objects.
+        """
         config = testLib.ConfigObject()
         control = testLib.ControlObject()
         self.assertTrue(testLib.checkControl(control, config.foo, config.bar.list()))
 
     def testPickle(self):
-        """Test that C++ Control object pickles correctly"""
+        """Test that C++ Control object pickles correctly."""
         config = testLib.ConfigObject()
         new = pickle.loads(pickle.dumps(config))
         self.assertTrue(config.compare(new))
@@ -84,7 +86,8 @@ class NestedWrapTest(unittest.TestCase):
 
     def testReadControl(self):
         """Test reading the values from a C++ Control object into a Config
-        object."""
+        object.
+        """
         control = testLib.OuterControlObject()
         control.a.p = 6.0
         control.a.q = 4
@@ -95,7 +98,8 @@ class NestedWrapTest(unittest.TestCase):
 
     def testDefaults(self):
         """Test that C++ Control object defaults are correctly used as defaults
-        for Config objects."""
+        for Config objects.
+        """
         config = testLib.OuterConfigObject()
         control = testLib.OuterControlObject()
         self.assertTrue(testLib.checkNestedControl(control, config.a.p, config.a.q, config.b))
