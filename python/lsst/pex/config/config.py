@@ -117,7 +117,7 @@ def _joinNamePath(prefix=None, name=None, index=None):
         name = prefix + "." + name
 
     if index is not None:
-        return "%s[%r]" % (name, index)
+        return f"{name}[{index!r}]"
     else:
         return name
 
@@ -164,7 +164,7 @@ def _typeStr(x):
     if xtype.__module__ == "builtins":
         return xtype.__name__
     else:
-        return "%s.%s" % (xtype.__module__, xtype.__name__)
+        return f"{xtype.__module__}.{xtype.__name__}"
 
 
 if yaml:
@@ -617,7 +617,7 @@ class Field(Generic[FieldTypeVar]):
             return
 
         if not isinstance(value, self.dtype):
-            msg = "Value %s is of incorrect type %s. Expected type %s" % (
+            msg = "Value {} is of incorrect type {}. Expected type {}".format(
                 value,
                 _typeStr(value),
                 _typeStr(self.dtype),
@@ -673,9 +673,9 @@ class Field(Generic[FieldTypeVar]):
         doc = "# " + str(self.doc).replace("\n", "\n# ")
         if isinstance(value, float) and not math.isfinite(value):
             # non-finite numbers need special care
-            outfile.write("{}\n{}=float('{!r}')\n\n".format(doc, fullname, value))
+            outfile.write(f"{doc}\n{fullname}=float('{value!r}')\n\n")
         else:
-            outfile.write("{}\n{}={!r}\n\n".format(doc, fullname, value))
+            outfile.write(f"{doc}\n{fullname}={value!r}\n\n")
 
     def toDict(self, instance):
         """Convert the field value so that it can be set as the value of an
@@ -1133,7 +1133,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 field = self._fields[name]
                 field.__set__(self, value, at=at, label=label)
             except KeyError:
-                raise KeyError("No field of name %s exists in config type %s" % (name, _typeStr(self)))
+                raise KeyError(f"No field of name {name} exists in config type {_typeStr(self)}")
 
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
@@ -1356,7 +1356,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 )
                 for imp in sorted(self._imports):
                     if imp in sys.modules and sys.modules[imp] is not None:
-                        outfile.write("import {}\n".format(imp))
+                        outfile.write(f"import {imp}\n")
             self._save(outfile)
         finally:
             self._rename(tmp)
@@ -1556,7 +1556,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             self.__dict__[attr] = value
         else:
             # We throw everything else.
-            raise AttributeError("%s has no attribute %s" % (_typeStr(self), attr))
+            raise AttributeError(f"{_typeStr(self)} has no attribute {attr}")
 
     def __delattr__(self, attr, at=None, label="deletion"):
         if attr in self._fields:
@@ -1586,9 +1586,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         return str(self.toDict())
 
     def __repr__(self):
-        return "%s(%s)" % (
+        return "{}({})".format(
             _typeStr(self),
-            ", ".join("%s=%r" % (k, v) for k, v in self.toDict().items() if v is not None),
+            ", ".join(f"{k}={v!r}" for k, v in self.toDict().items() if v is not None),
         )
 
     def compare(self, other, shortcut=True, rtol=1e-8, atol=1e-8, output=None):

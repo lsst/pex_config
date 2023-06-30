@@ -389,7 +389,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
             return
 
         for _, v in sorted(actionStruct.items()):
-            outfile.write("{}={}()\n".format(v._name, _typeStr(v)))
+            outfile.write(f"{v._name}={_typeStr(v)}()\n")
             v._save(outfile)
 
     def freeze(self, instance):

@@ -127,7 +127,7 @@ class ConfigField(Field[FieldTypeVar]):
         name = _joinNamePath(prefix=instance._name, name=self.name)
 
         if value != self.dtype and type(value) != self.dtype:
-            msg = "Value %s is of incorrect type %s. Expected %s" % (
+            msg = "Value {} is of incorrect type {}. Expected {}".format(
                 value,
                 _typeStr(value),
                 _typeStr(self.dtype),

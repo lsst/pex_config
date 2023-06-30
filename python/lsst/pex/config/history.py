@@ -144,7 +144,7 @@ class Color:
                         if val[k] in Color.colors:
                             Color.categories[k] = val[k]
                         else:
-                            print("Unknown colour %s for category %s" % (val[k], k), file=sys.stderr)
+                            print(f"Unknown colour {val[k]} for category {k}", file=sys.stderr)
                     else:
                         unknown.append(k)
 
@@ -249,7 +249,7 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
 
     # Generate the config history content.
     msg = []
-    fullname = "%s.%s" % (config._name, name) if config._name is not None else name
+    fullname = f"{config._name}.{name}" if config._name is not None else name
     msg.append(_colorize(re.sub(r"^root\.", "", fullname), "NAME"))
     for value, output in outputs:
         line = prefix + _colorize("%-*s" % (valueLength, value), "VALUE") + " "

@@ -200,7 +200,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
                     try:
                         dtype = getattr(nestedModuleObj, ctype).ConfigClass
                     except AttributeError:
-                        raise AttributeError("'%s.%s.ConfigClass' does not exist" % (moduleName, ctype))
+                        raise AttributeError(f"'{moduleName}.{ctype}.ConfigClass' does not exist")
                     fields[k] = ConfigField(doc=doc, dtype=dtype)
                 else:
                     try:

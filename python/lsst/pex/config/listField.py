@@ -83,7 +83,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
                 for i, x in enumerate(value):
                     self.insert(i, x, setHistory=False)
             except TypeError:
-                msg = "Value %s is of incorrect type %s. Sequence type expected" % (value, _typeStr(value))
+                msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
                 raise FieldValidationError(self._field, config, msg)
         if setHistory:
             self.history.append((list(self._list), at, label))
@@ -253,7 +253,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             object.__setattr__(self, attr, value)
         else:
             # We throw everything else.
-            msg = "%s has no attribute %s" % (_typeStr(self._field), attr)
+            msg = f"{_typeStr(self._field)} has no attribute {attr}"
             raise FieldValidationError(self._field, self._config, msg)
 
     def __reduce__(self):

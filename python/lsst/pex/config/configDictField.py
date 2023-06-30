@@ -46,19 +46,21 @@ class ConfigDict(Dict[str, Config]):
 
     def __setitem__(self, k, x, at=None, label="setitem", setHistory=True):
         if self._config._frozen:
-            msg = "Cannot modify a frozen Config. Attempting to set item at key %r to value %s" % (k, x)
+            msg = f"Cannot modify a frozen Config. Attempting to set item at key {k!r} to value {x}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # validate keytype
         k = _autocast(k, self._field.keytype)
         if type(k) != self._field.keytype:
-            msg = "Key %r is of type %s, expected type %s" % (k, _typeStr(k), _typeStr(self._field.keytype))
+            msg = "Key {!r} is of type {}, expected type {}".format(
+                k, _typeStr(k), _typeStr(self._field.keytype)
+            )
             raise FieldValidationError(self._field, self._config, msg)
 
         # validate itemtype
         dtype = self._field.itemtype
         if type(x) != self._field.itemtype and x != self._field.itemtype:
-            msg = "Value %s at key %r is of incorrect type %s. Expected type %s" % (
+            msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                 x,
                 k,
                 _typeStr(x),
@@ -198,7 +200,7 @@ class ConfigDictField(DictField):
                 item = value[k]
                 item.validate()
                 if self.itemCheck is not None and not self.itemCheck(item):
-                    msg = "Item at key %r is not a valid value: %s" % (k, item)
+                    msg = f"Item at key {k!r} is not a valid value: {item}"
                     raise FieldValidationError(self, instance, msg)
         DictField.validate(self, instance)
 
@@ -225,12 +227,12 @@ class ConfigDictField(DictField):
         configDict = self.__get__(instance)
         fullname = _joinNamePath(instance._name, self.name)
         if configDict is None:
-            outfile.write("{}={!r}\n".format(fullname, configDict))
+            outfile.write(f"{fullname}={configDict!r}\n")
             return
 
-        outfile.write("{}={!r}\n".format(fullname, {}))
+        outfile.write(f"{fullname}={{}}\n")
         for v in configDict.values():
-            outfile.write("{}={}()\n".format(v._name, _typeStr(v)))
+            outfile.write(f"{v._name}={_typeStr(v)}()\n")
             v._save(outfile)
 
     def freeze(self, instance):
@@ -280,7 +282,7 @@ class ConfigDictField(DictField):
         for k, v1 in d1.items():
             v2 = d2[k]
             result = compareConfigs(
-                "%s[%r]" % (name, k), v1, v2, shortcut=shortcut, rtol=rtol, atol=atol, output=output
+                f"{name}[{k!r}]", v1, v2, shortcut=shortcut, rtol=rtol, atol=atol, output=output
             )
             if not result and shortcut:
                 return False

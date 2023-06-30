@@ -55,7 +55,7 @@ def getComparisonName(name1, name2):
         formatted as ``"{name1} / {name2}"``.
     """
     if name1 != name2:
-        return "%s / %s" % (name1, name2)
+        return f"{name1} / {name2}"
     return name1
 
 
@@ -104,7 +104,7 @@ def compareScalars(name, v1, v2, output, rtol=1e-8, atol=1e-8, dtype=None):
     else:
         result = v1 == v2
     if not result and output is not None:
-        output("Inequality in %s: %r != %r" % (name, v1, v2))
+        output(f"Inequality in {name}: {v1!r} != {v2!r}")
     return result
 
 
@@ -165,7 +165,7 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
             return False
     if type(c1) != type(c2):
         if output is not None:
-            output("Config types do not match for %s: %s != %s" % (name, type(c1), type(c2)))
+            output(f"Config types do not match for {name}: {type(c1)} != {type(c2)}")
         return False
     equal = True
     for field in c1._fields.values():

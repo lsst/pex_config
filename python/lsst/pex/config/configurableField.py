@@ -144,7 +144,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
             self.__initValue(at, label)
 
         history = self._config._history.setdefault(self._field.name, [])
-        msg = "retarget(target=%s, ConfigClass=%s)" % (_typeStr(target), _typeStr(ConfigClass))
+        msg = f"retarget(target={_typeStr(target)}, ConfigClass={_typeStr(ConfigClass)})"
         history.append((msg, at, label))
 
     def __getattr__(self, name):
@@ -294,7 +294,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             default = ConfigClass
         if default != ConfigClass and type(default) != ConfigClass:
             raise TypeError(
-                "'default' is of incorrect type %s. Expected %s" % (_typeStr(default), _typeStr(ConfigClass))
+                f"'default' is of incorrect type {_typeStr(default)}. Expected {_typeStr(ConfigClass)}"
             )
 
         source = getStackFrame()
@@ -359,7 +359,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             value = oldValue.ConfigClass()
             oldValue.update(__at=at, __label=label, **value._storage)
         else:
-            msg = "Value %s is of incorrect type %s. Expected %s" % (
+            msg = "Value {} is of incorrect type {}. Expected {}".format(
                 value,
                 _typeStr(value),
                 _typeStr(oldValue.ConfigClass),
