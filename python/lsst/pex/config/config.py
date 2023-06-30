@@ -1010,9 +1010,17 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         return self._storage.items()
 
     def __contains__(self, name):
-        """!Return True if the specified field exists in this config.
+        """Return `True` if the specified field exists in this config.
 
-        @param[in] name  field name to test for
+        Parameters
+        ----------
+        name : `str`
+            Field name to test for.
+
+        Returns
+        -------
+        in : `bool`
+            `True` if the specified field exists in the config.
         """
         return self._storage.__contains__(name)
 
