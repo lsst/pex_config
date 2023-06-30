@@ -102,7 +102,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.registry["foo2"].ConfigClass, self.fooConfig2Class)
         self.assertEqual(self.registry["foo21"].ConfigClass, self.fooConfig1Class)
 
-        self.assertEqual(set(self.registry.keys()), set(("foo1", "foo2", "foo21")))
+        self.assertEqual(set(self.registry.keys()), {"foo1", "foo2", "foo21"})
 
     def testWrapper(self):
         wrapper21 = self.registry["foo21"]

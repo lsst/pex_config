@@ -134,9 +134,9 @@ class ConfigChoiceFieldTest(unittest.TestCase):
     def testSelectionSet(self):
         # test in place modification
         self.config.c.names.add("BBB")
-        self.assertEqual(set(self.config.c.names), set(["AAA", "BBB"]))
+        self.assertEqual(set(self.config.c.names), {"AAA", "BBB"})
         self.config.c.names.remove("AAA")
-        self.assertEqual(set(self.config.c.names), set(["BBB"]))
+        self.assertEqual(set(self.config.c.names), {"BBB"})
         self.assertRaises(KeyError, self.config.c.names.remove, "AAA")
         self.config.c.names.discard("AAA")
 
