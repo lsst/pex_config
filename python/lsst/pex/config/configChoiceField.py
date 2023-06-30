@@ -31,7 +31,7 @@ __all__ = ["ConfigChoiceField"]
 import collections.abc
 import copy
 import weakref
-from typing import Any, ForwardRef, Optional, Union, overload
+from typing import Any, ForwardRef, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, compareScalars, getComparisonName
@@ -483,7 +483,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         self.typemap = typemap
         self.multi = multi
 
-    def __class_getitem__(cls, params: Union[tuple[type, ...], type, ForwardRef]):
+    def __class_getitem__(cls, params: tuple[type, ...] | type | ForwardRef):
         raise ValueError("ConfigChoiceField does not support typing argument")
 
     def _getOrMake(self, instance, label="default"):
@@ -501,7 +501,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigChoiceField":
+    ) -> ConfigChoiceField:
         ...
 
     @overload
@@ -517,7 +517,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
             return self._getOrMake(instance)
 
     def __set__(
-        self, instance: Config, value: Optional[ConfigInstanceDict], at: Any = None, label: str = "assignment"
+        self, instance: Config, value: ConfigInstanceDict | None, at: Any = None, label: str = "assignment"
     ) -> None:
         if instance._frozen:
             raise FieldValidationError(self, instance, "Cannot modify a frozen Config")

@@ -73,11 +73,11 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigurableActionField[ActionTypeVar]":
+    ) -> ConfigurableActionField[ActionTypeVar]:
         ...
 
     @overload
-    def __get__(self, instance: "Config", owner: Any = None, at: Any = None, label: str = "default") -> Any:
+    def __get__(self, instance: Config, owner: Any = None, at: Any = None, label: str = "default") -> Any:
         ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):

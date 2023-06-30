@@ -31,7 +31,8 @@ __all__ = ("ConfigurableInstance", "ConfigurableField")
 
 import copy
 import weakref
-from typing import Any, Generic, Mapping, Union, overload
+from collections.abc import Mapping
+from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, getComparisonName
@@ -312,7 +313,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
 
     @staticmethod
     def _parseTypingArgs(
-        params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
+        params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
         return kwds
 
@@ -328,7 +329,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigurableField":
+    ) -> ConfigurableField:
         ...
 
     @overload

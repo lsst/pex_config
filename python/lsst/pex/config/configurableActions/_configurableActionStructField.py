@@ -23,22 +23,9 @@ from __future__ import annotations
 __all__ = ("ConfigurableActionStructField", "ConfigurableActionStruct")
 
 import weakref
+from collections.abc import Iterable, Iterator, Mapping
 from types import GenericAlias, SimpleNamespace
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Generic, TypeVar, overload
 
 from lsst.pex.config.callStack import StackFrame, getCallStack, getStackFrame
 from lsst.pex.config.comparison import compareConfigs, compareScalars, getComparisonName
@@ -58,7 +45,7 @@ class ConfigurableActionStructUpdater:
     def __set__(
         self,
         instance: ConfigurableActionStruct,
-        value: Union[Mapping[str, ConfigurableAction], ConfigurableActionStruct],
+        value: Mapping[str, ConfigurableAction] | ConfigurableActionStruct,
     ) -> None:
         if isinstance(value, Mapping):
             pass
@@ -92,7 +79,7 @@ class ConfigurableActionStructRemover:
         ConfigurableActionStruct
     """
 
-    def __set__(self, instance: ConfigurableActionStruct, value: Union[str, Iterable[str]]) -> None:
+    def __set__(self, instance: ConfigurableActionStruct, value: str | Iterable[str]) -> None:
         # strings are iterable, but not in the way that is intended. If a
         # single name is specified, turn it into a tuple before attempting
         # to remove the attribute
@@ -142,9 +129,9 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
 
     # declare attributes that are set with __setattr__
     _config_: weakref.ref
-    _attrs: Dict[str, ActionTypeVar]
+    _attrs: dict[str, ActionTypeVar]
     _field: ConfigurableActionStructField
-    _history: List[tuple]
+    _history: list[tuple]
 
     # create descriptors to handle special update and remove behavior
     update = ConfigurableActionStructUpdater()
@@ -178,7 +165,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         return value
 
     @property
-    def history(self) -> List[tuple]:
+    def history(self) -> list[tuple]:
         return self._history
 
     @property
@@ -188,7 +175,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     def __setattr__(
         self,
         attr: str,
-        value: Union[ActionTypeVar, Type[ActionTypeVar]],
+        value: ActionTypeVar | type[ActionTypeVar],
         at=None,
         label="setattr",
         setHistory=False,
@@ -233,7 +220,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         for name in self.fieldNames:
             yield getattr(self, name)
 
-    def items(self) -> Iterable[Tuple[str, ActionTypeVar]]:
+    def items(self) -> Iterable[tuple[str, ActionTypeVar]]:
         for name in self.fieldNames:
             yield name, getattr(self, name)
 
@@ -262,12 +249,12 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     # Explicitly annotate these on the class, they are present in the base
     # class through injection, so type systems have trouble seeing them.
     name: str
-    default: Optional[Mapping[str, ConfigurableAction]]
+    default: Mapping[str, ConfigurableAction] | None
 
     def __init__(
         self,
         doc: str,
-        default: Optional[Mapping[str, ConfigurableAction]] = None,
+        default: Mapping[str, ConfigurableAction] | None = None,
         optional: bool = False,
         deprecated=None,
     ):
@@ -288,14 +275,14 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     def __set__(
         self,
         instance: Config,
-        value: Union[
-            None,
-            Mapping[str, ConfigurableAction],
-            SimpleNamespace,
-            ConfigurableActionStruct,
-            ConfigurableActionStructField,
-            Type[ConfigurableActionStructField],
-        ],
+        value: (
+            None
+            | Mapping[str, ConfigurableAction]
+            | SimpleNamespace
+            | ConfigurableActionStruct
+            | ConfigurableActionStructField
+            | type[ConfigurableActionStructField]
+        ),
         at: Iterable[StackFrame] = None,
         label: str = "assigment",
     ):
@@ -352,7 +339,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         if instance is None or not isinstance(instance, Config):
             return self
         else:
-            field: Optional[ConfigurableActionStruct] = instance._storage[self.name]
+            field: ConfigurableActionStruct | None = instance._storage[self.name]
             return field
 
     def rename(self, instance: Config):

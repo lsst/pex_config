@@ -29,7 +29,8 @@ __all__ = ["ListField"]
 
 import collections.abc
 import weakref
-from typing import Any, Generic, Iterable, MutableSequence, Union, overload
+from collections.abc import Iterable, MutableSequence
+from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
@@ -429,7 +430,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
     def __set__(
         self,
         instance: Config,
-        value: Union[Iterable[FieldTypeVar], None],
+        value: Iterable[FieldTypeVar] | None,
         at: Any = None,
         label: str = "assignment",
     ) -> None:

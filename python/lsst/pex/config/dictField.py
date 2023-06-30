@@ -31,7 +31,8 @@ __all__ = ["DictField"]
 
 import collections.abc
 import weakref
-from typing import Any, ForwardRef, Generic, Iterator, Mapping, Type, TypeVar, Union, cast
+from collections.abc import Iterator, Mapping
+from typing import Any, ForwardRef, Generic, TypeVar, cast
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
@@ -235,11 +236,11 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     {'myKey': 42}
     """
 
-    DictClass: Type[Dict] = Dict
+    DictClass: type[Dict] = Dict
 
     @staticmethod
     def _parseTypingArgs(
-        params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
+        params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
         if len(params) != 2:
             raise ValueError("Only tuples of types that are length 2 are supported")
@@ -346,7 +347,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     def __set__(
         self,
         instance: Config,
-        value: Union[Mapping[KeyTypeVar, ItemTypeVar], None],
+        value: Mapping[KeyTypeVar, ItemTypeVar] | None,
         at: Any = None,
         label: str = "assignment",
     ) -> None:

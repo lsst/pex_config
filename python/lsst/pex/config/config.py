@@ -45,7 +45,8 @@ import shutil
 import sys
 import tempfile
 import warnings
-from typing import Any, ForwardRef, Generic, Mapping, Optional, TypeVar, Union, cast, overload
+from collections.abc import Mapping
+from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
 
 try:
     from types import GenericAlias
@@ -399,13 +400,13 @@ class Field(Generic[FieldTypeVar]):
     Class.
     """
 
-    supportedTypes = set((str, bool, float, int, complex))
+    supportedTypes = {str, bool, float, int, complex}
     """Supported data types for field values (`set` of types).
     """
 
     @staticmethod
     def _parseTypingArgs(
-        params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
+        params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
         """Parse type annotations into keyword constructor arguments.
 
@@ -463,7 +464,7 @@ class Field(Generic[FieldTypeVar]):
             kwds = {**kwds, **{"dtype": unpackedParams}}
         return kwds
 
-    def __class_getitem__(cls, params: Union[tuple[type, ...], type, ForwardRef]):
+    def __class_getitem__(cls, params: tuple[type, ...] | type | ForwardRef):
         return _PexConfigGenericAlias(cls, params)
 
     def __init__(self, doc, dtype=None, default=None, check=None, optional=False, deprecated=None):
@@ -707,12 +708,12 @@ class Field(Generic[FieldTypeVar]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "Field[FieldTypeVar]":
+    ) -> Field[FieldTypeVar]:
         ...
 
     @overload
     def __get__(
-        self, instance: "Config", owner: Any = None, at: Any = None, label: str = "default"
+        self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
     ) -> FieldTypeVar:
         ...
 
@@ -744,7 +745,7 @@ class Field(Generic[FieldTypeVar]):
                     )
 
     def __set__(
-        self, instance: "Config", value: Optional[FieldTypeVar], at: Any = None, label: str = "assignment"
+        self, instance: Config, value: FieldTypeVar | None, at: Any = None, label: str = "assignment"
     ) -> None:
         """Set an attribute on the config instance.
 

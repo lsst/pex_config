@@ -27,7 +27,7 @@
 
 __all__ = ["ConfigField"]
 
-from typing import Any, Optional, overload
+from typing import Any, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, getComparisonName
@@ -120,7 +120,7 @@ class ConfigField(Field[FieldTypeVar]):
             return value
 
     def __set__(
-        self, instance: Config, value: Optional[FieldTypeVar], at: Any = None, label: str = "assignment"
+        self, instance: Config, value: FieldTypeVar | None, at: Any = None, label: str = "assignment"
     ) -> None:
         if instance._frozen:
             raise FieldValidationError(self, instance, "Cannot modify a frozen Config")
