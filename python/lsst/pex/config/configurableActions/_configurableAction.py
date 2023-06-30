@@ -31,7 +31,7 @@ ActionTypeVar = TypeVar("ActionTypeVar", bound="ConfigurableAction")
 
 class ConfigurableAction(Config):
     """A `ConfigurableAction` is an interface that extends a
-    `lsst.pex.config.Config` class to include a `__call__` method.
+    `lsst.pex.config.Config` class to include a ``__call__`` method.
 
     This interface is designed to create an action that can be used at
     runtime with a state that is determined during the configuration stage. A
@@ -43,15 +43,16 @@ class ConfigurableAction(Config):
 
     This class is intended to be an interface only, but because of various
     inheritance conflicts this class can not be implemented as an Abstract
-    Base Class. Instead, the `__call__` method is purely virtual, meaning that
-    it will raise a `NotImplementedError` when called. Subclasses that
+    Base Class. Instead, the ``__call__`` method is purely virtual, meaning
+    that it will raise a `NotImplementedError` when called. Subclasses that
     represent concrete actions must provide an override.
     """
 
     identity: str | None = None
-    """If a configurable action is assigned to a `ConfigurableActionField`, or
-    a `ConfigurableActionStructField` the name of the field will be bound to
-    this variable when it is retrieved.
+    """If a configurable action is assigned to a
+    `ConfigurableActionField`, or a
+    `ConfigurableActionStructField` the name of the
+    field will be bound to this variable when it is retrieved.
     """
 
     def __setattr__(self, attr, value, at=None, label="assignment"):

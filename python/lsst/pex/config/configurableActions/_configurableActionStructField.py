@@ -111,21 +111,23 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     the ConfigurableActionStructField. This class should not be created
     directly.
 
-    This class allows managing a collection of `ConfigurableActions` with a
+    This class allows managing a collection of `ConfigurableAction` with a
     struct like interface, that is to say in an attribute like notation.
 
     Attributes can be dynamically added or removed as such:
 
-    ConfigurableActionStructInstance.variable1 = a_configurable_action
-    del ConfigurableActionStructInstance.variable1
+    .. code-block:: python
+
+        ConfigurableActionStructInstance.variable1 = a_configurable_action
+        del ConfigurableActionStructInstance.variable1
 
     Each action is then available to be individually configured as a normal
     `lsst.pex.config.Config` object.
 
-    ConfigurableActionStruct supports two special convenience attributes.
+    `ConfigurableActionStruct` supports two special convenience attributes.
 
-    The first is ``update``. You may assign a dict of `ConfigurableActions` or
-    a `ConfigurableActionStruct` to this attribute which will update the
+    The first is ``update``. You may assign a dict of `ConfigurableAction` or a
+    `ConfigurableActionStruct` to this attribute which will update the
     `ConfigurableActionStruct` on which the attribute is invoked such that it
     will be updated to contain the entries specified by the structure on the
     right hand side of the equals sign.
@@ -248,9 +250,9 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     `~lsst.pex.config.Config` class in a manner similar to how a
     `~lsst.pipe.base.Struct` works.
 
-    This class uses a `ConfigurableActionStruct` as an intermediary
-    object to organize the `ConfigurableActions`. See its documentation for
-    further information.
+    This class uses a `ConfigurableActionStruct` as an intermediary object to
+    organize the `ConfigurableAction`. See its documentation for further
+    information.
     """
 
     # specify StructClass to make this more generic for potential future

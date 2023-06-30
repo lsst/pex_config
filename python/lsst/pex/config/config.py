@@ -648,8 +648,8 @@ class Field(Generic[FieldTypeVar]):
         ----------
         outfile : file-like object
             A writeable field handle.
-        instance : `Config`
-            The `Config` instance that contains this field.
+        instance : `~lsst.pex.config.Config`
+            The `~lsst.pex.config.Config` instance that contains this field.
 
         Notes
         -----
@@ -683,8 +683,8 @@ class Field(Generic[FieldTypeVar]):
 
         Parameters
         ----------
-        instance : `Config`
-            The `Config` that contains this field.
+        instance : `~lsst.pex.config.Config`
+            The `~lsst.pex.config.Config` that contains this field.
 
         Returns
         -------
@@ -973,12 +973,8 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Returns
         -------
-        names : `dict_keys`
+        names : `~collections.abc.KeysView`
             List of `lsst.pex.config.Field` names.
-
-        See Also
-        --------
-        lsst.pex.config.Config.iterkeys
         """
         return self._storage.keys()
 
@@ -987,7 +983,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Returns
         -------
-        values : `dict_values`
+        values : `~collections.abc.ValuesView`
             Iterator of field values.
         """
         return self._storage.values()
@@ -997,7 +993,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Returns
         -------
-        items : `dict_items`
+        items : `~collections.abc.ItemsView`
             Iterator of tuples for each configuration. Tuple items are:
 
             0. Field name.
@@ -1490,8 +1486,8 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         Complex single-field validation can be defined by deriving new Field
         types. For convenience, some derived `lsst.pex.config.Field`-types
         (`~lsst.pex.config.ConfigField` and
-        `~lsst.pex.config.ConfigChoiceField`) are defined in `lsst.pex.config`
-        that handle recursing into subconfigs.
+        `~lsst.pex.config.ConfigChoiceField`) are defined in
+        ``lsst.pex.config`` that handle recursing into subconfigs.
 
         Inter-field relationships should only be checked in derived
         `~lsst.pex.config.Config` classes after calling this method, and base

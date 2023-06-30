@@ -67,7 +67,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
 
         Notes
         -----
-        If field.default is an instance of `lsst.pex.config.ConfigClass`,
+        If field.default is an instance of `lsst.pex.config.Config`,
         custom construct ``_value`` with the correct values from default.
         Otherwise, call ``ConfigClass`` constructor
         """
@@ -111,7 +111,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     """
 
     value = property(lambda x: x._value)
-    """The `ConfigClass` instance (`lsst.pex.config.ConfigClass`-type,
+    """The `ConfigClass` instance (`lsst.pex.config.Config`-type,
     read-only).
     """
 

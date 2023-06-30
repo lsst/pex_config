@@ -4,7 +4,7 @@
 Wrapping C++ control objects
 ############################
 
-C++ control objects defined using the ``LSST_CONTROL_FIELD`` macro in `lsst/pex/config.h` can be wrapped using pybind11 and the functions in `lsst.pex.config.wrap`, creating an equivalent Python `Config` object.
+C++ control objects defined using the ``LSST_CONTROL_FIELD`` macro in ``lsst/pex/config.h`` can be wrapped using pybind11 and the functions in `lsst.pex.config.wrap`, creating an equivalent Python `Config` object.
 The `Config` will automatically create and set values in the C++ object, will provide access to the doc strings from C++, and will even call the C++ class's ``validate`` method, if one exists.
 This helps to minimize duplication of code.
 

@@ -62,3 +62,7 @@ Python API reference
 .. automodapi:: lsst.pex.config.history
    :no-main-docstr:
    :no-inheritance-diagram:
+
+.. automodapi:: lsst.pex.config.configurableActions
+   :no-main-docstr:
+   :no-inheritance-diagram:

@@ -172,10 +172,10 @@ Specialized Config subclasses
 =============================
 
 There exists a subclass of `Config` which is designed to be configurable like a standard config, but have a runtime call interface.
-These specialized subclasses are named `~lsst.pex.config.configurableActions.ConfigurableAction`\ s, or actions for short.
+These specialized subclasses are named `~.configurableActions.ConfigurableAction`\ s, or actions for short.
 These actions are not intended to replace other runtime components, but compliment them.
 They provide configuration time mechanics to a simple runtime function.
 This interface allows for both configuration of an action as well as making which action to run configurable.
 These configurations are serialized out in a standard way, and thus allow complete functional states to be completely restored.
-The selection (thus configuration) of which `~lsst.pex.config.configurableActions.ConfigurableAction`\ s to run is made possible through the use of special `Field`\ s named `~lsst.pex.config.configurableActions.ConfigurableActionField` and `~lsst.pex.config.configurableActions.ConfigurableActionStructField`.
-See :doc:`field-types` for more details and examples of both `ConfigurableAction`\ s and the corresponding fields.
+The selection (thus configuration) of which `~.configurableActions.ConfigurableAction`\ s to run is made possible through the use of special `Field`\ s named `~.configurableActions.ConfigurableActionField` and `~.configurableActions.ConfigurableActionStructField`.
+See :doc:`field-types` for more details and examples of both `~.configurableActions.ConfigurableAction`\ s and the corresponding fields.
