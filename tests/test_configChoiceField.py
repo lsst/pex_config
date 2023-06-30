@@ -25,8 +25,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pickle
+import tempfile
 import unittest
 
 import lsst.pex.config as pexConfig
@@ -88,11 +88,13 @@ class ConfigChoiceFieldTest(unittest.TestCase):
         self.config.a["AAA"].f = 1
         self.config.a["BBB"].f = 1.0
         self.config.a = "BBB"
-        path = "choiceFieldTest.config"
-        self.config.save(path)
-        roundtrip = Config3()
-        roundtrip.load(path)
-        os.remove(path)
+
+        with tempfile.NamedTemporaryFile(prefix="choiceFieldTest-", suffix=".config") as temp:
+            path = temp.name
+            print(path)
+            self.config.save(path)
+            roundtrip = Config3()
+            roundtrip.load(path)
 
         self.assertEqual(self.config.a.name, roundtrip.a.name)
         self.assertEqual(self.config.a["AAA"].f, roundtrip.a["AAA"].f)

@@ -25,8 +25,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pickle
+import tempfile
 import unittest
 
 import lsst.pex.config as pexConf
@@ -141,11 +141,12 @@ class ConfigurableFieldTest(unittest.TestCase):
         c = Config2()
         c.c2.retarget(Target1)
         c.c2.f = 10
-        c.save("test.py")
 
-        r = Config2()
-        r.load("test.py")
-        os.remove("test.py")
+        with tempfile.NamedTemporaryFile(suffix=".py", prefix="test-config-field-") as tmp:
+            c.save(tmp.name)
+
+            r = Config2()
+            r.load(tmp.name)
 
         self.assertEqual(c.c2.f, r.c2.f)
         self.assertEqual(c.c2.target, r.c2.target)

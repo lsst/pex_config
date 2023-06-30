@@ -30,6 +30,7 @@ import itertools
 import os
 import pickle
 import re
+import tempfile
 import unittest
 
 try:
@@ -335,25 +336,37 @@ class ConfigTest(unittest.TestCase):
         self.comp.r = "BBB"
         self.comp.p = "AAA"
         self.comp.c.f = 5.0
-        self.comp.save("roundtrip.test")
+        with tempfile.TemporaryDirectory(prefix="config-save-test", ignore_cleanup_errors=True) as tmpdir:
+            roundtrip_path = os.path.join(tmpdir, "roundtrip.test")
+            self.comp.save(roundtrip_path)
 
-        roundTrip = Complex()
-        roundTrip.load("roundtrip.test")
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
-        del roundTrip
+            roundTrip = Complex()
+            roundTrip.load(roundtrip_path)
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
+            del roundTrip
 
-        # test saving to an open file
-        with open("roundtrip.test", "w") as outfile:
-            self.comp.saveToStream(outfile)
-        roundTrip = Complex()
-        with open("roundtrip.test") as infile:
-            roundTrip.loadFromStream(infile)
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
-        del roundTrip
+            # test saving to an open file
+            roundtrip_path = os.path.join(tmpdir, "roundtrip_open.test")
+            with open(roundtrip_path, "w") as outfile:
+                self.comp.saveToStream(outfile)
+            roundTrip = Complex()
+            with open(roundtrip_path) as infile:
+                roundTrip.loadFromStream(infile)
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
+            del roundTrip
+
+            # Test an override of the default variable name.
+            roundtrip_path = os.path.join(tmpdir, "roundtrip_def.test")
+            with open(roundtrip_path, "w") as outfile:
+                self.comp.saveToStream(outfile, root="root")
+            roundTrip = Complex()
+            with self.assertRaises(NameError):
+                roundTrip.load(roundtrip_path)
+            roundTrip.load(roundtrip_path, root="root")
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
 
         # test saving to a string.
         saved_string = self.comp.saveToString()
@@ -362,17 +375,6 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.comp.c.f, roundTrip.c.f)
         self.assertEqual(self.comp.r.name, roundTrip.r.name)
         del roundTrip
-
-        # Test an override of the default variable name.
-        with open("roundtrip.test", "w") as outfile:
-            self.comp.saveToStream(outfile, root="root")
-        roundTrip = Complex()
-        with self.assertRaises(NameError):
-            roundTrip.load("roundtrip.test")
-        roundTrip.load("roundtrip.test", root="root")
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
 
     def testDuplicateRegistryNames(self):
         self.comp.r["AAA"].f = 5.0
