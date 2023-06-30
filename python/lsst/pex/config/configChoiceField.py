@@ -161,7 +161,7 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
 
     def __init__(self, config, field):
         collections.abc.Mapping.__init__(self)
-        self._dict = dict()
+        self._dict = {}
         self._selection = None
         self._config = config
         self._field = field

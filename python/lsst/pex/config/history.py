@@ -58,13 +58,13 @@ class Color:
     terminal.
     """
 
-    categories = dict(
-        NAME="blue",
-        VALUE="yellow",
-        FILE="green",
-        TEXT="red",
-        FUNCTION_NAME="blue",
-    )
+    categories = {
+        "NAME": "blue",
+        "VALUE": "yellow",
+        "FILE": "green",
+        "TEXT": "red",
+        "FUNCTION_NAME": "blue",
+    }
     """Mapping of semantic labels to color names (`dict`).
 
     Notes
