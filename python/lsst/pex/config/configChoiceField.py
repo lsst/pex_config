@@ -30,7 +30,6 @@ __all__ = ["ConfigChoiceField"]
 
 import collections.abc
 import copy
-import sys
 import weakref
 from typing import Any, ForwardRef, Optional, Union, overload
 
@@ -146,13 +145,7 @@ class SelectionSet(collections.abc.MutableSet):
         )
 
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.Mapping,)
-else:
-    _bases = (collections.abc.Mapping[str, Config],)
-
-
-class ConfigInstanceDict(*_bases):
+class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
     """Dictionary of instantiated configs, used to populate a
     `~lsst.pex.config.ConfigChoiceField`.
 

@@ -30,7 +30,6 @@ from __future__ import annotations
 __all__ = ["DictField"]
 
 import collections.abc
-import sys
 import weakref
 from typing import Any, ForwardRef, Generic, Iterator, Mapping, Type, TypeVar, Union, cast
 
@@ -50,13 +49,7 @@ KeyTypeVar = TypeVar("KeyTypeVar")
 ItemTypeVar = TypeVar("ItemTypeVar")
 
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.MutableMapping, Generic[KeyTypeVar, ItemTypeVar])
-else:
-    _bases = (collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar],)
-
-
-class Dict(*_bases):
+class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
     """An internal mapping container.
 
     This class emulates a `dict`, but adds validation and provenance.

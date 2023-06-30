@@ -78,13 +78,7 @@ else:
     doImport = None
 
 
-if int(sys.version_info.minor) < 9:
-    genericAliasKwds = {"_root": True}
-else:
-    genericAliasKwds = {}
-
-
-class _PexConfigGenericAlias(GenericAlias, **genericAliasKwds):
+class _PexConfigGenericAlias(GenericAlias):
     """A Subclass of python's GenericAlias used in defining and instantiating
     Generics.
 
@@ -167,7 +161,7 @@ def _typeStr(x):
         xtype = x
     else:
         xtype = type(x)
-    if (sys.version_info.major <= 2 and xtype.__module__ == "__builtin__") or xtype.__module__ == "builtins":
+    if xtype.__module__ == "builtins":
         return xtype.__name__
     else:
         return "%s.%s" % (xtype.__module__, xtype.__name__)

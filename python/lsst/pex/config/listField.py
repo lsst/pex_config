@@ -28,7 +28,6 @@
 __all__ = ["ListField"]
 
 import collections.abc
-import sys
 import weakref
 from typing import Any, Generic, Iterable, MutableSequence, Union, overload
 
@@ -45,13 +44,8 @@ from .config import (
     _typeStr,
 )
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.MutableSequence, Generic[FieldTypeVar])
-else:
-    _bases = (collections.abc.MutableSequence[FieldTypeVar],)
 
-
-class List(*_bases):
+class List(collections.abc.MutableSequence[FieldTypeVar]):
     """List collection used internally by `ListField`.
 
     Parameters
