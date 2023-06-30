@@ -73,7 +73,7 @@ class RangeField(Field):
     RegistryField
     """
 
-    supportedTypes = set((int, float))
+    supportedTypes = {int, float}
     """The set of data types allowed by `RangeField` instances (`set`
     containing `int` and `float` types).
     """
