@@ -42,7 +42,7 @@ def getCallerFrame(relative=0):
 
     Returns
     -------
-    frame : `__builtin__.Frame`
+    frame : `types.FrameType`
         Frame for the caller.
 
     Notes
@@ -127,7 +127,7 @@ class StackFrame:
 
         Parameters
         ----------
-        frame : `Frame`
+        frame : `types.FrameType`
             Frame object to interpret, such as from `inspect.currentframe`.
 
         Returns

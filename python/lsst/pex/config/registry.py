@@ -405,13 +405,12 @@ def makeRegistry(doc, configBaseType=Config):
         Docstring for the created `Registry` (this is set as the ``__doc__``
         attribute of the `Registry` instance.
     configBaseType : `lsst.pex.config.Config`-type
-        Base type of config classes in the `Registry`
-        (`lsst.pex.config.Registry.configBaseType`).
+        Base type of config classes in the `Registry`.
 
     Returns
     -------
     registry : `Registry`
-        Registry with ``__doc__`` and `~Registry.configBaseType` attributes
+        Registry with ``__doc__`` and ``_configBaseType`` attributes
         set.
     """
     cls = type("Registry", (Registry,), {"__doc__": doc})

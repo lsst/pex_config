@@ -271,8 +271,8 @@ class ConfigField(Field[FieldTypeVar]):
         - Ensures that the user-provided ``check`` function is valid.
 
         Most `~lsst.pex.config.Field` subclasses should call
-        `lsst.pex.config.field.Field.validate` if they re-implement
-        `~lsst.pex.config.field.Field.validate`.
+        `lsst.pex.config.Field.validate` if they re-implement
+        `~lsst.pex.config.Field.validate`.
         """
         value = self.__get__(instance)
         value.validate()

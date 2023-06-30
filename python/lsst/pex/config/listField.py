@@ -406,13 +406,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             Raised if:
 
             - The field is not optional, but the value is `None`.
-            - The list itself does not meet the requirements of the `length`,
-              `minLength`, or `maxLength` attributes.
-            - The `listCheck` callable returns `False`.
+            - The list itself does not meet the requirements of the ``length``,
+              ``minLength``, or ``maxLength`` attributes.
+            - The ``listCheck`` callable returns `False`.
 
         Notes
         -----
-        Individual item checks (`itemCheck`) are applied when each item is
+        Individual item checks (``itemCheck``) are applied when each item is
         set and are not re-checked by this method.
         """
         Field.validate(self, instance)
