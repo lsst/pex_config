@@ -894,7 +894,7 @@ class RecordingImporter:
         """Uninstall the importer."""
         sys.meta_path = self.origMetaPath
 
-    def find_module(self, fullname, path=None):
+    def find_spec(self, fullname, path, target=None):
         """Find a module.
 
         Called as part of the ``import`` chain of events.
