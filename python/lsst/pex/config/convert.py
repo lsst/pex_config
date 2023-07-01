@@ -57,7 +57,7 @@ def makePropertySet(config):
         instance. If ``config`` is `None` then this return value is also
         `None`.
 
-    See also
+    See Also
     --------
     lsst.daf.base.PropertySet
     """

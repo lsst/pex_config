@@ -42,7 +42,7 @@ def getCallerFrame(relative=0):
 
     Returns
     -------
-    frame : `__builtin__.Frame`
+    frame : `types.FrameType`
         Frame for the caller.
 
     Notes
@@ -97,7 +97,7 @@ class StackFrame:
     stack trace by the fact that it does not look up the source code until it
     is absolutely necessary, reducing the I/O.
 
-    See also
+    See Also
     --------
     getStackFrame
     """
@@ -127,7 +127,7 @@ class StackFrame:
 
         Parameters
         ----------
-        frame : `Frame`
+        frame : `types.FrameType`
             Frame object to interpret, such as from `inspect.currentframe`.
 
         Returns
@@ -149,7 +149,7 @@ class StackFrame:
         return cls(filename, lineno, function)
 
     def __repr__(self):
-        return "%s(%s, %s, %s)" % (self.__class__.__name__, self.filename, self.lineno, self.function)
+        return f"{self.__class__.__name__}({self.filename}, {self.lineno}, {self.function})"
 
     def format(self, full=False):
         """Format for printing.
@@ -165,9 +165,9 @@ class StackFrame:
         result : `str`
             Formatted string.
         """
-        result = "  File %s:%s (%s)" % (self.filename, self.lineno, self.function)
+        result = f"  File {self.filename}:{self.lineno} ({self.function})"
         if full:
-            result += "\n    %s" % (self.content,)
+            result += f"\n    {self.content}"
         return result
 
 

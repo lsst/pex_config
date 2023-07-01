@@ -33,12 +33,16 @@ import lsst.pex.config as pexConf
 
 
 class PexTestConfig(pexConf.Config):
+    """Test config."""
+
     list1 = pexConf.ListField(dtype=int, default=[1, 2], doc="list1")
     f1 = pexConf.Field(dtype=float, doc="f1")
     f2 = pexConf.Field(dtype=float, doc="f2")
 
 
 class EqualityTest(unittest.TestCase):
+    """Tests for equality."""
+
     def test(self):
         c1 = PexTestConfig()
         c2 = PexTestConfig()
@@ -50,6 +54,8 @@ class EqualityTest(unittest.TestCase):
 
 
 class LoadSpecialTest(unittest.TestCase):
+    """Load tests."""
+
     def test(self):
         c1 = PexTestConfig()
         c2 = PexTestConfig()

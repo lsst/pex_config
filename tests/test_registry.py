@@ -31,6 +31,8 @@ import lsst.pex.config as pexConfig
 
 
 class ConfigTest(unittest.TestCase):
+    """Test registry."""
+
     def setUp(self):
         """Note: the classes are defined here in order to test the register
         decorator.
@@ -100,7 +102,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.registry["foo2"].ConfigClass, self.fooConfig2Class)
         self.assertEqual(self.registry["foo21"].ConfigClass, self.fooConfig1Class)
 
-        self.assertEqual(set(self.registry.keys()), set(("foo1", "foo2", "foo21")))
+        self.assertEqual(set(self.registry.keys()), {"foo1", "foo2", "foo21"})
 
     def testWrapper(self):
         wrapper21 = self.registry["foo21"]
@@ -108,13 +110,14 @@ class ConfigTest(unittest.TestCase):
         self.assertIsInstance(foo21, self.fooAlg2Class)
 
     def testReplace(self):
-        """Test replacement in registry (should always fail)"""
+        """Test replacement in registry (should always fail)."""
         self.assertRaises(Exception, self.registry.register, "foo1", self.fooAlg2Class)
         self.assertEqual(self.registry["foo1"], self.fooAlg1Class)
 
     def testNesting(self):
         """Make sure nesting a config with a RegistryField doesn't deep-copy
-        the registry."""
+        the registry.
+        """
 
         class MidConfig(pexConfig.Config):
             field = self.registry.makeField("docs for registry field")

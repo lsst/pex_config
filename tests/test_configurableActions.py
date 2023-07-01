@@ -23,20 +23,16 @@ import unittest
 from io import StringIO
 from types import SimpleNamespace
 
+import lsst.pex.config.configurableActions.tests as actionTests
 from lsst.pex.config import FieldValidationError
-from lsst.pex.config.configurableActions.tests import (
-    ActionTest1,
-    ActionTest2,
-    ActionTest3,
-    TestConfig,
-    TestDivideAction,
-    TestSingleColumnAction,
-)
+from lsst.pex.config.configurableActions.tests import ActionTest1, ActionTest2, ActionTest3
 
 
 class ConfigurableActionsTestCase(unittest.TestCase):
+    """Test fo ConfigurableActions."""
+
     def _createConfig(self, default=None, singleDefault=None):
-        class NewTestConfig(TestConfig):
+        class NewTestConfig(actionTests.TestConfig):
             def setDefaults(self):
                 super().setDefaults()
                 if default is not None:
@@ -218,17 +214,17 @@ class ConfigurableActionsTestCase(unittest.TestCase):
         # This method will also test rename, as it is part of the
         # implementation in pex_config
         ioObject = StringIO()
-        config = TestConfig()
+        config = actionTests.TestConfig()
         config.actions.test1 = ActionTest1
         config.actions.test2 = ActionTest2
-        config.singleAction = TestDivideAction(
-            colA=TestSingleColumnAction(column="a"),
-            colB=TestSingleColumnAction(column="b"),
+        config.singleAction = actionTests.TestDivideAction(
+            colA=actionTests.TestSingleColumnAction(column="a"),
+            colB=actionTests.TestSingleColumnAction(column="b"),
         )
 
         config.saveToStream(ioObject)
         string1 = ioObject.getvalue()
-        loadedConfig = TestConfig()
+        loadedConfig = actionTests.TestConfig()
         loadedConfig.loadFromStream(string1)
         self.assertTrue(config.compare(loadedConfig), msg=f"{config} != {loadedConfig}")
         # Be sure that the fields are actually there
@@ -237,12 +233,12 @@ class ConfigurableActionsTestCase(unittest.TestCase):
         self.assertEqual(loadedConfig.singleAction.colB.column, "b")
         # Save an equivalent struct with fields originally ordered differently,
         # check that the saved form is the same (via deterministic sorting).
-        config2 = TestConfig()
+        config2 = actionTests.TestConfig()
         config2.actions.test2 = ActionTest2
         config2.actions.test1 = ActionTest1
-        config2.singleAction = TestDivideAction(
-            colB=TestSingleColumnAction(column="b"),
-            colA=TestSingleColumnAction(column="a"),
+        config2.singleAction = actionTests.TestDivideAction(
+            colB=actionTests.TestSingleColumnAction(column="b"),
+            colA=actionTests.TestSingleColumnAction(column="a"),
         )
         ioObject2 = StringIO()
         config2.saveToStream(ioObject2)
@@ -250,7 +246,7 @@ class ConfigurableActionsTestCase(unittest.TestCase):
         self.assertEqual(string1, ioObject2.getvalue())
 
     def testToDict(self):
-        """Test the toDict interface"""
+        """Test the toDict interface."""
         configClass = self._createConfig(default={"test1": ActionTest1}, singleDefault=ActionTest1)
         config = configClass()
         self.assertEqual(config.toDict(), {"actions": {"test1": {"var": 0}}, "singleAction": {"var": 0}})

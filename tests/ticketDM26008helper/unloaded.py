@@ -29,6 +29,8 @@ import lsst.pex.config as pexConfig
 
 
 class Unloaded(pexConfig.Config):
+    """Test config used by DM-26008 test code."""
+
     i = pexConfig.Field("integer test", int, optional=True)
     f = pexConfig.Field("float test", float, default=3.0)
     b = pexConfig.Field("boolean test", bool, default=False, optional=False)

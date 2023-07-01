@@ -60,7 +60,7 @@ class RangeField(Field):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -73,7 +73,7 @@ class RangeField(Field):
     RegistryField
     """
 
-    supportedTypes = set((int, float))
+    supportedTypes = {int, float}
     """The set of data types allowed by `RangeField` instances (`set`
     containing `int` and `float` types).
     """
@@ -98,9 +98,9 @@ class RangeField(Field):
 
         if min is not None and max is not None:
             if min > max:
-                raise ValueError("min = %s > %s = max" % (min, max))
+                raise ValueError(f"min = {min} > {max} = max")
             elif min == max and not (inclusiveMin and inclusiveMax):
-                raise ValueError("min = max = %s and min and max not both inclusive" % (min,))
+                raise ValueError(f"min = max = {min} and min and max not both inclusive")
 
         self.min = min
         """Minimum value accepted in the range. If `None`, the range has no
@@ -129,7 +129,7 @@ class RangeField(Field):
             source=source,
             deprecated=deprecated,
         )
-        self.rangeString = "%s%s,%s%s" % (
+        self.rangeString = "{}{},{}{}".format(
             ("[" if inclusiveMin else "("),
             ("-inf" if self.min is None else self.min),
             ("inf" if self.max is None else self.max),
@@ -143,5 +143,5 @@ class RangeField(Field):
     def _validateValue(self, value):
         Field._validateValue(self, value)
         if not self.minCheck(value, self.min) or not self.maxCheck(value, self.max):
-            msg = "%s is outside of valid range %s" % (value, self.rangeString)
+            msg = f"{value} is outside of valid range {self.rangeString}"
             raise ValueError(msg)

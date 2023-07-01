@@ -23,22 +23,9 @@ from __future__ import annotations
 __all__ = ("ConfigurableActionStructField", "ConfigurableActionStruct")
 
 import weakref
+from collections.abc import Iterable, Iterator, Mapping
 from types import GenericAlias, SimpleNamespace
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    Iterable,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Generic, TypeVar, overload
 
 from lsst.pex.config.callStack import StackFrame, getCallStack, getStackFrame
 from lsst.pex.config.comparison import compareConfigs, compareScalars, getComparisonName
@@ -48,16 +35,17 @@ from . import ActionTypeVar, ConfigurableAction
 
 
 class ConfigurableActionStructUpdater:
-    """This descriptor exists to abstract the logic of using a dictionary to
-    update a ConfigurableActionStruct through attribute assignment. This is
-    useful in the context of setting configuration through pipelines or on
-    the command line.
+    """Abstract the logic of using a dictionary to update a
+    `ConfigurableActionStruct` through attribute assignment.
+
+    This is useful in the context of setting configuration through pipelines
+    or on the command line.
     """
 
     def __set__(
         self,
         instance: ConfigurableActionStruct,
-        value: Union[Mapping[str, ConfigurableAction], ConfigurableActionStruct],
+        value: Mapping[str, ConfigurableAction] | ConfigurableActionStruct,
     ) -> None:
         if isinstance(value, Mapping):
             pass
@@ -78,10 +66,11 @@ class ConfigurableActionStructUpdater:
 
 
 class ConfigurableActionStructRemover:
-    """This descriptor exists to abstract the logic of removing an iterable
-    of action names from a ConfigurableActionStruct at one time using
-    attribute assignment. This is useful in the context of setting
-    configuration through pipelines or on the command line.
+    """Abstract the logic of removing an iterable of action names from a
+    `ConfigurableActionStruct` at one time using attribute assignment.
+
+    This is useful in the context of setting configuration through pipelines
+    or on the command line.
 
     Raises
     ------
@@ -90,7 +79,7 @@ class ConfigurableActionStructRemover:
         ConfigurableActionStruct
     """
 
-    def __set__(self, instance: ConfigurableActionStruct, value: Union[str, Iterable[str]]) -> None:
+    def __set__(self, instance: ConfigurableActionStruct, value: str | Iterable[str]) -> None:
         # strings are iterable, but not in the way that is intended. If a
         # single name is specified, turn it into a tuple before attempting
         # to remove the attribute
@@ -109,21 +98,23 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     the ConfigurableActionStructField. This class should not be created
     directly.
 
-    This class allows managing a collection of `ConfigurableActions` with a
+    This class allows managing a collection of `ConfigurableAction` with a
     struct like interface, that is to say in an attribute like notation.
 
     Attributes can be dynamically added or removed as such:
 
-    ConfigurableActionStructInstance.variable1 = a_configurable_action
-    del ConfigurableActionStructInstance.variable1
+    .. code-block:: python
+
+        ConfigurableActionStructInstance.variable1 = a_configurable_action
+        del ConfigurableActionStructInstance.variable1
 
     Each action is then available to be individually configured as a normal
     `lsst.pex.config.Config` object.
 
-    ConfigurableActionStruct supports two special convenience attributes.
+    `ConfigurableActionStruct` supports two special convenience attributes.
 
-    The first is ``update``. You may assign a dict of `ConfigurableActions` or
-    a `ConfigurableActionStruct` to this attribute which will update the
+    The first is ``update``. You may assign a dict of `ConfigurableAction` or a
+    `ConfigurableActionStruct` to this attribute which will update the
     `ConfigurableActionStruct` on which the attribute is invoked such that it
     will be updated to contain the entries specified by the structure on the
     right hand side of the equals sign.
@@ -138,9 +129,9 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
 
     # declare attributes that are set with __setattr__
     _config_: weakref.ref
-    _attrs: Dict[str, ActionTypeVar]
+    _attrs: dict[str, ActionTypeVar]
     _field: ConfigurableActionStructField
-    _history: List[tuple]
+    _history: list[tuple]
 
     # create descriptors to handle special update and remove behavior
     update = ConfigurableActionStructUpdater()
@@ -174,7 +165,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         return value
 
     @property
-    def history(self) -> List[tuple]:
+    def history(self) -> list[tuple]:
         return self._history
 
     @property
@@ -184,7 +175,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     def __setattr__(
         self,
         attr: str,
-        value: Union[ActionTypeVar, Type[ActionTypeVar]],
+        value: ActionTypeVar | type[ActionTypeVar],
         at=None,
         label="setattr",
         setHistory=False,
@@ -229,7 +220,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         for name in self.fieldNames:
             yield getattr(self, name)
 
-    def items(self) -> Iterable[Tuple[str, ActionTypeVar]]:
+    def items(self) -> Iterable[tuple[str, ActionTypeVar]]:
         for name in self.fieldNames:
             yield name, getattr(self, name)
 
@@ -246,10 +237,11 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     `~lsst.pex.config.Config` class in a manner similar to how a
     `~lsst.pipe.base.Struct` works.
 
-    This class uses a `ConfigurableActionStruct` as an intermediary
-    object to organize the `ConfigurableActions`. See its documentation for
-    further information.
+    This class uses a `ConfigurableActionStruct` as an intermediary object to
+    organize the `ConfigurableAction`. See its documentation for further
+    information.
     """
+
     # specify StructClass to make this more generic for potential future
     # inheritance
     StructClass = ConfigurableActionStruct
@@ -257,12 +249,12 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     # Explicitly annotate these on the class, they are present in the base
     # class through injection, so type systems have trouble seeing them.
     name: str
-    default: Optional[Mapping[str, ConfigurableAction]]
+    default: Mapping[str, ConfigurableAction] | None
 
     def __init__(
         self,
         doc: str,
-        default: Optional[Mapping[str, ConfigurableAction]] = None,
+        default: Mapping[str, ConfigurableAction] | None = None,
         optional: bool = False,
         deprecated=None,
     ):
@@ -283,14 +275,14 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     def __set__(
         self,
         instance: Config,
-        value: Union[
-            None,
-            Mapping[str, ConfigurableAction],
-            SimpleNamespace,
-            ConfigurableActionStruct,
-            ConfigurableActionStructField,
-            Type[ConfigurableActionStructField],
-        ],
+        value: (
+            None
+            | Mapping[str, ConfigurableAction]
+            | SimpleNamespace
+            | ConfigurableActionStruct
+            | ConfigurableActionStructField
+            | type[ConfigurableActionStructField]
+        ),
         at: Iterable[StackFrame] = None,
         label: str = "assigment",
     ):
@@ -347,7 +339,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         if instance is None or not isinstance(instance, Config):
             return self
         else:
-            field: Optional[ConfigurableActionStruct] = instance._storage[self.name]
+            field: ConfigurableActionStruct | None = instance._storage[self.name]
             return field
 
     def rename(self, instance: Config):
@@ -384,7 +376,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
             return
 
         for _, v in sorted(actionStruct.items()):
-            outfile.write("{}={}()\n".format(v._name, _typeStr(v)))
+            outfile.write(f"{v._name}={_typeStr(v)}()\n")
             v._save(outfile)
 
     def freeze(self, instance):

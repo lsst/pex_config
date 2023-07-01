@@ -25,18 +25,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pickle
+import tempfile
 import unittest
 
 import lsst.pex.config as pexConf
 
 
 class Config1(pexConf.Config):
+    """First test config."""
+
     f = pexConf.Field("f", dtype=float, default=5, check=lambda x: x > 0)
 
 
 class Target1:
+    """First target class."""
+
     ConfigClass = Config1
 
     def __init__(self, config):
@@ -44,15 +48,20 @@ class Target1:
 
 
 def Target2(config):
+    """Second target class."""
     return config.f
 
 
 class Config2(pexConf.Config):
+    """Second test config."""
+
     c1 = pexConf.ConfigurableField("c1", target=Target1)
     c2 = pexConf.ConfigurableField("c2", target=Target2, ConfigClass=Config1, default=Config1(f=3))
 
 
 class ConfigurableFieldTest(unittest.TestCase):
+    """Test of ConfigurableField."""
+
     def testConstructor(self):
         try:
 
@@ -132,11 +141,12 @@ class ConfigurableFieldTest(unittest.TestCase):
         c = Config2()
         c.c2.retarget(Target1)
         c.c2.f = 10
-        c.save("test.py")
 
-        r = Config2()
-        r.load("test.py")
-        os.remove("test.py")
+        with tempfile.NamedTemporaryFile(suffix=".py", prefix="test-config-field-") as tmp:
+            c.save(tmp.name)
+
+            r = Config2()
+            r.load(tmp.name)
 
         self.assertEqual(c.c2.f, r.c2.f)
         self.assertEqual(c.c2.target, r.c2.target)

@@ -26,12 +26,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import tempfile
 import unittest
 
 import lsst.pex.config as pexConfig
 
 
 class Config1(pexConfig.Config):
+    """First test config."""
+
     f = pexConfig.Field("f", float, default=3.0)
 
     def _collectImports(self):
@@ -40,14 +43,20 @@ class Config1(pexConfig.Config):
 
 
 class Config2(pexConfig.Config):
+    """Second test config."""
+
     d1 = pexConfig.ConfigDictField("d1", keytype=str, itemtype=Config1, itemCheck=lambda x: x.f > 0)
 
 
 class Config3(pexConfig.Config):
+    """Third test config."""
+
     field1 = pexConfig.ConfigDictField(keytype=str, itemtype=pexConfig.Config, default={}, doc="doc")
 
 
 class ConfigDictFieldTest(unittest.TestCase):
+    """Test of ConfigDictField."""
+
     def testConstructor(self):
         try:
 
@@ -116,24 +125,26 @@ class ConfigDictFieldTest(unittest.TestCase):
 
     def testSave(self):
         c = Config2(d1={"a": Config1(f=4)})
-        c.save("configDictTest.py")
 
         # verify _collectImports is called on all the configDictValues
         stringOutput = c.saveToString()
         self.assertIn("import builtins", stringOutput)
 
-        rt = Config2()
-        rt.load("configDictTest.py")
+        with tempfile.TemporaryDirectory(prefix="config-dictfield-", ignore_cleanup_errors=True) as tmpdir:
+            path = os.path.join(tmpdir, "configDictTest.py")
+            c.save(path)
 
-        os.remove("configDictTest.py")
-        self.assertEqual(rt.d1["a"].f, c.d1["a"].f)
+            rt = Config2()
+            rt.load(path)
 
-        c = Config2()
-        c.save("emptyConfigDictTest.py")
-        rt.load("emptyConfigDictTest.py")
-        os.remove("emptyConfigDictTest.py")
+            self.assertEqual(rt.d1["a"].f, c.d1["a"].f)
 
-        self.assertIsNone(rt.d1)
+            c = Config2()
+            path = os.path.join(tmpdir, "emptyConfigDictTest.py")
+            c.save(path)
+            rt.load(path)
+
+            self.assertIsNone(rt.d1)
 
     def testToDict(self):
         c = Config2(d1={"a": Config1(f=4), "b": Config1})
@@ -151,7 +162,7 @@ class ConfigDictFieldTest(unittest.TestCase):
         self.assertRaises(pexConfig.FieldValidationError, setattr, c.d1, "should", "fail")
 
     def testEquality(self):
-        """Test ConfigDictField.__eq__
+        """Test ConfigDictField.__eq__.
 
         We create two configs, with the keys explicitly added in a different
         order and test their equality.

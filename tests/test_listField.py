@@ -32,6 +32,7 @@ import lsst.pex.config as pexConfig
 
 
 def isSorted(theList):
+    """Determine if a list is sorted."""
     if len(theList) <= 1:
         return True
 
@@ -44,10 +45,13 @@ def isSorted(theList):
 
 
 def isPositive(x):
+    """Determine if an integer is positive."""
     return x > 0
 
 
 class Config1(pexConfig.Config):
+    """First test config."""
+
     l1 = pexConfig.ListField("l1", int, minLength=2, maxLength=5, default=[1, 2, 3], itemCheck=isPositive)
     l2 = pexConfig.ListField("l2", int, length=3, default=[1, 2, 3], listCheck=isSorted, itemCheck=isPositive)
     l3 = pexConfig.ListField("l3", int, length=3, default=None, optional=True, itemCheck=isPositive)
@@ -55,11 +59,15 @@ class Config1(pexConfig.Config):
 
 
 class Config2(pexConfig.Config):
+    """Second test config."""
+
     lf = pexConfig.ListField("lf", float, default=[1, 2, 3])
     ls = pexConfig.ListField("ls", str, default=["hi"])
 
 
 class ListFieldTest(unittest.TestCase):
+    """Test ListField."""
+
     def testConstructor(self):
         try:
 

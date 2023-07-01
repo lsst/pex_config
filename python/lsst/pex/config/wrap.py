@@ -146,7 +146,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
     ``std::int64_t``, ``double``, and ``std::string`` fields, along with
     ``std::list`` and ``std::vectors`` of those types.
 
-    See also
+    See Also
     --------
     wrap
     """
@@ -200,7 +200,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
                     try:
                         dtype = getattr(nestedModuleObj, ctype).ConfigClass
                     except AttributeError:
-                        raise AttributeError("'%s.%s.ConfigClass' does not exist" % (moduleName, ctype))
+                        raise AttributeError(f"'{moduleName}.{ctype}.ConfigClass' does not exist")
                     fields[k] = ConfigField(doc=doc, dtype=dtype)
                 else:
                     try:
@@ -303,8 +303,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
 
 
 def wrap(ctrl):
-    """Decorator that adds fields from a C++ control class to a
-    `lsst.pex.config.Config` class.
+    """Add fields from a C++ control class to a `lsst.pex.config.Config` class.
 
     Parameters
     ----------
@@ -325,7 +324,7 @@ def wrap(ctrl):
         class MyConfigClass(Config):
             pass
 
-    See also
+    See Also
     --------
     makeConfigClass
     """

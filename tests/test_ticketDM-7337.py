@@ -31,6 +31,8 @@ import lsst.pex.config
 
 
 class TicketDM7337Test(unittest.TestCase):
+    """Test for string ChoiceField."""
+
     def testStrChoice(self):
         """Test that ChoiceField converts "str" types to be compatible
         with string literals.

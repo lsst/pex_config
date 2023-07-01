@@ -31,6 +31,8 @@ import lsst.pex.config as pexConf
 
 
 class SubConfigDefaultsTest(unittest.TestCase):
+    """Test ticket 1911."""
+
     def setUp(self):
         class Configurable:
             class ConfigClass(pexConf.Config):

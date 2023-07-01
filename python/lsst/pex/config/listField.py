@@ -28,9 +28,9 @@
 __all__ = ["ListField"]
 
 import collections.abc
-import sys
 import weakref
-from typing import Any, Generic, Iterable, MutableSequence, Union, overload
+from collections.abc import Iterable, MutableSequence
+from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
@@ -45,13 +45,8 @@ from .config import (
     _typeStr,
 )
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.MutableSequence, Generic[FieldTypeVar])
-else:
-    _bases = (collections.abc.MutableSequence[FieldTypeVar],)
 
-
-class List(*_bases):
+class List(collections.abc.MutableSequence[FieldTypeVar]):
     """List collection used internally by `ListField`.
 
     Parameters
@@ -89,7 +84,7 @@ class List(*_bases):
                 for i, x in enumerate(value):
                     self.insert(i, x, setHistory=False)
             except TypeError:
-                msg = "Value %s is of incorrect type %s. Sequence type expected" % (value, _typeStr(value))
+                msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
                 raise FieldValidationError(self._field, config, msg)
         if setHistory:
             self.history.append((list(self._list), at, label))
@@ -119,7 +114,6 @@ class List(*_bases):
             appropriate type for this field or does not pass the field's
             `ListField.itemCheck` method.
         """
-
         if not isinstance(x, self._field.itemtype) and x is not None:
             msg = "Item at position %d with value %s is of incorrect type %s. Expected %s" % (
                 i,
@@ -260,7 +254,7 @@ class List(*_bases):
             object.__setattr__(self, attr, value)
         else:
             # We throw everything else.
-            msg = "%s has no attribute %s" % (_typeStr(self._field), attr)
+            msg = f"{_typeStr(self._field)} has no attribute {attr}"
             raise FieldValidationError(self._field, self._config, msg)
 
     def __reduce__(self):
@@ -304,7 +298,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -407,13 +401,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             Raised if:
 
             - The field is not optional, but the value is `None`.
-            - The list itself does not meet the requirements of the `length`,
-              `minLength`, or `maxLength` attributes.
-            - The `listCheck` callable returns `False`.
+            - The list itself does not meet the requirements of the ``length``,
+              ``minLength``, or ``maxLength`` attributes.
+            - The ``listCheck`` callable returns `False`.
 
         Notes
         -----
-        Individual item checks (`itemCheck`) are applied when each item is
+        Individual item checks (``itemCheck``) are applied when each item is
         set and are not re-checked by this method.
         """
         Field.validate(self, instance)
@@ -436,7 +430,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
     def __set__(
         self,
         instance: Config,
-        value: Union[Iterable[FieldTypeVar], None],
+        value: Iterable[FieldTypeVar] | None,
         at: Any = None,
         label: str = "assignment",
     ) -> None:

@@ -30,9 +30,9 @@ from __future__ import annotations
 __all__ = ["DictField"]
 
 import collections.abc
-import sys
 import weakref
-from typing import Any, ForwardRef, Generic, Iterator, Mapping, Type, TypeVar, Union, cast
+from collections.abc import Iterator, Mapping
+from typing import Any, ForwardRef, Generic, TypeVar, cast
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
@@ -50,13 +50,7 @@ KeyTypeVar = TypeVar("KeyTypeVar")
 ItemTypeVar = TypeVar("ItemTypeVar")
 
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.MutableMapping, Generic[KeyTypeVar, ItemTypeVar])
-else:
-    _bases = (collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar],)
-
-
-class Dict(*_bases):
+class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
     """An internal mapping container.
 
     This class emulates a `dict`, but adds validation and provenance.
@@ -74,7 +68,7 @@ class Dict(*_bases):
                     # do not set history per-item
                     self.__setitem__(k, value[k], at=at, label=label, setHistory=False)
             except TypeError:
-                msg = "Value %s is of incorrect type %s. Mapping type expected." % (value, _typeStr(value))
+                msg = f"Value {value} is of incorrect type {_typeStr(value)}. Mapping type expected."
                 raise FieldValidationError(self._field, self._config, msg)
         if setHistory:
             self._history.append((dict(self._dict), at, label))
@@ -107,24 +101,24 @@ class Dict(*_bases):
         self, k: KeyTypeVar, x: ItemTypeVar, at: Any = None, label: str = "setitem", setHistory: bool = True
     ) -> None:
         if self._config._frozen:
-            msg = "Cannot modify a frozen Config. Attempting to set item at key %r to value %s" % (k, x)
+            msg = f"Cannot modify a frozen Config. Attempting to set item at key {k!r} to value {x}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # validate keytype
         k = _autocast(k, self._field.keytype)
         if type(k) != self._field.keytype:
-            msg = "Key %r is of type %s, expected type %s" % (k, _typeStr(k), _typeStr(self._field.keytype))
+            msg = f"Key {k!r} is of type {_typeStr(k)}, expected type {_typeStr(self._field.keytype)}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # validate itemtype
         x = _autocast(x, self._field.itemtype)
         if self._field.itemtype is None:
             if type(x) not in self._field.supportedTypes and x is not None:
-                msg = "Value %s at key %r is of invalid type %s" % (x, k, _typeStr(x))
+                msg = f"Value {x} at key {k!r} is of invalid type {_typeStr(x)}"
                 raise FieldValidationError(self._field, self._config, msg)
         else:
             if type(x) != self._field.itemtype and x is not None:
-                msg = "Value %s at key %r is of incorrect type %s. Expected type %s" % (
+                msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                     x,
                     k,
                     _typeStr(x),
@@ -134,7 +128,7 @@ class Dict(*_bases):
 
         # validate item using itemcheck
         if self._field.itemCheck is not None and not self._field.itemCheck(x):
-            msg = "Item at key %r is not a valid value: %s" % (k, x)
+            msg = f"Item at key {k!r} is not a valid value: {x}"
             raise FieldValidationError(self._field, self._config, msg)
 
         if at is None:
@@ -171,7 +165,7 @@ class Dict(*_bases):
             object.__setattr__(self, attr, value)
         else:
             # We throw everything else.
-            msg = "%s has no attribute %s" % (_typeStr(self._field), attr)
+            msg = f"{_typeStr(self._field)} has no attribute {attr}"
             raise FieldValidationError(self._field, self._config, msg)
 
     def __reduce__(self):
@@ -213,7 +207,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -242,11 +236,11 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     {'myKey': 42}
     """
 
-    DictClass: Type[Dict] = Dict
+    DictClass: type[Dict] = Dict
 
     @staticmethod
     def _parseTypingArgs(
-        params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
+        params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
         if len(params) != 2:
             raise ValueError("Only tuples of types that are length 2 are supported")
@@ -353,7 +347,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     def __set__(
         self,
         instance: Config,
-        value: Union[Mapping[KeyTypeVar, ItemTypeVar], None],
+        value: Mapping[KeyTypeVar, ItemTypeVar] | None,
         at: Any = None,
         label: str = "assignment",
     ) -> None:
@@ -434,7 +428,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         for k, v1 in d1.items():
             v2 = d2[k]
             result = compareScalars(
-                "%s[%r]" % (name, k), v1, v2, dtype=self.itemtype, rtol=rtol, atol=atol, output=output
+                f"{name}[{k!r}]", v1, v2, dtype=self.itemtype, rtol=rtol, atol=atol, output=output
             )
             if not result and shortcut:
                 return False

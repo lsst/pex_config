@@ -56,7 +56,7 @@ class ChoiceField(Field[FieldTypeVar]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ConfigChoiceField
     ConfigDictField
@@ -92,7 +92,7 @@ class ChoiceField(Field[FieldTypeVar]):
                     "ChoiceField's allowed choice %s is of incorrect type %s. Expected %s"
                     % (choice, _typeStr(choice), _typeStr(dtype))
                 )
-            self.__doc__ += "%s\n  %s\n" % ("``{0!r}``".format(str(choice)), choiceDoc)
+            self.__doc__ += "{}\n  {}\n".format(f"``{str(choice)!r}``", choiceDoc)
 
         self.source = getStackFrame()
 

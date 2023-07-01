@@ -29,8 +29,10 @@ from .define import TestConfig, TestConfigurable
 
 
 class AnotherConfig(TestConfig):
-    pass
+    """Another test config."""
 
 
 class AnotherConfigurable(TestConfigurable):
+    """Another configurable."""
+
     ConfigClass = AnotherConfig

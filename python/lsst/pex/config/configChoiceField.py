@@ -30,9 +30,8 @@ __all__ = ["ConfigChoiceField"]
 
 import collections.abc
 import copy
-import sys
 import weakref
-from typing import Any, ForwardRef, Optional, Union, overload
+from typing import Any, ForwardRef, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, compareScalars, getComparisonName
@@ -78,7 +77,7 @@ class SelectionSet(collections.abc.MutableSet):
                         # invoke __getitem__ to ensure it's present
                         self._dict.__getitem__(v, at=at)
             except TypeError:
-                msg = "Value %s is of incorrect type %s. Sequence type expected" % (value, _typeStr(value))
+                msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
                 raise FieldValidationError(self._field, self._config, msg)
             self._set = set(value)
         else:
@@ -146,13 +145,7 @@ class SelectionSet(collections.abc.MutableSet):
         )
 
 
-if int(sys.version_info.minor) < 9:
-    _bases = (collections.abc.Mapping,)
-else:
-    _bases = (collections.abc.Mapping[str, Config],)
-
-
-class ConfigInstanceDict(*_bases):
+class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
     """Dictionary of instantiated configs, used to populate a
     `~lsst.pex.config.ConfigChoiceField`.
 
@@ -168,7 +161,7 @@ class ConfigInstanceDict(*_bases):
 
     def __init__(self, config, field):
         collections.abc.Mapping.__init__(self)
-        self._dict = dict()
+        self._dict = {}
         self._selection = None
         self._config = config
         self._field = field
@@ -303,7 +296,7 @@ class ConfigInstanceDict(*_bases):
             raise FieldValidationError(self._field, self._config, "Unknown key %r" % k)
 
         if value != dtype and type(value) != dtype:
-            msg = "Value %s at key %s is of incorrect type %s. Expected type %s" % (
+            msg = "Value {} at key {} is of incorrect type {}. Expected type {}".format(
                 value,
                 k,
                 _typeStr(value),
@@ -346,11 +339,13 @@ class ConfigInstanceDict(*_bases):
             object.__setattr__(self, attr, value)
         else:
             # We throw everything else.
-            msg = "%s has no attribute %s" % (_typeStr(self._field), attr)
+            msg = f"{_typeStr(self._field)} has no attribute {attr}"
             raise FieldValidationError(self._field, self._config, msg)
 
     def freeze(self):
-        """Invoking this freeze method will create a local copy of the field
+        """Freeze the config.
+
+        Invoking this freeze method will create a local copy of the field
         attribute's typemap. This decouples this instance dict from the
         underlying objects type map ensuring that and subsequent changes to the
         typemap will not be reflected in this instance (i.e imports adding
@@ -395,7 +390,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigDictField
@@ -488,7 +483,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         self.typemap = typemap
         self.multi = multi
 
-    def __class_getitem__(cls, params: Union[tuple[type, ...], type, ForwardRef]):
+    def __class_getitem__(cls, params: tuple[type, ...] | type | ForwardRef):
         raise ValueError("ConfigChoiceField does not support typing argument")
 
     def _getOrMake(self, instance, label="default"):
@@ -506,7 +501,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigChoiceField":
+    ) -> ConfigChoiceField:
         ...
 
     @overload
@@ -522,7 +517,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
             return self._getOrMake(instance)
 
     def __set__(
-        self, instance: Config, value: Optional[ConfigInstanceDict], at: Any = None, label: str = "assignment"
+        self, instance: Config, value: ConfigInstanceDict | None, at: Any = None, label: str = "assignment"
     ) -> None:
         if instance._frozen:
             raise FieldValidationError(self, instance, "Cannot modify a frozen Config")
@@ -588,9 +583,9 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         for v in instanceDict.values():
             v._save(outfile)
         if self.multi:
-            outfile.write("{}.names={!r}\n".format(fullname, sorted(instanceDict.names)))
+            outfile.write(f"{fullname}.names={sorted(instanceDict.names)!r}\n")
         else:
-            outfile.write("{}.name={!r}\n".format(fullname, instanceDict.name))
+            outfile.write(f"{fullname}.name={instanceDict.name!r}\n")
 
     def __deepcopy__(self, memo):
         """Customize deep-copying, because we always want a reference to the
@@ -658,7 +653,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         equal = True
         for k, c1, c2 in nested:
             result = compareConfigs(
-                "%s[%r]" % (name, k), c1, c2, shortcut=shortcut, rtol=rtol, atol=atol, output=output
+                f"{name}[{k!r}]", c1, c2, shortcut=shortcut, rtol=rtol, atol=atol, output=output
             )
             if not result and shortcut:
                 return False

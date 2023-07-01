@@ -8,7 +8,7 @@ Field access
 ------------
 
 Iterating through a `Config` instance yields the names of the `Field` attributes it contains.
-The `Config` class also supports many dictionary-like methods: `~Config.keys`, `~Config.items`, `~Config.iterkeys`, `~Config.iteritems`, and `~Config.itervalues`.
+The `Config` class also supports many dictionary-like methods: `~Config.keys`, `~Config.items`, and `~Config.values`.
 
 History
 -------

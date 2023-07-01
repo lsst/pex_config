@@ -25,14 +25,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pickle
+import tempfile
 import unittest
 
 import lsst.pex.config as pexConfig
 
 
 class Config1(pexConfig.Config):
+    """The first test config."""
+
     f = pexConfig.Field(doc="Config1.f", dtype=int, default=4)
 
     def validate(self):
@@ -42,6 +44,8 @@ class Config1(pexConfig.Config):
 
 
 class Config2(pexConfig.Config):
+    """The second test config."""
+
     f = pexConfig.Field(doc="Config2.f", dtype=float, default=0.5, check=lambda x: x > 0)
 
 
@@ -49,6 +53,8 @@ TYPEMAP = {"AAA": Config1, "BBB": Config2, "CCC": Config1}
 
 
 class Config3(pexConfig.Config):
+    """A test config with choice fields."""
+
     a = pexConfig.ConfigChoiceField(
         doc="single non-optional", typemap=TYPEMAP, default="AAA", multi=False, optional=False
     )
@@ -64,6 +70,8 @@ class Config3(pexConfig.Config):
 
 
 class ConfigChoiceFieldTest(unittest.TestCase):
+    """Tests for ConfigChoiceField."""
+
     def setUp(self):
         self.config = Config3()
 
@@ -80,11 +88,13 @@ class ConfigChoiceFieldTest(unittest.TestCase):
         self.config.a["AAA"].f = 1
         self.config.a["BBB"].f = 1.0
         self.config.a = "BBB"
-        path = "choiceFieldTest.config"
-        self.config.save(path)
-        roundtrip = Config3()
-        roundtrip.load(path)
-        os.remove(path)
+
+        with tempfile.NamedTemporaryFile(prefix="choiceFieldTest-", suffix=".config") as temp:
+            path = temp.name
+            print(path)
+            self.config.save(path)
+            roundtrip = Config3()
+            roundtrip.load(path)
 
         self.assertEqual(self.config.a.name, roundtrip.a.name)
         self.assertEqual(self.config.a["AAA"].f, roundtrip.a["AAA"].f)
@@ -126,9 +136,9 @@ class ConfigChoiceFieldTest(unittest.TestCase):
     def testSelectionSet(self):
         # test in place modification
         self.config.c.names.add("BBB")
-        self.assertEqual(set(self.config.c.names), set(["AAA", "BBB"]))
+        self.assertEqual(set(self.config.c.names), {"AAA", "BBB"})
         self.config.c.names.remove("AAA")
-        self.assertEqual(set(self.config.c.names), set(["BBB"]))
+        self.assertEqual(set(self.config.c.names), {"BBB"})
         self.assertRaises(KeyError, self.config.c.names.remove, "AAA")
         self.config.c.names.discard("AAA")
 

@@ -355,7 +355,7 @@ class RegistryField(ConfigChoiceField):
         proxy (`RegistryInstanceDict`) and then all positional and keyword
         arguments passed to ``apply``.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -405,13 +405,12 @@ def makeRegistry(doc, configBaseType=Config):
         Docstring for the created `Registry` (this is set as the ``__doc__``
         attribute of the `Registry` instance.
     configBaseType : `lsst.pex.config.Config`-type
-        Base type of config classes in the `Registry`
-        (`lsst.pex.config.Registry.configBaseType`).
+        Base type of config classes in the `Registry`.
 
     Returns
     -------
     registry : `Registry`
-        Registry with ``__doc__`` and `~Registry.configBaseType` attributes
+        Registry with ``__doc__`` and ``_configBaseType`` attributes
         set.
     """
     cls = type("Registry", (Registry,), {"__doc__": doc})
@@ -419,8 +418,7 @@ def makeRegistry(doc, configBaseType=Config):
 
 
 def registerConfigurable(name, registry, ConfigClass=None):
-    """A decorator that adds a class as a configurable in a `Registry`
-    instance.
+    """Add a class as a configurable in a `Registry` instance.
 
     Parameters
     ----------
@@ -432,7 +430,7 @@ def registerConfigurable(name, registry, ConfigClass=None):
         Config class associated with the configurable. If `None`, the class's
         ``ConfigClass`` attribute is used instead.
 
-    See also
+    See Also
     --------
     registerConfig
 
@@ -449,8 +447,8 @@ def registerConfigurable(name, registry, ConfigClass=None):
 
 
 def registerConfig(name, registry, target):
-    """Decorator that adds a class as a ``ConfigClass`` in a `Registry` and
-    associates it with the given configurable.
+    """Add a class as a ``ConfigClass`` in a `Registry` and
+    associate it with the given configurable.
 
     Parameters
     ----------
@@ -461,7 +459,7 @@ def registerConfig(name, registry, target):
     target : obj
         A configurable type, such as a subclass of `lsst.pipe.base.Task`.
 
-    See also
+    See Also
     --------
     registerConfigurable
 

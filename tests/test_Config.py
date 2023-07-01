@@ -30,6 +30,7 @@ import itertools
 import os
 import pickle
 import re
+import tempfile
 import unittest
 
 try:
@@ -50,6 +51,8 @@ GLOBAL_REGISTRY = {}
 
 
 class Simple(pexConfig.Config):
+    """A simple config used for testing."""
+
     i = pexConfig.Field("integer test", int, optional=True)
     f = pexConfig.Field("float test", float, default=3.0)
     b = pexConfig.Field("boolean test", bool, default=False, optional=False)
@@ -70,6 +73,8 @@ GLOBAL_REGISTRY["AAA"] = Simple
 
 
 class InnerConfig(pexConfig.Config):
+    """Inner config used for testing."""
+
     f = pexConfig.Field("Inner.f", float, default=0.0, check=lambda x: x >= 0, optional=False)
 
 
@@ -77,6 +82,8 @@ GLOBAL_REGISTRY["BBB"] = InnerConfig
 
 
 class OuterConfig(InnerConfig, pexConfig.Config):
+    """Outer config used for testing."""
+
     i = pexConfig.ConfigField("Outer.i", InnerConfig)
 
     def __init__(self):
@@ -90,6 +97,8 @@ class OuterConfig(InnerConfig, pexConfig.Config):
 
 
 class Complex(pexConfig.Config):
+    """A complex config for testing."""
+
     c = pexConfig.ConfigField("an inner config", InnerConfig)
     r = pexConfig.ConfigChoiceField(
         "a registry field", typemap=GLOBAL_REGISTRY, default="AAA", optional=False
@@ -98,10 +107,14 @@ class Complex(pexConfig.Config):
 
 
 class Deprecation(pexConfig.Config):
+    """A test config with a deprecated field."""
+
     old = pexConfig.Field("Something.", int, default=10, deprecated="not used!")
 
 
 class ConfigTest(unittest.TestCase):
+    """Tests of basic Config functionality."""
+
     def setUp(self):
         self.simple = Simple()
         self.inner = InnerConfig()
@@ -223,7 +236,7 @@ class ConfigTest(unittest.TestCase):
         self.comp.validate()
 
     def testRangeFieldConstructor(self):
-        """Test RangeField constructor's checking of min, max"""
+        """Test RangeField constructor's checking of min, max."""
         val = 3
         self.assertRaises(ValueError, pexConfig.RangeField, "test", int, default=val, min=val, max=val - 1)
         self.assertRaises(
@@ -280,7 +293,7 @@ class ConfigTest(unittest.TestCase):
                 )
 
     def testRangeFieldDefault(self):
-        """Test RangeField's checking of the default value"""
+        """Test RangeField's checking of the default value."""
         minVal = 3
         maxVal = 4
         for val, inclusiveMin, inclusiveMax, shouldRaise in (
@@ -323,25 +336,37 @@ class ConfigTest(unittest.TestCase):
         self.comp.r = "BBB"
         self.comp.p = "AAA"
         self.comp.c.f = 5.0
-        self.comp.save("roundtrip.test")
+        with tempfile.TemporaryDirectory(prefix="config-save-test", ignore_cleanup_errors=True) as tmpdir:
+            roundtrip_path = os.path.join(tmpdir, "roundtrip.test")
+            self.comp.save(roundtrip_path)
 
-        roundTrip = Complex()
-        roundTrip.load("roundtrip.test")
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
-        del roundTrip
+            roundTrip = Complex()
+            roundTrip.load(roundtrip_path)
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
+            del roundTrip
 
-        # test saving to an open file
-        with open("roundtrip.test", "w") as outfile:
-            self.comp.saveToStream(outfile)
-        roundTrip = Complex()
-        with open("roundtrip.test", "r") as infile:
-            roundTrip.loadFromStream(infile)
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
-        del roundTrip
+            # test saving to an open file
+            roundtrip_path = os.path.join(tmpdir, "roundtrip_open.test")
+            with open(roundtrip_path, "w") as outfile:
+                self.comp.saveToStream(outfile)
+            roundTrip = Complex()
+            with open(roundtrip_path) as infile:
+                roundTrip.loadFromStream(infile)
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
+            del roundTrip
+
+            # Test an override of the default variable name.
+            roundtrip_path = os.path.join(tmpdir, "roundtrip_def.test")
+            with open(roundtrip_path, "w") as outfile:
+                self.comp.saveToStream(outfile, root="root")
+            roundTrip = Complex()
+            with self.assertRaises(NameError):
+                roundTrip.load(roundtrip_path)
+            roundTrip.load(roundtrip_path, root="root")
+            self.assertEqual(self.comp.c.f, roundTrip.c.f)
+            self.assertEqual(self.comp.r.name, roundTrip.r.name)
 
         # test saving to a string.
         saved_string = self.comp.saveToString()
@@ -350,17 +375,6 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.comp.c.f, roundTrip.c.f)
         self.assertEqual(self.comp.r.name, roundTrip.r.name)
         del roundTrip
-
-        # Test an override of the default variable name.
-        with open("roundtrip.test", "w") as outfile:
-            self.comp.saveToStream(outfile, root="root")
-        roundTrip = Complex()
-        with self.assertRaises(NameError):
-            roundTrip.load("roundtrip.test")
-        roundTrip.load("roundtrip.test", root="root")
-        os.remove("roundtrip.test")
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
-        self.assertEqual(self.comp.r.name, roundTrip.r.name)
 
     def testDuplicateRegistryNames(self):
         self.comp.r["AAA"].f = 5.0
@@ -573,7 +587,6 @@ except ImportError:
         Also check that we have the right number of keys, and as they are
         all known to be valid we know that we got them all.
         """
-
         names = self.simple.names()
         self.assertEqual(len(names), 8)
         for name in names:

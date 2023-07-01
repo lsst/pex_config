@@ -37,6 +37,8 @@ from ._configurableActionStructField import ConfigurableActionStructField
 
 
 class ActionTest1(ConfigurableAction):
+    """Configurable Action Test 1."""
+
     var = Field(doc="test field", dtype=int, default=0)
 
     def __call__(self):
@@ -47,6 +49,8 @@ class ActionTest1(ConfigurableAction):
 
 
 class ActionTest2(ConfigurableAction):
+    """Configurable Action Test 2."""
+
     var = Field(doc="test field", dtype=int, default=1)
 
     def __call__(self):
@@ -57,6 +61,8 @@ class ActionTest2(ConfigurableAction):
 
 
 class ActionTest3(ConfigurableAction):
+    """Configurable Action Test 3."""
+
     var = Field(doc="test field", dtype=int, default=3)
 
     def __call__(self):
@@ -67,6 +73,8 @@ class ActionTest3(ConfigurableAction):
 
 
 class TestDivideAction(ConfigurableAction):
+    """Configurable action that can divide."""
+
     colA = ConfigurableActionField(doc="Action used to calculate numerator", default=None)
     colB = ConfigurableActionField(doc="Action used to calculate divisor", default=None)
 
@@ -78,6 +86,8 @@ class TestDivideAction(ConfigurableAction):
 
 
 class TestSingleColumnAction(ConfigurableAction):
+    """Configurable action that can return a single column."""
+
     column = Field(doc="Column to load for this action", dtype=str, optional=False)
 
     def __call__(self, arg, **kwargs):
@@ -85,5 +95,7 @@ class TestSingleColumnAction(ConfigurableAction):
 
 
 class TestConfig(Config):
+    """Test configuration for configurable action tests."""
+
     actions = ConfigurableActionStructField(doc="Actions to be tested", default=None)
     singleAction = ConfigurableActionField(doc="A configurable action", default=None)

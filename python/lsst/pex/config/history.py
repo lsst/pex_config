@@ -58,13 +58,13 @@ class Color:
     terminal.
     """
 
-    categories = dict(
-        NAME="blue",
-        VALUE="yellow",
-        FILE="green",
-        TEXT="red",
-        FUNCTION_NAME="blue",
-    )
+    categories = {
+        "NAME": "blue",
+        "VALUE": "yellow",
+        "FILE": "green",
+        "TEXT": "red",
+        "FUNCTION_NAME": "blue",
+    }
     """Mapping of semantic labels to color names (`dict`).
 
     Notes
@@ -134,7 +134,6 @@ class Color:
 
             Only strings written to a terminal are colorized.
         """
-
         if val is not None:
             Color._colorize = val
 
@@ -145,7 +144,7 @@ class Color:
                         if val[k] in Color.colors:
                             Color.categories[k] = val[k]
                         else:
-                            print("Unknown colour %s for category %s" % (val[k], k), file=sys.stderr)
+                            print(f"Unknown colour {val[k]} for category {k}", file=sys.stderr)
                     else:
                         unknown.append(k)
 
@@ -191,7 +190,6 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
     verbose : `bool`, optional
         Default is `False`.
     """
-
     if name is None:
         for i, name in enumerate(config.history.keys()):
             if i > 0:
@@ -251,7 +249,7 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
 
     # Generate the config history content.
     msg = []
-    fullname = "%s.%s" % (config._name, name) if config._name is not None else name
+    fullname = f"{config._name}.{name}" if config._name is not None else name
     msg.append(_colorize(re.sub(r"^root\.", "", fullname), "NAME"))
     for value, output in outputs:
         line = prefix + _colorize("%-*s" % (valueLength, value), "VALUE") + " "

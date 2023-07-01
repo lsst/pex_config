@@ -7,7 +7,7 @@ Types of configuration fields
 .. TODO: improve this page to summarize the purpose of each field, and then have a dedicated section for each field. https://jira.lsstcorp.org/browse/DM-17196
 
 Attributes of the configuration object must be subclasses of `Field`.
-A number of these are predefined: `Field`, `RangeField`, `ChoiceField`, `ListField`, `ConfigField`, `ConfigChoiceField`, `RegistryField`, `ConfigurableField`, `ConfigurableActionField`, and `ConfigurableActionStructField`.
+A number of these are predefined: `Field`, `RangeField`, `ChoiceField`, `ListField`, `ConfigField`, `ConfigChoiceField`, `RegistryField`, `ConfigurableField`, `~.configurableActions.ConfigurableActionField`, and `~.configurableActions.ConfigurableActionStructField`.
 
 Example of `RangeField`:
 
@@ -79,7 +79,7 @@ Examples of `ChoiceField` and `ConfigField` and the use of the `Config` object's
                 raise ValueError("Cannot compute aperture correction "
                                  "without doing PSF determination.")
 
-Examples of `ConfigurableActionField` and `ConfigurableActionStructField` making use of `ConfigurableAction`\ s in a `Config` object.
+Examples of `~.configurableActions.ConfigurableActionField` and `~.configurableActions.ConfigurableActionStructField` making use of `~.configurableActions.ConfigurableAction`\ s in a `Config` object.
 
 .. code-block:: python
 

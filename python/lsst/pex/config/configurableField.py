@@ -31,7 +31,8 @@ __all__ = ("ConfigurableInstance", "ConfigurableField")
 
 import copy
 import weakref
-from typing import Any, Generic, Mapping, Union, overload
+from collections.abc import Mapping
+from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, getComparisonName
@@ -67,7 +68,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
 
         Notes
         -----
-        If field.default is an instance of `lsst.pex.config.ConfigClass`,
+        If field.default is an instance of `lsst.pex.config.Config`,
         custom construct ``_value`` with the correct values from default.
         Otherwise, call ``ConfigClass`` constructor
         """
@@ -111,7 +112,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     """
 
     value = property(lambda x: x._value)
-    """The `ConfigClass` instance (`lsst.pex.config.ConfigClass`-type,
+    """The `ConfigClass` instance (`lsst.pex.config.Config`-type,
     read-only).
     """
 
@@ -127,7 +128,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         return self.target(*args, config=self.value, **kw)
 
     def retarget(self, target, ConfigClass=None, at=None, label="retarget"):
-        """Target a new configurable and ConfigClass"""
+        """Target a new configurable and ConfigClass."""
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 
@@ -144,7 +145,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
             self.__initValue(at, label)
 
         history = self._config._history.setdefault(self._field.name, [])
-        msg = "retarget(target=%s, ConfigClass=%s)" % (_typeStr(target), _typeStr(ConfigClass))
+        msg = f"retarget(target={_typeStr(target)}, ConfigClass={_typeStr(ConfigClass)})"
         history.append((msg, at, label))
 
     def __getattr__(self, name):
@@ -171,7 +172,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         """
         Pretend to be an isntance of  ConfigClass.
         Attributes defiend by ConfigurableInstance will shadow those defined
-        in ConfigClass
+        in ConfigClass.
         """
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
@@ -224,7 +225,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
-    See also
+    See Also
     --------
     ChoiceField
     ConfigChoiceField
@@ -294,7 +295,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             default = ConfigClass
         if default != ConfigClass and type(default) != ConfigClass:
             raise TypeError(
-                "'default' is of incorrect type %s. Expected %s" % (_typeStr(default), _typeStr(ConfigClass))
+                f"'default' is of incorrect type {_typeStr(default)}. Expected {_typeStr(ConfigClass)}"
             )
 
         source = getStackFrame()
@@ -312,7 +313,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
 
     @staticmethod
     def _parseTypingArgs(
-        params: Union[tuple[type, ...], tuple[str, ...]], kwds: Mapping[str, Any]
+        params: tuple[type, ...] | tuple[str, ...], kwds: Mapping[str, Any]
     ) -> Mapping[str, Any]:
         return kwds
 
@@ -328,7 +329,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigurableField":
+    ) -> ConfigurableField:
         ...
 
     @overload
@@ -359,7 +360,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             value = oldValue.ConfigClass()
             oldValue.update(__at=at, __label=label, **value._storage)
         else:
-            msg = "Value %s is of incorrect type %s. Expected %s" % (
+            msg = "Value {} is of incorrect type {}. Expected {}".format(
                 value,
                 _typeStr(value),
                 _typeStr(oldValue.ConfigClass),
