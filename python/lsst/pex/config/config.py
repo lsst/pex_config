@@ -1168,7 +1168,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             code = compile(f.read(), filename=filename, mode="exec")
             self.loadFromString(code, root=root, filename=filename)
 
-    def loadFromStream(self, stream, root="config", filename=None):
+    def loadFromStream(self, stream, root="config", filename=None, extraLocals=None):
         """Modify this Config in place by executing the Python code in the
         provided stream.
 
@@ -1190,6 +1190,8 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         filename : `str`, optional
             Name of the configuration file, or `None` if unknown or contained
             in the stream. Used for error reporting.
+        extraLocals : `dict` of `str` to `object`, optional
+            Any extra variables to include in local scope when loading.
 
         Notes
         -----
@@ -1211,9 +1213,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             code = compile(stream.read(), filename=filename, mode="exec")
         else:
             code = stream
-        self.loadFromString(code, root=root, filename=filename)
+        self.loadFromString(code, root=root, filename=filename, extraLocals=extraLocals)
 
-    def loadFromString(self, code, root="config", filename=None):
+    def loadFromString(self, code, root="config", filename=None, extraLocals=None):
         """Modify this Config in place by executing the Python code in the
         provided string.
 
@@ -1234,6 +1236,14 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         filename : `str`, optional
             Name of the configuration file, or `None` if unknown or contained
             in the stream. Used for error reporting.
+        extraLocals : `dict` of `str` to `object`, optional
+            Any extra variables to include in local scope when loading.
+
+        Raises
+        ------
+        ValueError
+            Raised if a key in extraLocals is the same value as the value of
+            the root argument.
 
         See Also
         --------
@@ -1250,6 +1260,13 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         with RecordingImporter() as importer:
             globals = {"__file__": filename}
             local = {root: self}
+            if extraLocals is not None:
+                # verify the value of root was not passed as extra local args
+                if root in extraLocals:
+                    raise ValueError(
+                        f"{root} is reserved and cannot be used as a variable name in extraLocals"
+                    )
+                local.update(extraLocals)
             exec(code, globals, local)
 
         self._imports.update(importer.getModules())
