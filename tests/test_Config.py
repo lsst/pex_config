@@ -32,6 +32,7 @@ import pickle
 import re
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 try:
     import yaml
@@ -370,10 +371,15 @@ class ConfigTest(unittest.TestCase):
 
         # test saving to a string.
         saved_string = self.comp.saveToString()
+        saved_string += "config.c.f = parameters.value"
+        namespace = SimpleNamespace(value=7)
+        extraLocals = {"parameters": namespace}
         roundTrip = Complex()
-        roundTrip.loadFromString(saved_string)
-        self.assertEqual(self.comp.c.f, roundTrip.c.f)
+        roundTrip.loadFromString(saved_string, extraLocals=extraLocals)
+        self.assertEqual(namespace.value, roundTrip.c.f)
         self.assertEqual(self.comp.r.name, roundTrip.r.name)
+        with self.assertRaises(ValueError):
+            roundTrip.loadFromString(saved_string, root="config", extraLocals={"config": 6})
         del roundTrip
 
     def testDuplicateRegistryNames(self):
