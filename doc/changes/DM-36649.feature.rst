@@ -1,2 +1,0 @@
-Introduce ConfigurableActions. These are pex_config fields and config types which function as a functor, state
-is set at config time, but the ConfigurableActions are callable at runtime to produce an action.
