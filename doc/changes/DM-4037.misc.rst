@@ -1,1 +1,0 @@
-There is now a requirement for configuration parameters to have a non-empty docstring.
