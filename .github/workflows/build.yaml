@@ -41,7 +41,7 @@ jobs:
         run: pip install pytest-xdist pytest-openfiles pytest-cov
 
       - name: Build and install
-        run: pip install -v .
+        run: pip install --no-deps -v .
 
       - name: Run tests
         run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
