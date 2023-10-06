@@ -72,7 +72,7 @@ class ConfigDict(Dict[str, Config]):
 
         # validate itemtype
         dtype = self._field.itemtype
-        if type(x) is not self._field.itemtype and x != self._field.itemtype:
+        if not isinstance(x, self._field.itemtype) and x != self._field.itemtype:
             msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                 x,
                 k,
@@ -89,7 +89,7 @@ class ConfigDict(Dict[str, Config]):
             if x == dtype:
                 self._dict[k] = dtype(__name=name, __at=at, __label=label)
             else:
-                self._dict[k] = dtype(__name=name, __at=at, __label=label, **x._storage)
+                self._dict[k] = type(x)(__name=name, __at=at, __label=label, **x._storage)
             if setHistory:
                 self.history.append(("Added item at key %s" % k, at, label))
         else:
