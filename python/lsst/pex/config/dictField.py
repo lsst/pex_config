@@ -54,6 +54,21 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
     """An internal mapping container.
 
     This class emulates a `dict`, but adds validation and provenance.
+
+    Parameters
+    ----------
+    config : `~lsst.pex.config.Config`
+        Config to proxy.
+    field : `~lsst.pex.config.DictField`
+        Field to use.
+    value : `~typing.Any`
+        Value to store.
+    at : `list` of `~lsst.pex.config.callStack.StackFrame`
+        Stack frame for history recording. Will be calculated if `None`.
+    label : `str`, optional
+        Label to use for history recording.
+    setHistory : `bool`, optional
+        Whether to append to the history record.
     """
 
     def __init__(self, config, field, value, at, label, setHistory=True):

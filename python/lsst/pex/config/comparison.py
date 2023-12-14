@@ -118,9 +118,9 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
     name : `str`
         Name to use when reporting differences, typically created by
         `getComparisonName`.
-    v1 : `lsst.pex.config.Config`
+    c1 : `lsst.pex.config.Config`
         Left-hand side config to compare.
-    v2 : `lsst.pex.config.Config`
+    c2 : `lsst.pex.config.Config`
         Right-hand side config to compare.
     shortcut : `bool`, optional
         If `True`, return as soon as an inequality is found. Default is `True`.

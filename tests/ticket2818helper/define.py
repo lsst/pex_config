@@ -33,7 +33,13 @@ class TestConfig(Config):
 
 
 class TestConfigurable:
-    """Test configurable field target class."""
+    """Test configurable field target class.
+
+    Parameters
+    ----------
+    config : `~lsst.pex.Config`
+        The configuration to use.
+    """
 
     ConfigClass = TestConfig
 

@@ -46,9 +46,9 @@ class SelectionSet(collections.abc.MutableSet):
     ----------
     dict_ : `ConfigInstanceDict`
         The dictionary of instantiated configs.
-    value
+    value : `~typing.Any`
         The selected key.
-    at : `lsst.pex.config.callStack.StackFrame`, optional
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
         The call stack when the selection was made.
     label : `str`, optional
         Label for history tracking.
@@ -94,7 +94,16 @@ class SelectionSet(collections.abc.MutableSet):
         return self._config_()
 
     def add(self, value, at=None):
-        """Add a value to the selected set."""
+        """Add a value to the selected set.
+
+        Parameters
+        ----------
+        value : `~typing.Any`
+            The selected key.
+        at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
+            Stack frames for history recording.
+        """
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 
@@ -109,7 +118,16 @@ class SelectionSet(collections.abc.MutableSet):
         self._set.add(value)
 
     def discard(self, value, at=None):
-        """Discard a value from the selected set."""
+        """Discard a value from the selected set.
+
+        Parameters
+        ----------
+        value : `~typing.Any`
+            The selected key.
+        at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
+            Stack frames for history recording.
+        """
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 

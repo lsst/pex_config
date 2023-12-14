@@ -32,7 +32,13 @@ import lsst.pex.config as pexConfig
 
 
 def isSorted(theList):
-    """Determine if a list is sorted."""
+    """Determine if a list is sorted.
+
+    Parameters
+    ----------
+    theList : `list`
+        The list to check.
+    """
     if len(theList) <= 1:
         return True
 
@@ -45,7 +51,13 @@ def isSorted(theList):
 
 
 def isPositive(x):
-    """Determine if an integer is positive."""
+    """Determine if an integer is positive.
+
+    Parameters
+    ----------
+    x : `int`
+        The integer to check.
+    """
     return x > 0
 
 

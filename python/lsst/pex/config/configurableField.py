@@ -51,6 +51,17 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     """A retargetable configuration in a `ConfigurableField` that proxies
     a `~lsst.pex.config.Config`.
 
+    Parameters
+    ----------
+    config : `~lsst.pex.config.Config`
+        Config to proxy.
+    field : `~lsst.pex.config.ConfigurableField`
+        Field to use.
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
+        Stack frame for history recording. Will be calculated if `None`.
+    label : `str`, optional
+        Label to use for history recording.
+
     Notes
     -----
     ``ConfigurableInstance`` implements ``__getattr__`` and ``__setattr__``
@@ -119,6 +130,13 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     def apply(self, *args, **kw):
         """Call the configurable.
 
+        Parameters
+        ----------
+        *args : `~typing.Any`
+            Arguments to use when calling the configurable.
+        **kw : `~typing.Any`
+            Keyword parameters to use when calling.
+
         Notes
         -----
         In addition to the user-provided positional and keyword arguments,
@@ -128,7 +146,20 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         return self.target(*args, config=self.value, **kw)
 
     def retarget(self, target, ConfigClass=None, at=None, label="retarget"):
-        """Target a new configurable and ConfigClass."""
+        """Target a new configurable and ConfigClass.
+
+        Parameters
+        ----------
+        target : `type`
+            Item to retarget.
+        ConfigClass : `type` or `None`, optional
+            New config class to use.
+        at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
+            Stack for history recording.
+        label : `str`, optional
+            Label for history recording.
+        """
         if self._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 
@@ -209,7 +240,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     target : configurable class
         The configurable target. Configurables have a ``ConfigClass``
         attribute. Within the task framework, configurables are
-        `lsst.pipe.base.Task` subclasses)
+        `lsst.pipe.base.Task` subclasses).
     ConfigClass : `lsst.pex.config.Config`-type, optional
         The subclass of `lsst.pex.config.Config` expected as the configuration
         class of the ``target``. If ``ConfigClass`` is unset then
@@ -248,7 +279,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
 
         Parameters
         ----------
-        target
+        target : configurable class
             The configurable being verified.
         ConfigClass : `lsst.pex.config.Config`-type or `None`
             The configuration class associated with the ``target``. This can

@@ -39,6 +39,13 @@ class ConfigurableWrapper:
 
     Used for configurables that don't contain a ``ConfigClass`` attribute,
     or contain one that is being overridden.
+
+    Parameters
+    ----------
+    target : configurable class
+        Target class.
+    ConfigClass : `type`
+        Config class.
     """
 
     def __init__(self, target, ConfigClass):
@@ -272,9 +279,7 @@ class RegistryInstanceDict(ConfigInstanceDict):
 
         Parameters
         ----------
-        selection : `str` or `~collections.abc.Iterable` [ `str` ]
-            Name or names of targets, depending on whether ``multi=True``.
-        *args, **kwargs
+        *args, **kwargs : `~typing.Any
             Additional arguments will be passed on to the configurable
             target(s).
 
@@ -349,7 +354,7 @@ class RegistryField(ConfigChoiceField):
     multi : `bool`, optional
         If `True`, the field allows multiple selections. The default is
         `False`.
-    on_none: `Callable`, optional
+    on_none : `Callable`, optional
         A callable that should be invoked when ``apply`` is called but the
         selected name or names is `None`.  Will be passed the field attribute
         proxy (`RegistryInstanceDict`) and then all positional and keyword
