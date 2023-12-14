@@ -73,7 +73,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         Otherwise, call ``ConfigClass`` constructor
         """
         name = _joinNamePath(self._config._name, self._field.name)
-        if type(self._field.default) == self.ConfigClass:
+        if type(self._field.default) is self.ConfigClass:
             storage = self._field.default._storage
         else:
             storage = {}
@@ -293,7 +293,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
 
         if default is None:
             default = ConfigClass
-        if default != ConfigClass and type(default) != ConfigClass:
+        if default != ConfigClass and type(default) is not ConfigClass:
             raise TypeError(
                 f"'default' is of incorrect type {_typeStr(default)}. Expected {_typeStr(ConfigClass)}"
             )
@@ -354,7 +354,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         if isinstance(value, ConfigurableInstance):
             oldValue.retarget(value.target, value.ConfigClass, at, label)
             oldValue.update(__at=at, __label=label, **value._storage)
-        elif type(value) == oldValue._ConfigClass:
+        elif type(value) is oldValue._ConfigClass:
             oldValue.update(__at=at, __label=label, **value._storage)
         elif value == oldValue.ConfigClass:
             value = oldValue.ConfigClass()

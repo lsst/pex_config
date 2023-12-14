@@ -306,7 +306,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
                 # a ConfigurableActionStruct initialized with this data
                 value = self.StructClass(instance, self, vars(value), at=at, label=label)
 
-            elif type(value) == ConfigurableActionStructField:
+            elif type(value) is ConfigurableActionStructField:
                 raise ValueError(
                     "ConfigurableActionStructFields can only be used in a class body declaration"
                     f"Use a {self.StructClass}, SimpleNamespace or Struct"

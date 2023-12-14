@@ -106,7 +106,7 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
 
         # validate keytype
         k = _autocast(k, self._field.keytype)
-        if type(k) != self._field.keytype:
+        if type(k) is not self._field.keytype:
             msg = f"Key {k!r} is of type {_typeStr(k)}, expected type {_typeStr(self._field.keytype)}"
             raise FieldValidationError(self._field, self._config, msg)
 
@@ -117,7 +117,7 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
                 msg = f"Value {x} at key {k!r} is of invalid type {_typeStr(x)}"
                 raise FieldValidationError(self._field, self._config, msg)
         else:
-            if type(x) != self._field.itemtype and x is not None:
+            if type(x) is not self._field.itemtype and x is not None:
                 msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                     x,
                     k,

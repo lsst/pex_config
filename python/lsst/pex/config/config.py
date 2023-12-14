@@ -1585,7 +1585,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             object.__delattr__(self, attr)
 
     def __eq__(self, other):
-        if type(other) == type(self):
+        if type(other) is type(self):
             for name in self._fields:
                 thisValue = getattr(self, name)
                 otherValue = getattr(other, name)

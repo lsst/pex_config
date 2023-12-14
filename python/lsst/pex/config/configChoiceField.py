@@ -295,7 +295,7 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         except Exception:
             raise FieldValidationError(self._field, self._config, "Unknown key %r" % k)
 
-        if value != dtype and type(value) != dtype:
+        if value != dtype and type(value) is not dtype:
             msg = "Value {} at key {} is of incorrect type {}. Expected type {}".format(
                 value,
                 k,

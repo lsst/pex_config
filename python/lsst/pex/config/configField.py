@@ -126,7 +126,7 @@ class ConfigField(Field[FieldTypeVar]):
             raise FieldValidationError(self, instance, "Cannot modify a frozen Config")
         name = _joinNamePath(prefix=instance._name, name=self.name)
 
-        if value != self.dtype and type(value) != self.dtype:
+        if value != self.dtype and type(value) is not self.dtype:
             msg = "Value {} is of incorrect type {}. Expected {}".format(
                 value,
                 _typeStr(value),

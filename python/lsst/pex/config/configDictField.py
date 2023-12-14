@@ -51,7 +51,7 @@ class ConfigDict(Dict[str, Config]):
 
         # validate keytype
         k = _autocast(k, self._field.keytype)
-        if type(k) != self._field.keytype:
+        if type(k) is not self._field.keytype:
             msg = "Key {!r} is of type {}, expected type {}".format(
                 k, _typeStr(k), _typeStr(self._field.keytype)
             )
@@ -59,7 +59,7 @@ class ConfigDict(Dict[str, Config]):
 
         # validate itemtype
         dtype = self._field.itemtype
-        if type(x) != self._field.itemtype and x != self._field.itemtype:
+        if type(x) is not self._field.itemtype and x != self._field.itemtype:
             msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                 x,
                 k,
