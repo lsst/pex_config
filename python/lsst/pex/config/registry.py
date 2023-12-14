@@ -194,7 +194,7 @@ class Registry(collections.abc.Mapping):
         multi : `bool`, optional
             A flag to allow multiple selections in the `RegistryField` if
             `True`.
-        on_none: `Callable`, optional
+        on_none : `Callable`, optional
             A callable that should be invoked when ``apply`` is called but the
             selected name or names is `None`.  Will be passed the field
             attribute proxy (`RegistryInstanceDict`) and then all positional

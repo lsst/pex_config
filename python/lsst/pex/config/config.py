@@ -436,7 +436,7 @@ class Field(Generic[FieldTypeVar]):
 
         Raises
         ------
-        ValueError :
+        ValueError
             Raised if params is of incorrect length.
             Raised if a forward reference could not be resolved
             Raised if there is a conflict between params and values in kwds
@@ -1081,7 +1081,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        kw
+        **kw
             Keywords are configuration field names. Values are configuration
             field values.
 
@@ -1521,7 +1521,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         ----------
         name : `str`
             Name of a `~lsst.pex.config.Field` in this config.
-        kwargs
+        **kwargs
             Keyword arguments passed to `lsst.pex.config.history.format`.
 
         Returns
