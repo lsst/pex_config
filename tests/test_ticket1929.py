@@ -44,13 +44,7 @@ class Config2(Config1):
 
 
 class Config3(Config1):
-    """Third test config.
-
-    Parameters
-    ----------
-    **kw : `~typing.Any`
-        Keyword parameters.
-    """
+    """Third test config."""
 
     def __init__(self, **kw):
         self.f = 6

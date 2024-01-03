@@ -39,13 +39,7 @@ class Config1(pexConf.Config):
 
 
 class Target1:
-    """First target class.
-
-    Parameters
-    ----------
-    config : `~lsst.pex.Config`
-        The configuration to use.
-    """
+    """First target class."""
 
     ConfigClass = Config1
 
@@ -54,13 +48,7 @@ class Target1:
 
 
 def Target2(config):
-    """Second target class.
-
-    Parameters
-    ----------
-    config : `~lsst.pex.Config`
-        The configuration to use.
-    """
+    """Second target class."""
     return config.f
 
 
