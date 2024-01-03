@@ -38,6 +38,19 @@ class ConfigDict(Dict[str, Config]):
 
     Much like `Dict`, `ConfigDict` is a custom `MutableMapper` which tracks
     the history of changes to any of its items.
+
+    Parameters
+    ----------
+    config : `~lsst.pex.config.Config`
+        Config to use.
+    field : `~lsst.pex.config.ConfigDictField`
+        Field to use.
+    value : `~typing.Any`
+        Value to store in dict.
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
+        Stack frame for history recording. Will be calculated if `None`.
+    label : `str`, optional
+        Label to use for history recording.
     """
 
     def __init__(self, config, field, value, at, label):
@@ -51,7 +64,7 @@ class ConfigDict(Dict[str, Config]):
 
         # validate keytype
         k = _autocast(k, self._field.keytype)
-        if type(k) != self._field.keytype:
+        if type(k) is not self._field.keytype:
             msg = "Key {!r} is of type {}, expected type {}".format(
                 k, _typeStr(k), _typeStr(self._field.keytype)
             )
@@ -59,7 +72,7 @@ class ConfigDict(Dict[str, Config]):
 
         # validate itemtype
         dtype = self._field.itemtype
-        if type(x) != self._field.itemtype and x != self._field.itemtype:
+        if type(x) is not self._field.itemtype and x != self._field.itemtype:
             msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
                 x,
                 k,
@@ -116,6 +129,10 @@ class ConfigDictField(DictField):
     optional : `bool`, optional
         If `True`, this configuration `~lsst.pex.config.Field` is *optional*.
         Default is `True`.
+    dictCheck : `~collections.abc.Callable` or `None`, optional
+        Callable to check a dict.
+    itemCheck : `~collections.abc.Callable` or `None`, optional
+        Callable to check an item.
     deprecated : None or `str`, optional
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.

@@ -39,6 +39,26 @@ class ConfigurableActionField(ConfigField[ActionTypeVar]):
 
     Any configuration of this field that is done prior to having a new
     `ConfigurableAction` assigned to it is forgotten.
+
+    Parameters
+    ----------
+    doc : `str`
+        Documentation string.
+    dtype : `ConfigurableAction`
+        Data type to use for this field.
+    default : `lsst.pex.config.Config`, optional
+        If default is `None`, the field will default to a default-constructed
+        instance of ``dtype``. Additionally, to allow for fewer deep-copies,
+        assigning an instance of ``ConfigField`` to ``dtype`` itself is
+        considered equivalent to assigning a default-constructed sub-config.
+        This means that the argument default can be ``dtype``, as well as an
+        instance of ``dtype``.
+    check : `~collections.abc.Callable`, optional
+        A callback function that validates the field's value, returning `True`
+        if the value is valid, and `False` otherwise.
+    deprecated : `bool` or `None`, optional
+        A description of why this Field is deprecated, including removal date.
+        If not `None`, the string is appended to the docstring for this Field.
     """
 
     # These attributes are dynamically assigned when constructing the base

@@ -204,6 +204,15 @@ if yaml:
 class ConfigMeta(type):
     """A metaclass for `lsst.pex.config.Config`.
 
+    Parameters
+    ----------
+    name : `str`
+        Name to use for class.
+    bases : `~collections.abc.Iterable`
+        Base classes.
+    dict_ : `dict`
+        Additional parameters.
+
     Notes
     -----
     ``ConfigMeta`` adds a dictionary containing all `~lsst.pex.config.Field`
@@ -377,7 +386,6 @@ class Field(Generic[FieldTypeVar]):
     useful for annotating the type of the identifier (i.e. variable in previous
     example) and does nothing for assigning the dtype of the ``Field``.
 
-
     Examples
     --------
     Instances of ``Field`` should be used as class attributes of
@@ -436,7 +444,7 @@ class Field(Generic[FieldTypeVar]):
 
         Raises
         ------
-        ValueError :
+        ValueError
             Raised if params is of incorrect length.
             Raised if a forward reference could not be resolved
             Raised if there is a conflict between params and values in kwds
@@ -528,7 +536,7 @@ class Field(Generic[FieldTypeVar]):
 
         self.source = source
         """The stack frame where this field is defined (`list` of
-        `lsst.pex.config.callStack.StackFrame`).
+        `~lsst.pex.config.callStack.StackFrame`).
         """
 
     def rename(self, instance):
@@ -755,7 +763,8 @@ class Field(Generic[FieldTypeVar]):
             The config instance that contains this field.
         value : obj
             Value to set on this field.
-        at : `list` of `lsst.pex.config.callStack.StackFrame`
+        at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
             The call stack (created by
             `lsst.pex.config.callStack.getCallStack`).
         label : `str`, optional
@@ -898,6 +907,15 @@ class RecordingImporter:
         """Find a module.
 
         Called as part of the ``import`` chain of events.
+
+        Parameters
+        ----------
+        fullname : `str`
+            Name of module.
+        path : `list` [`str`]
+            Search path. Unused.
+        target : `~typing.Any`, optional
+            Unused.
         """
         self._modules.add(fullname)
         # Return None because we don't do any importing.
@@ -1081,7 +1099,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        kw
+        **kw
             Keywords are configuration field names. Values are configuration
             field values.
 
@@ -1174,7 +1192,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        stream : file-like object, `str`, `bytes`, or compiled string
+        stream : file-like object, `str`, `bytes`, or `~types.CodeType`
             Stream containing configuration override code.  If this is a
             code object, it should be compiled with ``mode="exec"``.
         root : `str`, optional
@@ -1221,7 +1239,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        code : `str`, `bytes`, or compiled string
+        code : `str`, `bytes`, or `~types.CodeType`
             Stream containing configuration override code.
         root : `str`, optional
             Name of the variable in file that refers to the config being
@@ -1342,7 +1360,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         outfile : file-like object
             Destination file object write the config into. Accepts strings not
             bytes.
-        root
+        root : `str`, optional
             Name to use for the root config variable. The same value must be
             used when loading (see `lsst.pex.config.Config.load`).
         skipImports : `bool`, optional
@@ -1521,7 +1539,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         ----------
         name : `str`
             Name of a `~lsst.pex.config.Field` in this config.
-        kwargs
+        **kwargs
             Keyword arguments passed to `lsst.pex.config.history.format`.
 
         Returns
@@ -1585,7 +1603,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             object.__delattr__(self, attr)
 
     def __eq__(self, other):
-        if type(other) == type(self):
+        if type(other) is type(self):
             for name in self._fields:
                 thisValue = getattr(self, name)
                 otherValue = getattr(other, name)
@@ -1735,15 +1753,15 @@ def _classFromPython(config_py):
     return pytype
 
 
-def unreduceConfig(cls, stream):
+def unreduceConfig(cls_, stream):
     """Create a `~lsst.pex.config.Config` from a stream.
 
     Parameters
     ----------
-    cls : `lsst.pex.config.Config`-type
+    cls_ : `lsst.pex.config.Config`-type
         A `lsst.pex.config.Config` type (not an instance) that is instantiated
         with configurations in the ``stream``.
-    stream : file-like object, `str`, or compiled string
+    stream : file-like object, `str`, or `~types.CodeType`
         Stream containing configuration override code.
 
     Returns
@@ -1755,6 +1773,6 @@ def unreduceConfig(cls, stream):
     --------
     lsst.pex.config.Config.loadFromStream
     """
-    config = cls()
+    config = cls_()
     config.loadFromStream(stream)
     return config

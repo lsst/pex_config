@@ -46,7 +46,7 @@ _dtypeMap = {
 }
 """Mapping from C++ types to Python type (`dict`)
 
-Tassumes we can round-trip between these using the usual pybind11 converters,
+It assumes we can round-trip between these using the usual pybind11 converters,
 but doesn't require they be binary equivalent under-the-hood or anything.
 """
 
@@ -148,7 +148,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
 
     See Also
     --------
-    wrap
+    wrap : Add fields from C++ object.
     """
     if name is None:
         if "Control" not in ctrl.__name__:
@@ -243,8 +243,15 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
 
         Parameters
         ----------
-        control
+        control : `type`
             C++ Control object.
+        __at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
+            Internal use only.
+        __label : `str`, optional
+            Internal use only.
+        __reset : `bool`, optional
+            Internal use only.
 
         Notes
         -----
@@ -326,7 +333,7 @@ def wrap(ctrl):
 
     See Also
     --------
-    makeConfigClass
+    makeConfigClass : Make a config class.
     """
 
     def decorate(cls):

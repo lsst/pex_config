@@ -123,7 +123,7 @@ class Color:
         ----------
         val : `bool` or `dict`, optional
             The value is usually a bool, but it may be a dict which is used
-            to modify Color.categories
+            to modify `Color.categories`.
 
         Returns
         -------

@@ -118,9 +118,9 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
     name : `str`
         Name to use when reporting differences, typically created by
         `getComparisonName`.
-    v1 : `lsst.pex.config.Config`
+    c1 : `lsst.pex.config.Config`
         Left-hand side config to compare.
-    v2 : `lsst.pex.config.Config`
+    c2 : `lsst.pex.config.Config`
         Right-hand side config to compare.
     shortcut : `bool`, optional
         If `True`, return as soon as an inequality is found. Default is `True`.
@@ -163,7 +163,7 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
             if output is not None:
                 output("RHS is None for %s" % name)
             return False
-    if type(c1) != type(c2):
+    if type(c1) is not type(c2):
         if output is not None:
             output(f"Config types do not match for {name}: {type(c1)} != {type(c2)}")
         return False

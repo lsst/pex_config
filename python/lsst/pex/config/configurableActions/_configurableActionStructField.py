@@ -101,6 +101,21 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
     This class allows managing a collection of `ConfigurableAction` with a
     struct like interface, that is to say in an attribute like notation.
 
+    Parameters
+    ----------
+    config : `~lsst.pex.config.Config`
+        Config to use.
+    field : `ConfigurableActionStructField`
+        Field to use.
+    value : `~collections.abc.Mapping` [`str`, `ConfigurableAction`]
+        Value to assign.
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
+        Stack frames to use for history recording.
+    label : `str`, optional
+        Label to use for history recording.
+
+    Notes
+    -----
     Attributes can be dynamically added or removed as such:
 
     .. code-block:: python
@@ -232,14 +247,27 @@ T = TypeVar("T", bound="ConfigurableActionStructField")
 
 
 class ConfigurableActionStructField(Field[ActionTypeVar]):
-    r"""`ConfigurableActionStructField` is a `~lsst.pex.config.Field` subclass
-    that allows `ConfigurableAction`\ s to be organized in a
+    """`ConfigurableActionStructField` is a `~lsst.pex.config.Field` subclass
+    that allows a `ConfigurableAction` to be organized in a
     `~lsst.pex.config.Config` class in a manner similar to how a
     `~lsst.pipe.base.Struct` works.
 
     This class uses a `ConfigurableActionStruct` as an intermediary object to
     organize the `ConfigurableAction`. See its documentation for further
     information.
+
+    Parameters
+    ----------
+    doc : `str`
+        Documentation string.
+    default : `~collections.abc.Mapping` [ `str`, `ConfigurableAction` ] \
+            or `None`, optional
+        Default value.
+    optional : `bool`, optional
+        If `True`, the field doesn't need to have a set value.
+    deprecated : `bool` or `None`, optional
+        A description of why this Field is deprecated, including removal date.
+        If not `None`, the string is appended to the docstring for this Field.
     """
 
     # specify StructClass to make this more generic for potential future
@@ -306,7 +334,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
                 # a ConfigurableActionStruct initialized with this data
                 value = self.StructClass(instance, self, vars(value), at=at, label=label)
 
-            elif type(value) == ConfigurableActionStructField:
+            elif type(value) is ConfigurableActionStructField:
                 raise ValueError(
                     "ConfigurableActionStructFields can only be used in a class body declaration"
                     f"Use a {self.StructClass}, SimpleNamespace or Struct"

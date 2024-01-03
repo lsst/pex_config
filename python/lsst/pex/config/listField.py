@@ -57,7 +57,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         Instance of the `ListField` using this ``List``.
     value : sequence
         Sequence of values that are inserted into this ``List``.
-    at : `list` of `lsst.pex.config.callStack.StackFrame`
+    at : `list` of `~lsst.pex.config.callStack.StackFrame`
         The call stack (created by `lsst.pex.config.callStack.getCallStack`).
     label : `str`
         Event label for the history.
@@ -210,7 +210,8 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             Index where the item is inserted.
         x : object
             Item that is inserted.
-        at : `list` of `lsst.pex.config.callStack.StackFrame`, optional
+        at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
+                optional
             The call stack (created by
             `lsst.pex.config.callStack.getCallStack`).
         label : `str`, optional
