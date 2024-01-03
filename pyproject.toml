@@ -175,4 +175,5 @@ checks = [
 exclude = [
     '^__init__$',
     '\._[a-zA-Z_]+$',  # Private methods.
+    "^test_.*",  # Do not test docstrings in test code.
 ]
