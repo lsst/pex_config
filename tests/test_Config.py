@@ -87,9 +87,13 @@ class OuterConfig(InnerConfig, pexConfig.Config):
 
     i = pexConfig.ConfigField("Outer.i", InnerConfig)
 
-    def __init__(self):
-        pexConfig.Config.__init__(self)
-        self.i.f = 5.0
+    # This does not work - it breaks usage as a type even in ConfigField
+    # def __init__(self):
+    #    pexConfig.Config.__init__(self)
+    #     self.i.f = 5.0
+
+    def setDefaults(self):
+        self.i = InnerConfig(f=5.0)
 
     def validate(self):
         pexConfig.Config.validate(self)
@@ -101,6 +105,7 @@ class Complex(pexConfig.Config):
     """A complex config for testing."""
 
     c = pexConfig.ConfigField("an inner config", InnerConfig)
+    d = pexConfig.ConfigDictField[str, InnerConfig](doc="a configdictfield of inner", default={})
     r = pexConfig.ConfigChoiceField(
         "a registry field", typemap=GLOBAL_REGISTRY, default="AAA", optional=False
     )
@@ -120,14 +125,19 @@ class ConfigTest(unittest.TestCase):
         self.simple = Simple()
         self.inner = InnerConfig()
         self.outer = OuterConfig()
-        self.comp = Complex()
+        self.comp_kwargs = {
+            "d": {"outer": self.outer},
+        }
+        self.comp = Complex(**self.comp_kwargs)
         self.deprecation = Deprecation()
 
     def tearDown(self):
         del self.simple
         del self.inner
         del self.outer
+        del self.comp_kwargs
         del self.comp
+        del self.deprecation
 
     def testFieldTypeAnnotationRuntime(self):
         # test parsing type annotation for runtime dtype
@@ -341,7 +351,7 @@ class ConfigTest(unittest.TestCase):
             roundtrip_path = os.path.join(tmpdir, "roundtrip.test")
             self.comp.save(roundtrip_path)
 
-            roundTrip = Complex()
+            roundTrip = Complex(**self.comp_kwargs)
             roundTrip.load(roundtrip_path)
             self.assertEqual(self.comp.c.f, roundTrip.c.f)
             self.assertEqual(self.comp.r.name, roundTrip.r.name)
@@ -351,7 +361,7 @@ class ConfigTest(unittest.TestCase):
             roundtrip_path = os.path.join(tmpdir, "roundtrip_open.test")
             with open(roundtrip_path, "w") as outfile:
                 self.comp.saveToStream(outfile)
-            roundTrip = Complex()
+            roundTrip = Complex(**self.comp_kwargs)
             with open(roundtrip_path) as infile:
                 roundTrip.loadFromStream(infile)
             self.assertEqual(self.comp.c.f, roundTrip.c.f)
@@ -362,7 +372,7 @@ class ConfigTest(unittest.TestCase):
             roundtrip_path = os.path.join(tmpdir, "roundtrip_def.test")
             with open(roundtrip_path, "w") as outfile:
                 self.comp.saveToStream(outfile, root="root")
-            roundTrip = Complex()
+            roundTrip = Complex(**self.comp_kwargs)
             with self.assertRaises(NameError):
                 roundTrip.load(roundtrip_path)
             roundTrip.load(roundtrip_path, root="root")
@@ -374,7 +384,7 @@ class ConfigTest(unittest.TestCase):
         saved_string += "config.c.f = parameters.value"
         namespace = SimpleNamespace(value=7)
         extraLocals = {"parameters": namespace}
-        roundTrip = Complex()
+        roundTrip = Complex(**self.comp_kwargs)
         roundTrip.loadFromString(saved_string, extraLocals=extraLocals)
         self.assertEqual(namespace.value, roundTrip.c.f)
         self.assertEqual(self.comp.r.name, roundTrip.r.name)
@@ -528,7 +538,7 @@ except ImportError:
         self.assertEqual(self.comp.c.f, comp.c.f)
 
     def testCompare(self):
-        comp2 = Complex()
+        comp2 = Complex(**self.comp_kwargs)
         inner2 = InnerConfig()
         simple2 = Simple()
         self.assertTrue(self.comp.compare(comp2))
