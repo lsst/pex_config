@@ -82,8 +82,9 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
                 for k in value:
                     # do not set history per-item
                     self.__setitem__(k, value[k], at=at, label=label, setHistory=False)
-            except TypeError:
-                msg = f"Value {value} is of incorrect type {_typeStr(value)}. Mapping type expected."
+            except TypeError as exc:
+                msg = (f"Setting {k} raised an exception:\n{exc}\nPossible cause: "
+                       f"Value {value} is of incorrect type {_typeStr(value)}. Mapping type expected.")
                 raise FieldValidationError(self._field, self._config, msg)
         if setHistory:
             self._history.append((dict(self._dict), at, label))
