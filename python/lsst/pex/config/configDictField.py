@@ -73,7 +73,10 @@ class ConfigDict(Dict[str, Config]):
         # validate itemtype
         dtype = self._field.itemtype
         if type(x) is not self._field.itemtype and x != self._field.itemtype:
-            msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
+            msg = (
+                "Value {} at key {!r} is of incorrect type {}. Expected type {}"
+                " (must be exact type and not a derived type)"
+            ).format(
                 x,
                 k,
                 _typeStr(x),
