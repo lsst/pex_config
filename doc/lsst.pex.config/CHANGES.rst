@@ -1,23 +1,29 @@
+lsst-pex-config v27.0.0 (2024-05-29)
+====================================
+
+- Improved all docstrings to make them compliant with Numpydoc.
+- Minor code cleanups driven by Ruff linting. (`DM-42116 <https://rubinobs.atlassian.net/browse/DM-42116>`_)
+
 lsst-pex-config v26.0.0 (2023-09-22)
 ====================================
 
 New Features
 ------------
 
-- Added a dynamic-default callback argument to ``RegistryField``. (`DM-31924 <https://jira.lsstcorp.org/browse/DM-31924>`_)
-- Introduced ``ConfigurableActions``. These are ``pex_config`` fields and config types which function as a functor, state is set at config time, but the ``ConfigurableActions`` are callable at runtime to produce an action. (`DM-36649 <https://jira.lsstcorp.org/browse/DM-36649>`_)
+- Added a dynamic-default callback argument to ``RegistryField``. (`DM-31924 <https://rubinobs.atlassian.net/browse/DM-31924>`_)
+- Introduced ``ConfigurableActions``. These are ``pex_config`` fields and config types which function as a functor, state is set at config time, but the ``ConfigurableActions`` are callable at runtime to produce an action. (`DM-36649 <https://rubinobs.atlassian.net/browse/DM-36649>`_)
 
 
 API Changes
 -----------
 
-- The ``loadFromStream`` and ``loadFromString`` methods now take a dictionary as an optional argument which allows specifying additional variables to use in local scope when reading configs. (`DM-40198 <https://jira.lsstcorp.org/browse/DM-40198>`_)
+- The ``loadFromStream`` and ``loadFromString`` methods now take a dictionary as an optional argument which allows specifying additional variables to use in local scope when reading configs. (`DM-40198 <https://rubinobs.atlassian.net/browse/DM-40198>`_)
 
 
 Other Changes and Additions
 ---------------------------
 
-- There is now a requirement for configuration parameters to have a non-empty docstring. (`DM-4037 <https://jira.lsstcorp.org/browse/DM-4037>`_)
+- There is now a requirement for configuration parameters to have a non-empty docstring. (`DM-4037 <https://rubinobs.atlassian.net/browse/DM-4037>`_)
 
 
 lsst-pex-config v25.0.0 (2023-02-28)
@@ -26,7 +32,7 @@ lsst-pex-config v25.0.0 (2023-02-28)
 Other Changes and Additions
 ---------------------------
 
-- Some sorting now happens when saving config files (via DM-33027). (`DM-35060 <https://jira.lsstcorp.org/browse/DM-35060>`_)
+- Some sorting now happens when saving config files (via DM-33027). (`DM-35060 <https://rubinobs.atlassian.net/browse/DM-35060>`_)
 
 
 lsst-pex-config v24.0.0 (2022-08-30)

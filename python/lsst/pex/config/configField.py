@@ -99,14 +99,12 @@ class ConfigField(Field[FieldTypeVar]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> "ConfigField[FieldTypeVar]":
-        ...
+    ) -> "ConfigField[FieldTypeVar]": ...
 
     @overload
     def __get__(
         self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> FieldTypeVar:
-        ...
+    ) -> FieldTypeVar: ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
         if instance is None or not isinstance(instance, Config):

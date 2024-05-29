@@ -13,16 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Need to clone everything for the git tags.
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
@@ -31,25 +31,28 @@ jobs:
         run: sudo apt-get install libyaml-dev
 
       - name: Install prereqs for setuptools
-        run: pip install wheel
+        run: |
+          pip install uv
+          uv pip install --system wheel
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: uv pip install --system -r requirements.txt
 
       # We have two cores so we can speed up the testing with xdist
       - name: Install support package for pytest
-        run: pip install pytest-xdist pytest-openfiles pytest-cov
+        run: uv pip install --system pytest pytest-xdist pytest-cov
 
       - name: Build and install
-        run: pip install --no-deps -v .
+        run: uv pip install --system --no-deps -v .
 
       - name: Run tests
-        run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
+        run: pytest -r a -v -n 3 --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
 
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   pypi:
 
@@ -58,13 +61,13 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Need to clone everything to embed the version.
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip"

@@ -519,14 +519,12 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigChoiceField:
-        ...
+    ) -> ConfigChoiceField: ...
 
     @overload
     def __get__(
         self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigInstanceDict:
-        ...
+    ) -> ConfigInstanceDict: ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
         if instance is None or not isinstance(instance, Config):
