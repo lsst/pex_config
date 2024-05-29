@@ -144,8 +144,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
     @overload
     def __setitem__(
         self, i: int, x: FieldTypeVar, at: Any = None, label: str = "setitem", setHistory: bool = True
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __setitem__(
@@ -155,8 +154,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         at: Any = None,
         label: str = "setitem",
         setHistory: bool = True,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __setitem__(self, i, x, at=None, label="setitem", setHistory=True):
         if self._config._frozen:
@@ -179,12 +177,10 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             self.history.append((list(self._list), at, label))
 
     @overload
-    def __getitem__(self, i: int) -> FieldTypeVar:
-        ...
+    def __getitem__(self, i: int) -> FieldTypeVar: ...
 
     @overload
-    def __getitem__(self, i: slice) -> MutableSequence[FieldTypeVar]:
-        ...
+    def __getitem__(self, i: slice) -> MutableSequence[FieldTypeVar]: ...
 
     def __getitem__(self, i):
         return self._list[i]

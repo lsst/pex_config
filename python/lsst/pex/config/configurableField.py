@@ -360,14 +360,12 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigurableField:
-        ...
+    ) -> ConfigurableField: ...
 
     @overload
     def __get__(
         self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigurableInstance[FieldTypeVar]:
-        ...
+    ) -> ConfigurableInstance[FieldTypeVar]: ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
         if instance is None or not isinstance(instance, Config):

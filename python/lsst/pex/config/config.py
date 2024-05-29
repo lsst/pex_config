@@ -716,14 +716,12 @@ class Field(Generic[FieldTypeVar]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> Field[FieldTypeVar]:
-        ...
+    ) -> Field[FieldTypeVar]: ...
 
     @overload
     def __get__(
         self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> FieldTypeVar:
-        ...
+    ) -> FieldTypeVar: ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
         """Define how attribute access should occur on the Config instance

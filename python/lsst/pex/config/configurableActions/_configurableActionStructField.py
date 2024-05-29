@@ -354,14 +354,12 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigurableActionStruct[ActionTypeVar]:
-        ...
+    ) -> ConfigurableActionStruct[ActionTypeVar]: ...
 
     @overload
     def __get__(
         self, instance: Config, owner: Any = None, at: Any = None, label: str = "default"
-    ) -> ConfigurableActionStruct[ActionTypeVar]:
-        ...
+    ) -> ConfigurableActionStruct[ActionTypeVar]: ...
 
     def __get__(self, instance, owner=None, at=None, label="default"):
         if instance is None or not isinstance(instance, Config):
