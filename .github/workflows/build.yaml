@@ -38,13 +38,13 @@ jobs:
 
       # We have two cores so we can speed up the testing with xdist
       - name: Install support package for pytest
-        run: pip install pytest-xdist pytest-openfiles pytest-cov
+        run: pip install pytest-xdist pytest-cov
 
       - name: Build and install
         run: pip install --no-deps -v .
 
       - name: Run tests
-        run: pytest -r a -v -n 3 --open-files --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
+        run: pytest -r a -v -n 3 --cov=tests --cov=lsst.pex.config --cov-report=xml --cov-report=term
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v4
