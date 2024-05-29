@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lsst-pex-config"
+requires-python = ">=3.10.0"
 description = "A flexible configuration system using Python files."
 license = {text = "BSD 3-Clause License, GPLv3+"}
 readme = "README.rst"
@@ -18,6 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
 keywords = ["lsst"]
