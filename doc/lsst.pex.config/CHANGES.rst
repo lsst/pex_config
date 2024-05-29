@@ -1,3 +1,9 @@
+lsst-pex-config v27.0.0 (2024-05-29)
+====================================
+
+- Improved all docstrings to make them compliant with Numpydoc.
+- Minor code cleanups driven by Ruff linting. (`DM-42116 <https://rubinobs.atlassian.net/browse/DM-42116>`_)
+
 lsst-pex-config v26.0.0 (2023-09-22)
 ====================================
 
