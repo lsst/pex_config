@@ -38,6 +38,7 @@ __all__ = (
 import copy
 import importlib
 import io
+import itertools
 import math
 import os
 import re
@@ -60,6 +61,14 @@ try:
     import yaml
 except ImportError:
     yaml = None
+
+try:
+    from astrodata import AstroData
+except ImportError:
+
+    class AstroData:
+        pass
+
 
 from .callStack import getCallStack, getStackFrame
 from .comparison import compareConfigs, compareScalars, getComparisonName
@@ -140,8 +149,17 @@ def _autocast(x, dtype):
         ``dtype``. If the cast cannot be performed the original value of
         ``x`` is returned.
     """
-    if dtype == float and isinstance(x, int):
+    if isinstance(x, int) and (
+        dtype == float or (isinstance(dtype, tuple) and float in dtype and int not in dtype)
+    ):
         return float(x)
+    if isinstance(x, str):
+        for type in (int, float, bool):
+            if dtype == type or (isinstance(dtype, tuple) and type in dtype):
+                try:
+                    return type(x)
+                except ValueError:  # Carry on and try a different coercion
+                    pass
     return x
 
 
@@ -233,9 +251,9 @@ class ConfigMeta(type):
             for b in bases:
                 fields.update(getFields(b))
 
-            for k, v in classtype.__dict__.items():
-                if isinstance(v, Field):
-                    fields[k] = v
+            field_dict = {k: v for k, v in classtype.__dict__.items() if isinstance(v, Field)}
+            for k, v in sorted(field_dict.items(), key=lambda x: x[1]._creation_order):
+                fields[k] = v
             return fields
 
         fields = getFields(cls)
@@ -292,17 +310,8 @@ class FieldValidationError(ValueError):
         """
 
         self.configSource = config._source
-        error = (
-            "%s '%s' failed validation: %s\n"
-            "For more information see the Field definition at:\n%s"
-            " and the Config definition at:\n%s"
-            % (
-                self.fieldType.__name__,
-                self.fullname,
-                msg,
-                self.fieldSource.format(),
-                self.configSource.format(),
-            )
+        error = "{} '{}' ({}) failed validation: {}".format(
+            self.fieldType.__name__, self.fullname, field.doc, msg
         )
         super().__init__(error)
 
@@ -408,9 +417,11 @@ class Field(Generic[FieldTypeVar]):
     Class.
     """
 
-    supportedTypes = {str, bool, float, int, complex}
+    supportedTypes = {str, bool, float, int, complex, tuple, AstroData}
     """Supported data types for field values (`set` of types).
     """
+
+    _counter = itertools.count()
 
     @staticmethod
     def _parseTypingArgs(
@@ -480,7 +491,12 @@ class Field(Generic[FieldTypeVar]):
             raise ValueError(
                 "dtype must either be supplied as an argument or as a type argument to the class"
             )
-        if dtype not in self.supportedTypes:
+        if isinstance(dtype, list):
+            dtype = tuple(dtype)
+        if isinstance(dtype, tuple):
+            if any([x not in self.supportedTypes for x in dtype]):
+                raise ValueError("Unsupported Field dtype in %s" % repr(dtype))
+        elif dtype not in self.supportedTypes:
             raise ValueError("Unsupported Field dtype %s" % _typeStr(dtype))
 
         source = getStackFrame()
@@ -538,6 +554,8 @@ class Field(Generic[FieldTypeVar]):
         """The stack frame where this field is defined (`list` of
         `~lsst.pex.config.callStack.StackFrame`).
         """
+
+        self._creation_order = next(Field._counter)
 
     def rename(self, instance):
         r"""Rename the field in a `~lsst.pex.config.Config` (for internal use
@@ -626,11 +644,18 @@ class Field(Generic[FieldTypeVar]):
             return
 
         if not isinstance(value, self.dtype):
-            msg = "Value {} is of incorrect type {}. Expected type {}".format(
-                value,
-                _typeStr(value),
-                _typeStr(self.dtype),
-            )
+            if isinstance(self.dtype, tuple):
+                msg = "Value {} is of incorrect type {}. Expected types {}".format(
+                    value,
+                    _typeStr(value),
+                    [_typeStr(dt) for dt in self.dtype],
+                )
+            else:
+                msg = "Value {} is of incorrect type {}. Expected type {}".format(
+                    value,
+                    _typeStr(value),
+                    _typeStr(self.dtype),
+                )
             raise TypeError(msg)
         if self.check is not None and not self.check(value):
             msg = "Value %s is not a valid value" % str(value)
@@ -797,6 +822,12 @@ class Field(Generic[FieldTypeVar]):
         if instance._frozen:
             raise FieldValidationError(self, instance, "Cannot modify a frozen Config")
 
+        if at is None:
+            at = getCallStack()
+        # setDefaults() gets a free pass due to our mashing of inheritance
+        if self.name not in instance._fields:
+            raise AttributeError("{} has no attribute {}".format(instance.__class__.__name__, self.name))
+
         history = instance._history.setdefault(self.name, [])
         if value is not None:
             value = _autocast(value, self.dtype)
@@ -806,9 +837,9 @@ class Field(Generic[FieldTypeVar]):
                 raise FieldValidationError(self, instance, str(e))
 
         instance._storage[self.name] = value
-        if at is None:
-            at = getCallStack()
-        history.append((value, at, label))
+        # We don't want to put an actual AD object here, so just the filename
+        value_to_append = value.filename if isinstance(value, AstroData) else value
+        history.append((value_to_append, at, label))
 
     def __delete__(self, instance, at=None, label="deletion"):
         """Delete an attribute from a `lsst.pex.config.Config` instance.
@@ -981,6 +1012,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
     _history: dict[str, list[Any]]
     _imports: set[Any]
 
+    # Only _fields are exposure. _storage retains items that have been
+    # deleted.
+
     def __iter__(self):
         """Iterate over fields."""
         return self._fields.__iter__()
@@ -993,7 +1027,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         names : `~collections.abc.KeysView`
             List of `lsst.pex.config.Field` names.
         """
-        return self._storage.keys()
+        return list(self._fields)
 
     def values(self):
         """Get field values.
@@ -1003,7 +1037,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         values : `~collections.abc.ValuesView`
             Iterator of field values.
         """
-        return self._storage.values()
+        return self.toDict().values()
 
     def items(self):
         """Get configurations as ``(field name, field value)`` pairs.
@@ -1016,7 +1050,11 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             0. Field name.
             1. Field value.
         """
-        return self._storage.items()
+        return self.toDict().items()
+
+    def doc(self, field):
+        """Return docstring for field."""
+        return self._fields[field].doc
 
     def __contains__(self, name):
         """Return `True` if the specified field exists in this config.
@@ -1031,7 +1069,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         in : `bool`
             `True` if the specified field exists in the config.
         """
-        return self._storage.__contains__(name)
+        return self._storage.__contains__(name) and name in self._fields
 
     def __new__(cls, *args, **kw):
         """Allocate a new `lsst.pex.config.Config` object.
@@ -1057,9 +1095,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         instance._history = {}
         instance._imports = set()
         # load up defaults
-        for field in instance._fields.values():
-            instance._history[field.name] = []
-            field.__set__(instance, field.default, at=at + [field.source], label="default")
+        instance.reset(at=at)
         # set custom default-overrides
         instance.setDefaults()
         # set constructor overrides
@@ -1078,6 +1114,14 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         stream = io.StringIO()
         self.saveToStream(stream)
         return (unreduceConfig, (self.__class__, stream.getvalue().encode()))
+
+    def reset(self, at=None):
+        """Reset all values to their defaults."""
+        if at is None:
+            at = getCallStack()
+        for field in self._fields.values():
+            self._history[field.name] = []
+            field.__set__(self, field.default, at=at + [field.source], label="default")
 
     def setDefaults(self):
         """Subclass hook for computing defaults.
@@ -1150,7 +1194,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 field = self._fields[name]
                 field.__set__(self, value, at=at, label=label)
             except KeyError:
-                raise KeyError(f"No field of name {name} exists in config type {_typeStr(self)}")
+                raise KeyError(
+                    "{} has no field named {}".format(type(self).__name__.replace("Config", ""), name)
+                )
 
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
@@ -1530,7 +1576,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         for field in self._fields.values():
             field.validate(self)
 
-    def formatHistory(self, name, **kwargs):
+    def formatHistory(self, name=None, **kwargs):
         """Format a configuration field's history to a human-readable format.
 
         Parameters
@@ -1549,7 +1595,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         --------
         lsst.pex.config.history.format
         """
-        import lsst.pex.config.history as pexHist
+        from . import history as pexHist
 
         return pexHist.format(self, name, **kwargs)
 
@@ -1593,11 +1639,12 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             raise AttributeError(f"{_typeStr(self)} has no attribute {attr}")
 
     def __delattr__(self, attr, at=None, label="deletion"):
+        # CJS: Hacked to allow setDefaults() to delete non-existent fields
+        if at is None:
+            at = getCallStack()
         if attr in self._fields:
-            if at is None:
-                at = getCallStack()
-            self._fields[attr].__delete__(self, at=at, label=label)
-        else:
+            del self._fields[attr]
+        elif not any(stk.function == "setDefaults" for stk in at):
             object.__delattr__(self, attr)
 
     def __eq__(self, other):
