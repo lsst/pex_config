@@ -263,13 +263,8 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
                 _typ = ForwardRef(typ)
                 # type ignore below because typeshed seems to be wrong. It
                 # indicates there are only 2 args, as it was in python 3.8, but
-                # 3.9+ takes 3 args. Attempt in old style and new style to
-                # work with both.
-                try:
-                    result = _typ._evaluate(globals(), locals(), set())  # type: ignore
-                except TypeError:
-                    # python 3.8 path
-                    result = _typ._evaluate(globals(), locals())
+                # 3.9+ takes 3 args.
+                result = _typ._evaluate(globals(), locals(), recursive_guard=set())  # type: ignore
                 if result is None:
                     raise ValueError("Could not deduce type from input")
                 typ = cast(type, result)
