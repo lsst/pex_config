@@ -315,7 +315,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         label: str = "assigment",
     ):
         if instance._frozen:
-            msg = "Cannot modify a frozen Config. " "Attempting to set field to value %s" % value
+            msg = "Cannot modify a frozen Config. " f"Attempting to set field to value {value}"
             raise FieldValidationError(self, instance, msg)
 
         if at is None:

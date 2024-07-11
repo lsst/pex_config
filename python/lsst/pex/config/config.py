@@ -293,16 +293,9 @@ class FieldValidationError(ValueError):
 
         self.configSource = config._source
         error = (
-            "%s '%s' failed validation: %s\n"
-            "For more information see the Field definition at:\n%s"
-            " and the Config definition at:\n%s"
-            % (
-                self.fieldType.__name__,
-                self.fullname,
-                msg,
-                self.fieldSource.format(),
-                self.configSource.format(),
-            )
+            f"{self.fieldType.__name__} '{self.fullname}' failed validation: {msg}\n"
+            f"For more information see the Field definition at:\n{self.fieldSource.format()}"
+            f" and the Config definition at:\n{self.configSource.format()}"
         )
         super().__init__(error)
 
@@ -481,7 +474,7 @@ class Field(Generic[FieldTypeVar]):
                 "dtype must either be supplied as an argument or as a type argument to the class"
             )
         if dtype not in self.supportedTypes:
-            raise ValueError("Unsupported Field dtype %s" % _typeStr(dtype))
+            raise ValueError(f"Unsupported Field dtype {_typeStr(dtype)}")
 
         source = getStackFrame()
         self._setup(
@@ -626,14 +619,12 @@ class Field(Generic[FieldTypeVar]):
             return
 
         if not isinstance(value, self.dtype):
-            msg = "Value {} is of incorrect type {}. Expected type {}".format(
-                value,
-                _typeStr(value),
-                _typeStr(self.dtype),
+            msg = (
+                f"Value {value} is of incorrect type {_typeStr(value)}. Expected type {_typeStr(self.dtype)}"
             )
             raise TypeError(msg)
         if self.check is not None and not self.check(value):
-            msg = "Value %s is not a valid value" % str(value)
+            msg = f"Value {value} is not a valid value"
             raise ValueError(msg)
 
     def _collectImports(self, instance, imports):

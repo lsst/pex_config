@@ -89,10 +89,11 @@ class ChoiceField(Field[FieldTypeVar]):
         for choice, choiceDoc in self.allowed.items():
             if choice is not None and not isinstance(choice, dtype):
                 raise ValueError(
-                    "ChoiceField's allowed choice %s is of incorrect type %s. Expected %s"
-                    % (choice, _typeStr(choice), _typeStr(dtype))
+                    f"ChoiceField's allowed choice {choice} is of incorrect type "
+                    f"{_typeStr(choice)}. Expected {_typeStr(dtype)}"
                 )
-            self.__doc__ += "{}\n  {}\n".format(f"``{str(choice)!r}``", choiceDoc)
+            # Force to a string so that additional quotes are added with !r
+            self.__doc__ += f"``{str(choice)!r}``\n  {choiceDoc}\n"
 
         self.source = getStackFrame()
 

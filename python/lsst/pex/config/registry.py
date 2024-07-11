@@ -122,12 +122,7 @@ class Registry(collections.abc.Mapping):
 
     def __init__(self, configBaseType=Config):
         if not issubclass(configBaseType, Config):
-            raise TypeError(
-                "configBaseType=%s must be a subclass of Config"
-                % _typeStr(
-                    configBaseType,
-                )
-            )
+            raise TypeError(f"configBaseType={_typeStr(configBaseType)} must be a subclass of Config")
         self._configBaseType = configBaseType
         self._dict = {}
 
@@ -162,15 +157,15 @@ class Registry(collections.abc.Mapping):
         the original ``target`` is stored.
         """
         if name in self._dict:
-            raise RuntimeError("An item with name %r already exists" % name)
+            raise RuntimeError(f"An item with name {name!r} already exists")
         if ConfigClass is None:
             wrapper = target
         else:
             wrapper = ConfigurableWrapper(target, ConfigClass)
         if not issubclass(wrapper.ConfigClass, self._configBaseType):
             raise TypeError(
-                "ConfigClass=%s is not a subclass of %r"
-                % (_typeStr(wrapper.ConfigClass), _typeStr(self._configBaseType))
+                f"ConfigClass={_typeStr(wrapper.ConfigClass)} is not a subclass of "
+                f"{_typeStr(self._configBaseType)!r}"
             )
         self._dict[name] = wrapper
 
@@ -292,7 +287,7 @@ class RegistryInstanceDict(ConfigInstanceDict):
         if self.active is None:
             if self._field._on_none is not None:
                 return self._field._on_none(self, *args, **kwargs)
-            msg = "No selection has been made.  Options: %s" % " ".join(self.types.registry.keys())
+            msg = "No selection has been made.  Options: {}".format(" ".join(self.types.registry.keys()))
             raise FieldValidationError(self._field, self._config, msg)
         return self.apply_with(self._selection, *args, **kwargs)
 

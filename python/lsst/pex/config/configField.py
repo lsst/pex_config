@@ -82,7 +82,7 @@ class ConfigField(Field[FieldTypeVar]):
 
     def __init__(self, doc, dtype=None, default=None, check=None, deprecated=None):
         if dtype is None or not issubclass(dtype, Config):
-            raise ValueError("dtype=%s is not a subclass of Config" % _typeStr(dtype))
+            raise ValueError(f"dtype={_typeStr(dtype)} is not a subclass of Config")
         if default is None:
             default = dtype
         source = getStackFrame()
@@ -125,11 +125,7 @@ class ConfigField(Field[FieldTypeVar]):
         name = _joinNamePath(prefix=instance._name, name=self.name)
 
         if value != self.dtype and type(value) is not self.dtype:
-            msg = "Value {} is of incorrect type {}. Expected {}".format(
-                value,
-                _typeStr(value),
-                _typeStr(self.dtype),
-            )
+            msg = f"Value {value} is of incorrect type {_typeStr(value)}. Expected {_typeStr(self.dtype)}"
             raise FieldValidationError(self, instance, msg)
 
         if at is None:
@@ -276,7 +272,7 @@ class ConfigField(Field[FieldTypeVar]):
         value.validate()
 
         if self.check is not None and not self.check(value):
-            msg = "%s is not a valid value" % str(value)
+            msg = f"{value} is not a valid value"
             raise FieldValidationError(self, instance, msg)
 
     def _compare(self, instance1, instance2, shortcut, rtol, atol, output):

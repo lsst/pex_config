@@ -84,7 +84,7 @@ class SelectionSet(collections.abc.MutableSet):
             self._set = set()
 
         if setHistory:
-            self.__history.append(("Set selection to %s" % self, at, label))
+            self.__history.append((f"Set selection to {self}", at, label))
 
     @property
     def _config(self) -> Config:
@@ -114,7 +114,7 @@ class SelectionSet(collections.abc.MutableSet):
             # invoke __getitem__ to make sure it's present
             self._dict.__getitem__(value, at=at)
 
-        self.__history.append(("added %s to selection" % value, at, "selection"))
+        self.__history.append((f"added {value} to selection", at, "selection"))
         self._set.add(value)
 
     def discard(self, value, at=None):
@@ -137,7 +137,7 @@ class SelectionSet(collections.abc.MutableSet):
         if at is None:
             at = getCallStack()
 
-        self.__history.append(("removed %s from selection" % value, at, "selection"))
+        self.__history.append((f"removed {value} from selection", at, "selection"))
         self._set.discard(value)
 
     def __len__(self):
@@ -295,7 +295,7 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
                 dtype = self.types[k]
             except Exception:
                 raise FieldValidationError(
-                    self._field, self._config, "Unknown key %r in Registry/ConfigChoiceField" % k
+                    self._field, self._config, f"Unknown key {k!r} in Registry/ConfigChoiceField"
                 )
             name = _joinNamePath(self._config._name, self._field.name, k)
             if at is None:
@@ -311,14 +311,12 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         try:
             dtype = self.types[k]
         except Exception:
-            raise FieldValidationError(self._field, self._config, "Unknown key %r" % k)
+            raise FieldValidationError(self._field, self._config, f"Unknown key {k!r}")
 
         if value != dtype and type(value) is not dtype:
-            msg = "Value {} at key {} is of incorrect type {}. Expected type {}".format(
-                value,
-                k,
-                _typeStr(value),
-                _typeStr(dtype),
+            msg = (
+                f"Value {value} at key {k} is of incorrect type {_typeStr(value)}. "
+                f"Expected type {_typeStr(dtype)}"
             )
             raise FieldValidationError(self._field, self._config, msg)
 
@@ -658,7 +656,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars("selection for %s" % name, d1._selection, d2._selection, output=output):
+        if not compareScalars(f"selection for {name}", d1._selection, d2._selection, output=output):
             return False
         if d1._selection is None:
             return True

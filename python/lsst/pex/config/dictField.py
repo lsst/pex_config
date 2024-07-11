@@ -133,11 +133,9 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
                 raise FieldValidationError(self._field, self._config, msg)
         else:
             if type(x) is not self._field.itemtype and x is not None:
-                msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
-                    x,
-                    k,
-                    _typeStr(x),
-                    _typeStr(self._field.itemtype),
+                msg = (
+                    f"Value {x} at key {k!r} is of incorrect type {_typeStr(x)}. "
+                    f"Expected type {_typeStr(self._field.itemtype)}"
                 )
                 raise FieldValidationError(self._field, self._config, msg)
 
@@ -314,9 +312,9 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
                 "keytype must either be supplied as an argument or as a type argument to the class"
             )
         if keytype not in self.supportedTypes:
-            raise ValueError("'keytype' %s is not a supported type" % _typeStr(keytype))
+            raise ValueError(f"'keytype' {_typeStr(keytype)} is not a supported type")
         elif itemtype is not None and itemtype not in self.supportedTypes:
-            raise ValueError("'itemtype' %s is not a supported type" % _typeStr(itemtype))
+            raise ValueError(f"'itemtype' {_typeStr(itemtype)} is not a supported type")
         if dictCheck is not None and not hasattr(dictCheck, "__call__"):
             raise ValueError("'dictCheck' must be callable")
         if itemCheck is not None and not hasattr(itemCheck, "__call__"):
@@ -356,7 +354,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         Field.validate(self, instance)
         value = self.__get__(instance)
         if value is not None and self.dictCheck is not None and not self.dictCheck(value):
-            msg = "%s is not a valid value" % str(value)
+            msg = f"{value} is not a valid value"
             raise FieldValidationError(self, instance, msg)
 
     def __set__(
@@ -367,7 +365,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         label: str = "assignment",
     ) -> None:
         if instance._frozen:
-            msg = "Cannot modify a frozen Config. Attempting to set field to value %s" % value
+            msg = f"Cannot modify a frozen Config. Attempting to set field to value {value}"
             raise FieldValidationError(self, instance, msg)
 
         if at is None:
@@ -433,11 +431,11 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars("isnone for %s" % name, d1 is None, d2 is None, output=output):
+        if not compareScalars(f"isnone for {name}", d1 is None, d2 is None, output=output):
             return False
         if d1 is None and d2 is None:
             return True
-        if not compareScalars("keys for %s" % name, set(d1.keys()), set(d2.keys()), output=output):
+        if not compareScalars(f"keys for {name}", set(d1.keys()), set(d2.keys()), output=output):
             return False
         equal = True
         for k, v1 in d1.items():
