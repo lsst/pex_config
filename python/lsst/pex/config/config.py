@@ -1375,9 +1375,12 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 configType = type(self)
                 typeString = _typeStr(configType)
                 outfile.write(f"import {configType.__module__}\n")
+                # We are required to write this on a single line because
+                # of later regex matching, rather than adopting black style
+                # formatting.
                 outfile.write(
-                    f"assert type({root})=={typeString}, 'config is of type %s.%s instead of "
-                    f"{typeString}' % (type({root}).__module__, type({root}).__name__)\n"
+                    f'assert type({root}) is {typeString}, f"config is of type '
+                    f'{{type({root}).__module__}}.{{type({root}).__name__}} instead of {typeString}"\n\n'
                 )
                 for imp in sorted(self._imports):
                     if imp in sys.modules and sys.modules[imp] is not None:
@@ -1708,12 +1711,15 @@ def _classFromPython(config_py):
     """
     # standard serialization has the form:
     #     import config.class
-    #     assert type(config)==config.class.Config, ...
+    #     assert type(config) is config.class.Config, ...
+    # Older files use "type(config)==" instead.
     # We want to parse these two lines so we can get the class itself
 
     # Do a single regex to avoid large string copies when splitting a
     # large config into separate lines.
-    matches = re.search(r"^import ([\w.]+)\nassert .*==(.*?),", config_py)
+    # The assert regex cannot be greedy because the assert error string
+    # can include both "," and " is ".
+    matches = re.search(r"^import ([\w.]+)\nassert type\(\S+\)(?:\s*==\s*| is )(.*?),", config_py)
 
     if not matches:
         first_line, second_line, _ = config_py.split("\n", 2)
