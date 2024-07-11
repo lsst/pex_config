@@ -130,7 +130,7 @@ def _autocast(x, dtype):
     ----------
     x : object
         A value.
-    dtype : tpye
+    dtype : type
         Data type, such as `float`, `int`, or `str`.
 
     Returns
