@@ -140,7 +140,7 @@ def _autocast(x, dtype):
         ``dtype``. If the cast cannot be performed the original value of
         ``x`` is returned.
     """
-    if dtype == float and isinstance(x, int):
+    if dtype is float and isinstance(x, int):
         return float(x)
     return x
 
