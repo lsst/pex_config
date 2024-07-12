@@ -492,15 +492,12 @@ class ConfigTest(unittest.TestCase):
 
     def testBadImports(self):
         dummy = "somethingThatDoesntExist"
-        importing = (
-            """
+        importing = f"""
 try:
-    import %s
+    import {dummy}
 except ImportError:
     pass
 """
-            % dummy
-        )
         self.checkImportRoundTrip(importing, dummy, False)
 
     def testPickle(self):

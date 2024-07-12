@@ -97,7 +97,7 @@ class Color:
         try:
             color = Color.categories[category]
         except KeyError:
-            raise RuntimeError("Unknown category: %s" % category)
+            raise RuntimeError(f"Unknown category: {category}")
 
         self.rawText = str(text)
         x = color.lower().split(";")
@@ -110,7 +110,7 @@ class Color:
         try:
             self._code = "%s" % (30 + Color.colors[self.color])
         except KeyError:
-            raise RuntimeError("Unknown colour: %s" % self.color)
+            raise RuntimeError(f"Unknown colour: {self.color}")
 
         if bold:
             self._code += ";1"
@@ -149,7 +149,7 @@ class Color:
                         unknown.append(k)
 
                 if unknown:
-                    print("Unknown colourizing category: %s" % " ".join(unknown), file=sys.stderr)
+                    print("Unknown colourizing category: {}".format(" ".join(unknown)), file=sys.stderr)
 
         return Color._colorize if sys.stdout.isatty() else False
 

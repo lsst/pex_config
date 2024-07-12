@@ -152,7 +152,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
     """
     if name is None:
         if "Control" not in ctrl.__name__:
-            raise ValueError("Cannot guess appropriate Config class name for %s." % ctrl)
+            raise ValueError(f"Cannot guess appropriate Config class name for {ctrl}.")
         name = ctrl.__name__.replace("Control", "Config")
     if cls is None:
         cls = type(name, (base,), {"__doc__": doc})
@@ -213,7 +213,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
                             dtype = _dtypeMap.get(m.group("type"), None)
                             FieldCls = ListField
                     if dtype is None:
-                        raise TypeError("Could not parse field type '%s'." % ctype)
+                        raise TypeError(f"Could not parse field type '{ctype}'.")
                     fields[k] = FieldCls(doc=doc, dtype=dtype, optional=True)
 
     # Define a number of methods to put in the new Config class.  Note that

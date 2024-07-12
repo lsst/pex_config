@@ -46,13 +46,8 @@ import sys
 import tempfile
 import warnings
 from collections.abc import Mapping
+from types import GenericAlias
 from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
-
-try:
-    from types import GenericAlias
-except ImportError:
-    # cover python 3.8 usage
-    GenericAlias = type(Mapping[int, int])
 
 # if YAML is not available that's fine and we simply don't register
 # the yaml representer since we know it won't be used.
@@ -130,7 +125,7 @@ def _autocast(x, dtype):
     ----------
     x : object
         A value.
-    dtype : tpye
+    dtype : type
         Data type, such as `float`, `int`, or `str`.
 
     Returns
@@ -140,7 +135,7 @@ def _autocast(x, dtype):
         ``dtype``. If the cast cannot be performed the original value of
         ``x`` is returned.
     """
-    if dtype == float and isinstance(x, int):
+    if dtype is float and isinstance(x, int):
         return float(x)
     return x
 
@@ -293,16 +288,9 @@ class FieldValidationError(ValueError):
 
         self.configSource = config._source
         error = (
-            "%s '%s' failed validation: %s\n"
-            "For more information see the Field definition at:\n%s"
-            " and the Config definition at:\n%s"
-            % (
-                self.fieldType.__name__,
-                self.fullname,
-                msg,
-                self.fieldSource.format(),
-                self.configSource.format(),
-            )
+            f"{self.fieldType.__name__} '{self.fullname}' failed validation: {msg}\n"
+            f"For more information see the Field definition at:\n{self.fieldSource.format()}"
+            f" and the Config definition at:\n{self.configSource.format()}"
         )
         super().__init__(error)
 
@@ -456,13 +444,8 @@ class Field(Generic[FieldTypeVar]):
             _typ = ForwardRef(unpackedParams)
             # type ignore below because typeshed seems to be wrong. It
             # indicates there are only 2 args, as it was in python 3.8, but
-            # 3.9+ takes 3 args. Attempt in old style and new style to
-            # work with both.
-            try:
-                result = _typ._evaluate(globals(), locals(), set())  # type: ignore
-            except TypeError:
-                # python 3.8 path
-                result = _typ._evaluate(globals(), locals())
+            # 3.9+ takes 3 args.
+            result = _typ._evaluate(globals(), locals(), recursive_guard=set())  # type: ignore
             if result is None:
                 raise ValueError("Could not deduce type from input")
             unpackedParams = cast(type, result)
@@ -481,7 +464,7 @@ class Field(Generic[FieldTypeVar]):
                 "dtype must either be supplied as an argument or as a type argument to the class"
             )
         if dtype not in self.supportedTypes:
-            raise ValueError("Unsupported Field dtype %s" % _typeStr(dtype))
+            raise ValueError(f"Unsupported Field dtype {_typeStr(dtype)}")
 
         source = getStackFrame()
         self._setup(
@@ -626,14 +609,12 @@ class Field(Generic[FieldTypeVar]):
             return
 
         if not isinstance(value, self.dtype):
-            msg = "Value {} is of incorrect type {}. Expected type {}".format(
-                value,
-                _typeStr(value),
-                _typeStr(self.dtype),
+            msg = (
+                f"Value {value} is of incorrect type {_typeStr(value)}. Expected type {_typeStr(self.dtype)}"
             )
             raise TypeError(msg)
         if self.check is not None and not self.check(value):
-            msg = "Value %s is not a valid value" % str(value)
+            msg = f"Value {value} is not a valid value"
             raise ValueError(msg)
 
     def _collectImports(self, instance, imports):
@@ -1384,9 +1365,12 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 configType = type(self)
                 typeString = _typeStr(configType)
                 outfile.write(f"import {configType.__module__}\n")
+                # We are required to write this on a single line because
+                # of later regex matching, rather than adopting black style
+                # formatting.
                 outfile.write(
-                    f"assert type({root})=={typeString}, 'config is of type %s.%s instead of "
-                    f"{typeString}' % (type({root}).__module__, type({root}).__name__)\n"
+                    f'assert type({root}) is {typeString}, f"config is of type '
+                    f'{{type({root}).__module__}}.{{type({root}).__name__}} instead of {typeString}"\n\n'
                 )
                 for imp in sorted(self._imports):
                     if imp in sys.modules and sys.modules[imp] is not None:
@@ -1717,12 +1701,15 @@ def _classFromPython(config_py):
     """
     # standard serialization has the form:
     #     import config.class
-    #     assert type(config)==config.class.Config, ...
+    #     assert type(config) is config.class.Config, ...
+    # Older files use "type(config)==" instead.
     # We want to parse these two lines so we can get the class itself
 
     # Do a single regex to avoid large string copies when splitting a
     # large config into separate lines.
-    matches = re.search(r"^import ([\w.]+)\nassert .*==(.*?),", config_py)
+    # The assert regex cannot be greedy because the assert error string
+    # can include both "," and " is ".
+    matches = re.search(r"^import ([\w.]+)\nassert type\(\S+\)(?:\s*==\s*| is )(.*?),", config_py)
 
     if not matches:
         first_line, second_line, _ = config_py.split("\n", 2)

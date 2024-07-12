@@ -65,19 +65,15 @@ class ConfigDict(Dict[str, Config]):
         # validate keytype
         k = _autocast(k, self._field.keytype)
         if type(k) is not self._field.keytype:
-            msg = "Key {!r} is of type {}, expected type {}".format(
-                k, _typeStr(k), _typeStr(self._field.keytype)
-            )
+            msg = f"Key {k!r} is of type {_typeStr(k)}, expected type {_typeStr(self._field.keytype)}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # validate itemtype
         dtype = self._field.itemtype
         if type(x) is not self._field.itemtype and x != self._field.itemtype:
-            msg = "Value {} at key {!r} is of incorrect type {}. Expected type {}".format(
-                x,
-                k,
-                _typeStr(x),
-                _typeStr(self._field.itemtype),
+            msg = (
+                f"Value {x} at key {k!r} is of incorrect type {_typeStr(x)}. "
+                f"Expected type {_typeStr(self._field.itemtype)}"
             )
             raise FieldValidationError(self._field, self._config, msg)
 
@@ -91,19 +87,19 @@ class ConfigDict(Dict[str, Config]):
             else:
                 self._dict[k] = dtype(__name=name, __at=at, __label=label, **x._storage)
             if setHistory:
-                self.history.append(("Added item at key %s" % k, at, label))
+                self.history.append((f"Added item at key {k}", at, label))
         else:
             if x == dtype:
                 x = dtype()
             oldValue.update(__at=at, __label=label, **x._storage)
             if setHistory:
-                self.history.append(("Modified item at key %s" % k, at, label))
+                self.history.append((f"Modified item at key {k}", at, label))
 
     def __delitem__(self, k, at=None, label="delitem"):
         if at is None:
             at = getCallStack()
         Dict.__delitem__(self, k, at, label, False)
-        self.history.append(("Removed item at key %s" % k, at, label))
+        self.history.append((f"Removed item at key {k}", at, label))
 
 
 class ConfigDictField(DictField):
@@ -190,9 +186,9 @@ class ConfigDictField(DictField):
             deprecated=deprecated,
         )
         if keytype not in self.supportedTypes:
-            raise ValueError("'keytype' %s is not a supported type" % _typeStr(keytype))
+            raise ValueError(f"'keytype' {_typeStr(keytype)} is not a supported type")
         elif not issubclass(itemtype, Config):
-            raise ValueError("'itemtype' %s is not a supported type" % _typeStr(itemtype))
+            raise ValueError(f"'itemtype' {_typeStr(itemtype)} is not a supported type")
         if dictCheck is not None and not hasattr(dictCheck, "__call__"):
             raise ValueError("'dictCheck' must be callable")
         if itemCheck is not None and not hasattr(itemCheck, "__call__"):
@@ -293,7 +289,7 @@ class ConfigDictField(DictField):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars("keys for %s" % name, set(d1.keys()), set(d2.keys()), output=output):
+        if not compareScalars(f"keys for {name}", set(d1.keys()), set(d2.keys()), output=output):
             return False
         equal = True
         for k, v1 in d1.items():

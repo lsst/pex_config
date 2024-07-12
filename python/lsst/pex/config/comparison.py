@@ -156,12 +156,12 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
             return True
         else:
             if output is not None:
-                output("LHS is None for %s" % name)
+                output(f"LHS is None for {name}")
             return False
     else:
         if c2 is None:
             if output is not None:
-                output("RHS is None for %s" % name)
+                output(f"RHS is None for {name}")
             return False
     if type(c1) is not type(c2):
         if output is not None:

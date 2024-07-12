@@ -326,7 +326,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
                 "dtype must either be supplied as an argument or as a type argument to the class"
             )
         if dtype not in Field.supportedTypes:
-            raise ValueError("Unsupported dtype %s" % _typeStr(dtype))
+            raise ValueError(f"Unsupported dtype {_typeStr(dtype)}")
         if length is not None:
             if length <= 0:
                 raise ValueError("'length' (%d) must be positive" % length)
@@ -421,7 +421,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
                 msg = "Maximum allowed list length=%d, got length=%d" % (self.maxLength, lenValue)
                 raise FieldValidationError(self, instance, msg)
             elif self.listCheck is not None and not self.listCheck(value):
-                msg = "%s is not a valid value" % str(value)
+                msg = f"{value} is not a valid value"
                 raise FieldValidationError(self, instance, msg)
 
     def __set__(
@@ -501,11 +501,11 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars("isnone for %s" % name, l1 is None, l2 is None, output=output):
+        if not compareScalars(f"isnone for {name}", l1 is None, l2 is None, output=output):
             return False
         if l1 is None and l2 is None:
             return True
-        if not compareScalars("size for %s" % name, len(l1), len(l2), output=output):
+        if not compareScalars(f"size for {name}", len(l1), len(l2), output=output):
             return False
         equal = True
         for n, v1, v2 in zip(range(len(l1)), l1, l2):

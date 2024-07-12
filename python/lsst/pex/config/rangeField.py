@@ -91,7 +91,7 @@ class RangeField(Field):
         deprecated=None,
     ):
         if dtype not in self.supportedTypes:
-            raise ValueError("Unsupported RangeField dtype %s" % (_typeStr(dtype)))
+            raise ValueError(f"Unsupported RangeField dtype {_typeStr(dtype)}")
         source = getStackFrame()
         if min is None and max is None:
             raise ValueError("min and max cannot both be None")

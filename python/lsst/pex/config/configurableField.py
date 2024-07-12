@@ -308,8 +308,8 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
                 raise AttributeError("'target' must define attribute 'ConfigClass'")
         if not issubclass(ConfigClass, Config):
             raise TypeError(
-                "'ConfigClass' is of incorrect type %s.'ConfigClass' must be a subclass of Config"
-                % _typeStr(ConfigClass)
+                f"'ConfigClass' is of incorrect type {_typeStr(ConfigClass)}. "
+                "'ConfigClass' must be a subclass of Config"
             )
         if not hasattr(target, "__call__"):
             raise ValueError("'target' must be callable")
@@ -389,10 +389,9 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             value = oldValue.ConfigClass()
             oldValue.update(__at=at, __label=label, **value._storage)
         else:
-            msg = "Value {} is of incorrect type {}. Expected {}".format(
-                value,
-                _typeStr(value),
-                _typeStr(oldValue.ConfigClass),
+            msg = (
+                f"Value {value} is of incorrect type {_typeStr(value)}. "
+                f"Expected {_typeStr(oldValue.ConfigClass)}"
             )
             raise FieldValidationError(self, instance, msg)
 
@@ -418,9 +417,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             # save target information
             ConfigClass = value.ConfigClass
             outfile.write(
-                "{}.retarget(target={}, ConfigClass={})\n\n".format(
-                    fullname, _typeStr(target), _typeStr(ConfigClass)
-                )
+                f"{fullname}.retarget(target={_typeStr(target)}, ConfigClass={_typeStr(ConfigClass)})\n\n"
             )
         # save field values
         value._save(outfile)
@@ -438,7 +435,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         value.validate()
 
         if self.check is not None and not self.check(value):
-            msg = "%s is not a valid value" % str(value)
+            msg = f"{value} is not a valid value"
             raise FieldValidationError(self, instance, msg)
 
     def __deepcopy__(self, memo):
