@@ -69,22 +69,22 @@ class DictFieldTest(unittest.TestCase):
         try:
 
             class BadKeyCheck(pexConfig.Config):
-                d = pexConfig.DictField("...", keytype=int, itemtype=int, itemCheck=4)
-
-        except Exception:
-            pass
-        else:
-            raise SyntaxError("Non-callable itemCheck DictFields should not be allowed")
-
-        try:
-
-            class BadItemCheck(pexConfig.Config):
-                d = pexConfig.DictField("...", keytype=str, itemtype=float, keyCheck=4)
+                d = pexConfig.DictField("...", keytype=int, itemtype=int, keyCheck=4)
 
         except Exception:
             pass
         else:
             raise SyntaxError("Non-callable keyCheck DictFields should not be allowed")
+
+        try:
+
+            class BadItemCheck(pexConfig.Config):
+                d = pexConfig.DictField("...", keytype=str, itemtype=float, itemCheck=4)
+
+        except Exception:
+            pass
+        else:
+            raise SyntaxError("Non-callable itemCheck DictFields should not be allowed")
 
         try:
 
