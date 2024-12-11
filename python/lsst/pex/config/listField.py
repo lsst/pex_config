@@ -115,16 +115,14 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             `ListField.itemCheck` method.
         """
         if not isinstance(x, self._field.itemtype) and x is not None:
-            msg = "Item at position %d with value %s is of incorrect type %s. Expected %s" % (
-                i,
-                x,
-                _typeStr(x),
-                _typeStr(self._field.itemtype),
+            msg = (
+                f"Item at position {i} with value {x} is of incorrect type {_typeStr(x)}. "
+                f"Expected {_typeStr(self._field.itemtype)}"
             )
             raise FieldValidationError(self._field, self._config, msg)
 
         if self._field.itemCheck is not None and not self._field.itemCheck(x):
-            msg = "Item at position %d is not a valid value: %s" % (i, x)
+            msg = f"Item at position {i} is not a valid value: {x}"
             raise FieldValidationError(self._field, self._config, msg)
 
     def list(self):
@@ -329,15 +327,15 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             raise ValueError(f"Unsupported dtype {_typeStr(dtype)}")
         if length is not None:
             if length <= 0:
-                raise ValueError("'length' (%d) must be positive" % length)
+                raise ValueError(f"'length' ({length}) must be positive")
             minLength = None
             maxLength = None
         else:
             if maxLength is not None and maxLength <= 0:
-                raise ValueError("'maxLength' (%d) must be positive" % maxLength)
+                raise ValueError(f"'maxLength' ({maxLength}) must be positive")
             if minLength is not None and maxLength is not None and minLength > maxLength:
                 raise ValueError(
-                    "'maxLength' (%d) must be at least as large as 'minLength' (%d)" % (maxLength, minLength)
+                    f"'maxLength' ({maxLength}) must be at least as large as 'minLength' ({minLength})"
                 )
 
         if listCheck is not None and not hasattr(listCheck, "__call__"):
@@ -412,13 +410,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         if value is not None:
             lenValue = len(value)
             if self.length is not None and not lenValue == self.length:
-                msg = "Required list length=%d, got length=%d" % (self.length, lenValue)
+                msg = f"Required list length={self.length}, got length={lenValue}"
                 raise FieldValidationError(self, instance, msg)
             elif self.minLength is not None and lenValue < self.minLength:
-                msg = "Minimum allowed list length=%d, got length=%d" % (self.minLength, lenValue)
+                msg = f"Minimum allowed list length={self.minLength}, got length={lenValue}"
                 raise FieldValidationError(self, instance, msg)
             elif self.maxLength is not None and lenValue > self.maxLength:
-                msg = "Maximum allowed list length=%d, got length=%d" % (self.maxLength, lenValue)
+                msg = f"Maximum allowed list length={self.maxLength}, got length={lenValue}"
                 raise FieldValidationError(self, instance, msg)
             elif self.listCheck is not None and not self.listCheck(value):
                 msg = f"{value} is not a valid value"
@@ -510,8 +508,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         equal = True
         for n, v1, v2 in zip(range(len(l1)), l1, l2):
             result = compareScalars(
-                "%s[%d]" % (name, n), v1, v2, dtype=self.dtype, rtol=rtol, atol=atol, output=output
+                f"{name}[{n}]", v1, v2, dtype=self.dtype, rtol=rtol, atol=atol, output=output
             )
+
             if not result and shortcut:
                 return False
             equal = equal and result
