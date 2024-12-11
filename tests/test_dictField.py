@@ -79,7 +79,7 @@ class DictFieldTest(unittest.TestCase):
         try:
 
             class BadItemCheck(pexConfig.Config):
-                d = pexConfig.DictField("...", keytype=str, itemtype=float, itemCheck=4)
+                d = pexConfig.DictField("...", keytype=int, itemtype=int, itemCheck=4)
 
         except Exception:
             pass
