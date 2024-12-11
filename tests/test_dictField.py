@@ -38,6 +38,8 @@ class Config1(pexConfig.Config):
     d2 = pexConfig.DictField("d2", keytype=str, itemtype=str, default=None)
     d3 = pexConfig.DictField("d3", keytype=float, itemtype=float, optional=True, itemCheck=lambda x: x > 0)
     d4 = pexConfig.DictField("d4", keytype=str, itemtype=None, default={})
+    d5 = pexConfig.DictField[str, float]("d5", default={}, keyCheck=lambda k: k not in ["k1", "k2"])
+    d6 = pexConfig.DictField[int, str]("d6", default={-2: "v1", 4: "v2"}, keyCheck=lambda k: k % 2 == 0)
 
 
 class DictFieldTest(unittest.TestCase):
@@ -66,13 +68,23 @@ class DictFieldTest(unittest.TestCase):
 
         try:
 
-            class BadItemCheck(pexConfig.Config):
+            class BadKeyCheck(pexConfig.Config):
                 d = pexConfig.DictField("...", keytype=int, itemtype=int, itemCheck=4)
 
         except Exception:
             pass
         else:
             raise SyntaxError("Non-callable itemCheck DictFields should not be allowed")
+
+        try:
+
+            class BadItemCheck(pexConfig.Config):
+                d = pexConfig.DictField("...", keytype=str, itemtype=float, keyCheck=4)
+
+        except Exception:
+            pass
+        else:
+            raise SyntaxError("Non-callable keyCheck DictFields should not be allowed")
 
         try:
 
@@ -138,6 +150,23 @@ class DictFieldTest(unittest.TestCase):
 
         c.d2 = {"a": "b"}
         c.validate()
+
+    def testKeyCheckValidation(self):
+        c = Config1()
+        c.d5 = {"k3": -1, "k4": 0.25}
+        c.d6 = {6: "v3"}
+
+        with self.assertRaises(
+            pexConfig.FieldValidationError,
+            msg="Key check must reject dictionary assignment with invalid keys",
+        ):
+            c.d5 = {"k1": 1.5, "k2": 2.0}
+
+        with self.assertRaises(
+            pexConfig.FieldValidationError,
+            msg="Key check must reject invalid key addition",
+        ):
+            c.d6[3] = "v4"
 
     def testInPlaceModification(self):
         c = Config1()
