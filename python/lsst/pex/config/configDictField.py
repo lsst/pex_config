@@ -222,9 +222,6 @@ class ConfigDictField(DictField):
         value = self.__get__(instance)
         if value is not None:
             for k in value:
-                if self.keyCheck is not None and not self.keyCheck(k):
-                    msg = f"Key {k!r} is not a valid key"
-                    raise FieldValidationError(self, instance, msg)
                 item = value[k]
                 item.validate()
                 if self.itemCheck is not None and not self.itemCheck(item):
