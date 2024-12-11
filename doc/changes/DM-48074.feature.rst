@@ -1,0 +1,1 @@
+Introduced the `keyCheck` callback to `DictField` and `ConfigDictField`, allowing custom key validation during assignment. Added unit tests to ensure functionality.

@@ -54,6 +54,14 @@ class Config3(pexConfig.Config):
     field1 = pexConfig.ConfigDictField(keytype=str, itemtype=pexConfig.Config, default={}, doc="doc")
 
 
+class Config4(pexConfig.Config):
+    """Fourth test config."""
+
+    field1 = pexConfig.ConfigDictField(
+        keytype=str, itemtype=pexConfig.Config, default={}, doc="doc", keyCheck=lambda k: k.islower()
+    )
+
+
 class ConfigDictFieldTest(unittest.TestCase):
     """Test of ConfigDictField."""
 
@@ -77,6 +85,16 @@ class ConfigDictFieldTest(unittest.TestCase):
             pass
         else:
             raise SyntaxError("Unsupported itemtypes should not be allowed")
+
+        try:
+
+            class BadKeyCheck(pexConfig.Config):
+                d = pexConfig.ConfigDictField("...", keytype=str, itemtype=Config1, keyCheck=4)
+
+        except Exception:
+            pass
+        else:
+            raise SyntaxError("Non-callable keyCheck should not be allowed")
 
         try:
 
@@ -115,6 +133,14 @@ class ConfigDictFieldTest(unittest.TestCase):
 
         c.d1["a"].f = 5
         c.validate()
+
+    def testKeyCheckValidation(self):
+        c = Config4()
+        c.field1["lower"] = pexConfig.Config()
+        with self.assertRaises(pexConfig.FieldValidationError, msg="Key check should fail"):
+            c.field1["UPPER"] = pexConfig.Config()
+            # No need for c.validate() here, as the exception for key check is
+            # raised by the assignment.
 
     def testInPlaceModification(self):
         c = Config2(d1={})
