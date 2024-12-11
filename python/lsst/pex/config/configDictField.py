@@ -219,6 +219,23 @@ class ConfigDictField(DictField):
                 configDict[k]._rename(fullname)
 
     def validate(self, instance):
+        """Validate the field.
+
+        Parameters
+        ----------
+        instance : `lsst.pex.config.Config`
+            The config instance that contains this field.
+
+        Raises
+        ------
+        lsst.pex.config.FieldValidationError
+            Raised if validation fails for this field.
+
+        Notes
+        -----
+        Individual key checks (``keyCheck``) are applied when each key is added
+        and are not re-checked by this method.
+        """
         value = self.__get__(instance)
         if value is not None:
             for k in value:

@@ -339,11 +339,10 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         instance : `lsst.pex.config.Config`
             The configuration that contains this field.
 
-        Returns
-        -------
-        isValid : `bool`
-            `True` is returned if the field passes validation criteria (see
-            *Notes*). Otherwise `False`.
+        Raises
+        ------
+        lsst.pex.config.FieldValidationError
+            Raised if validation fails for this field (see *Notes*).
 
         Notes
         -----
@@ -353,10 +352,9 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         - If a value is not `None`, it must pass the `ConfigField.dictCheck`
           user callback function.
 
-        Individual item checks by the `ConfigField.keyCheck` and
-        `ConfigField.itemCheck` user callback function are done immediately
-        when the value is set on a key. Those checks are not repeated by this
-        method.
+        Individual key and item checks by the ``keyCheck`` and ``itemCheck``
+        user callback functions are done immediately when the value is set on a
+        key. Those checks are not repeated by this method.
         """
         Field.validate(self, instance)
         value = self.__get__(instance)
