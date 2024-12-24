@@ -77,6 +77,11 @@ class ConfigDict(Dict[str, Config]):
             )
             raise FieldValidationError(self._field, self._config, msg)
 
+        # validate key using keycheck
+        if self._field.keyCheck is not None and not self._field.keyCheck(k):
+            msg = f"Key {k!r} is not a valid key"
+            raise FieldValidationError(self._field, self._config, msg)
+
         if at is None:
             at = getCallStack()
         name = _joinNamePath(self._config._name, self._field.name, k)
@@ -127,6 +132,8 @@ class ConfigDictField(DictField):
         Default is `True`.
     dictCheck : `~collections.abc.Callable` or `None`, optional
         Callable to check a dict.
+    keyCheck : `~collections.abc.Callable` or `None`, optional
+        Callable to check a key.
     itemCheck : `~collections.abc.Callable` or `None`, optional
         Callable to check an item.
     deprecated : None or `str`, optional
@@ -140,7 +147,8 @@ class ConfigDictField(DictField):
 
         - ``keytype`` or ``itemtype`` arguments are not supported types
           (members of `ConfigDictField.supportedTypes`.
-        - ``dictCheck`` or ``itemCheck`` is not a callable function.
+        - ``dictCheck``, ``keyCheck`` or ``itemCheck`` is not a callable
+          function.
 
     See Also
     --------
@@ -172,6 +180,7 @@ class ConfigDictField(DictField):
         default=None,
         optional=False,
         dictCheck=None,
+        keyCheck=None,
         itemCheck=None,
         deprecated=None,
     ):
@@ -189,14 +198,18 @@ class ConfigDictField(DictField):
             raise ValueError(f"'keytype' {_typeStr(keytype)} is not a supported type")
         elif not issubclass(itemtype, Config):
             raise ValueError(f"'itemtype' {_typeStr(itemtype)} is not a supported type")
-        if dictCheck is not None and not hasattr(dictCheck, "__call__"):
-            raise ValueError("'dictCheck' must be callable")
-        if itemCheck is not None and not hasattr(itemCheck, "__call__"):
-            raise ValueError("'itemCheck' must be callable")
+
+        check_errors = []
+        for name, check in (("dictCheck", dictCheck), ("keyCheck", keyCheck), ("itemCheck", itemCheck)):
+            if check is not None and not hasattr(check, "__call__"):
+                check_errors.append(name)
+        if check_errors:
+            raise ValueError(f"{', '.join(check_errors)} must be callable")
 
         self.keytype = keytype
         self.itemtype = itemtype
         self.dictCheck = dictCheck
+        self.keyCheck = keyCheck
         self.itemCheck = itemCheck
 
     def rename(self, instance):
@@ -207,6 +220,23 @@ class ConfigDictField(DictField):
                 configDict[k]._rename(fullname)
 
     def validate(self, instance):
+        """Validate the field.
+
+        Parameters
+        ----------
+        instance : `lsst.pex.config.Config`
+            The config instance that contains this field.
+
+        Raises
+        ------
+        lsst.pex.config.FieldValidationError
+            Raised if validation fails for this field.
+
+        Notes
+        -----
+        Individual key checks (``keyCheck``) are applied when each key is added
+        and are not re-checked by this method.
+        """
         value = self.__get__(instance)
         if value is not None:
             for k in value:

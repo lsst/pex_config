@@ -214,7 +214,7 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
             if writeSourceLine:
                 line.append(
                     [
-                        "%s" % ("%s:%d" % (frame.filename, frame.lineno)),
+                        f"{frame.filename}:{frame.lineno}",
                         "FILE",
                     ]
                 )
@@ -252,14 +252,14 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
     fullname = f"{config._name}.{name}" if config._name is not None else name
     msg.append(_colorize(re.sub(r"^root\.", "", fullname), "NAME"))
     for value, output in outputs:
-        line = prefix + _colorize("%-*s" % (valueLength, value), "VALUE") + " "
+        line = prefix + _colorize(f"{value:<{valueLength}}", "VALUE") + " "
         for i, vt in enumerate(output):
             if writeSourceLine:
-                vt[0][0] = "%-*s" % (sourceLength, vt[0][0])
+                vt[0][0] = f"{vt[0][0]:<{sourceLength}}"
 
             output[i] = " ".join([_colorize(v, t) for v, t in vt])
 
-        line += ("\n%*s" % (valueLength + 1, "")).join(output)
+        line += f"\n{'':>{valueLength + 1}}".join(output)
         msg.append(line)
 
     return "\n".join(msg)

@@ -139,6 +139,11 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
                 )
                 raise FieldValidationError(self._field, self._config, msg)
 
+        # validate key using keycheck
+        if self._field.keyCheck is not None and not self._field.keyCheck(k):
+            msg = f"Key {k!r} is not a valid key"
+            raise FieldValidationError(self._field, self._config, msg)
+
         # validate item using itemcheck
         if self._field.itemCheck is not None and not self._field.itemCheck(x):
             msg = f"Item at key {k!r} is not a valid value: {x}"
@@ -214,6 +219,8 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         If `True`, the field doesn't need to have a set value.
     dictCheck : callable
         A function that validates the dictionary as a whole.
+    keyCheck : callable
+        A function that validates individual mapping keys.
     itemCheck : callable
         A function that validates individual mapping values.
     deprecated : None or `str`, optional
@@ -289,6 +296,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         default=None,
         optional=False,
         dictCheck=None,
+        keyCheck=None,
         itemCheck=None,
         deprecated=None,
     ):
@@ -310,14 +318,18 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
             raise ValueError(f"'keytype' {_typeStr(keytype)} is not a supported type")
         elif itemtype is not None and itemtype not in self.supportedTypes:
             raise ValueError(f"'itemtype' {_typeStr(itemtype)} is not a supported type")
-        if dictCheck is not None and not hasattr(dictCheck, "__call__"):
-            raise ValueError("'dictCheck' must be callable")
-        if itemCheck is not None and not hasattr(itemCheck, "__call__"):
-            raise ValueError("'itemCheck' must be callable")
+
+        check_errors = []
+        for name, check in (("dictCheck", dictCheck), ("keyCheck", keyCheck), ("itemCheck", itemCheck)):
+            if check is not None and not hasattr(check, "__call__"):
+                check_errors.append(name)
+        if check_errors:
+            raise ValueError(f"{', '.join(check_errors)} must be callable")
 
         self.keytype = keytype
         self.itemtype = itemtype
         self.dictCheck = dictCheck
+        self.keyCheck = keyCheck
         self.itemCheck = itemCheck
 
     def validate(self, instance):
@@ -328,23 +340,22 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         instance : `lsst.pex.config.Config`
             The configuration that contains this field.
 
-        Returns
-        -------
-        isValid : `bool`
-            `True` is returned if the field passes validation criteria (see
-            *Notes*). Otherwise `False`.
+        Raises
+        ------
+        lsst.pex.config.FieldValidationError
+            Raised if validation fails for this field (see *Notes*).
 
         Notes
         -----
         This method validates values according to the following criteria:
 
         - A non-optional field is not `None`.
-        - If a value is not `None`, is must pass the `ConfigField.dictCheck`
-          user callback functon.
+        - If a value is not `None`, it must pass the `ConfigField.dictCheck`
+          user callback function.
 
-        Individual item checks by the `ConfigField.itemCheck` user callback
-        function are done immediately when the value is set on a key. Those
-        checks are not repeated by this method.
+        Individual key and item checks by the ``keyCheck`` and ``itemCheck``
+        user callback functions are done immediately when the value is set on a
+        key. Those checks are not repeated by this method.
         """
         Field.validate(self, instance)
         value = self.__get__(instance)
