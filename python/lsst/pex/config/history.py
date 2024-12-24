@@ -259,7 +259,7 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
 
             output[i] = " ".join([_colorize(v, t) for v, t in vt])
 
-        line += ("\n" + f"{'':>{valueLength + 1}}").join(output)
+        line += f"\n{'':>{valueLength + 1}}".join(output)
         msg.append(line)
 
     return "\n".join(msg)
