@@ -198,12 +198,13 @@ class ConfigDictField(DictField):
             raise ValueError(f"'keytype' {_typeStr(keytype)} is not a supported type")
         elif not issubclass(itemtype, Config):
             raise ValueError(f"'itemtype' {_typeStr(itemtype)} is not a supported type")
-        if dictCheck is not None and not hasattr(dictCheck, "__call__"):
-            raise ValueError("'dictCheck' must be callable")
-        if keyCheck is not None and not hasattr(keyCheck, "__call__"):
-            raise ValueError("'keyCheck' must be callable")
-        if itemCheck is not None and not hasattr(itemCheck, "__call__"):
-            raise ValueError("'itemCheck' must be callable")
+
+        check_errors = []
+        for name, check in (("dictCheck", dictCheck), ("keyCheck", keyCheck), ("itemCheck", itemCheck)):
+            if check is not None and not hasattr(check, "__call__"):
+                check_errors.append(name)
+        if check_errors:
+            raise ValueError(f"{', '.join(check_errors)} must be callable")
 
         self.keytype = keytype
         self.itemtype = itemtype
