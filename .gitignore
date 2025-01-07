@@ -22,3 +22,4 @@ version.py
 build/
 
 roundtrip.test
+python/*.dist-info/
