@@ -39,6 +39,7 @@ import copy
 import importlib
 import io
 import math
+import numbers
 import os
 import re
 import shutil
@@ -134,9 +135,15 @@ def _autocast(x, dtype):
         If appropriate, the returned value is ``x`` cast to the given type
         ``dtype``. If the cast cannot be performed the original value of
         ``x`` is returned.
+
+    Notes
+    -----
+    Will convert numpy scalar types to the standard Python equivalents.
     """
-    if dtype is float and isinstance(x, int):
+    if dtype is float and isinstance(x, numbers.Real):
         return float(x)
+    if dtype is int and isinstance(x, numbers.Integral):
+        return int(x)
     return x
 
 
