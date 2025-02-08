@@ -197,7 +197,7 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
             print(format(config, name))
 
     outputs = []
-    for value, stack, label in config.history.get(name, []):
+    for value, stack, _ in config.history.get(name, []):
         output = []
         for frame in stack:
             if frame.function in (
@@ -241,11 +241,11 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
         # Find the maximum widths of the value and file:lineNo fields.
         if writeSourceLine:
             sourceLengths = []
-            for value, output in outputs:
+            for _, output in outputs:
                 sourceLengths.append(max([len(x[0][0]) for x in output]))
             sourceLength = max(sourceLengths)
 
-        valueLength = len(prefix) + max([len(str(value)) for value, output in outputs])
+        valueLength = len(prefix) + max([len(str(value)) for value, _ in outputs])
 
     # Generate the config history content.
     msg = []

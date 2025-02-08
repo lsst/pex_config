@@ -1415,7 +1415,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         class.
         """
         self._imports.add(self.__module__)
-        for name, field in self._fields.items():
+        for field in self._fields.values():
             field._collectImports(self, self._imports)
 
     def toDict(self):

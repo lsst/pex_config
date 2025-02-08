@@ -50,7 +50,7 @@ def getCallerFrame(relative=0):
     This function is excluded from the frame.
     """
     frame = inspect.currentframe().f_back.f_back  # Our caller's caller
-    for ii in range(relative):
+    for _ in range(relative):
         frame = frame.f_back
     return frame
 
