@@ -217,12 +217,8 @@ class ConfigTest(unittest.TestCase):
         self.outer.i.f = 10.0
         self.outer.validate()
 
-        try:
+        with self.assertRaises(pexConfig.FieldValidationError):
             self.simple.d["failKey"] = "failValue"
-        except pexConfig.FieldValidationError:
-            pass
-        except Exception:
-            raise "Validation error Expected"
         self.simple.validate()
 
         self.outer.i = InnerConfig
