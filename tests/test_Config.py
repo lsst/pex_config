@@ -597,7 +597,7 @@ except ImportError:
         self.assertIn("Hello", self.simple.values())
         self.assertEqual(len(self.simple.values()), 8)
 
-        for k, v, (k1, v1) in zip(self.simple.keys(), self.simple.values(), self.simple.items()):
+        for k, v, (k1, v1) in zip(self.simple.keys(), self.simple.values(), self.simple.items(), strict=True):
             self.assertEqual(k, k1)
             if k == "n":
                 self.assertNotEqual(v, v1)
