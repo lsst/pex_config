@@ -322,12 +322,12 @@ class ConfigTest(unittest.TestCase):
                     inclusiveMax=inclusiveMax,
                 )
 
-        if shouldRaise:
-            self.assertRaises(pexConfig.FieldValidationError, Cfg1)
-            self.assertRaises(pexConfig.FieldValidationError, Cfg2)
-        else:
-            Cfg1()
-            Cfg2()
+            if shouldRaise:
+                self.assertRaises(pexConfig.FieldValidationError, Cfg1)
+                self.assertRaises(pexConfig.FieldValidationError, Cfg2)
+            else:
+                Cfg1()
+                Cfg2()
 
     def testSave(self):
         self.comp.r = "BBB"
