@@ -30,6 +30,7 @@ __all__ = ["ListField"]
 import collections.abc
 import weakref
 from collections.abc import Iterable, MutableSequence
+from itertools import zip_longest
 from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
@@ -229,7 +230,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             if len(self) != len(other):
                 return False
 
-            for i, j in zip(self, other):
+            for i, j in zip_longest(self, other):
                 if i != j:
                     return False
             return True
@@ -506,7 +507,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         if not compareScalars(f"size for {name}", len(l1), len(l2), output=output):
             return False
         equal = True
-        for n, v1, v2 in zip(range(len(l1)), l1, l2):
+        for n, v1, v2 in zip(range(len(l1)), l1, l2, strict=False):
             result = compareScalars(
                 f"{name}[{n}]", v1, v2, dtype=self.dtype, rtol=rtol, atol=atol, output=output
             )
