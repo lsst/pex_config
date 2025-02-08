@@ -24,9 +24,9 @@ __all__ = (
     "ActionTest1",
     "ActionTest2",
     "ActionTest3",
+    "TestConfig",
     "TestDivideAction",
     "TestSingleColumnAction",
-    "TestConfig",
 )
 
 from lsst.pex.config import Config, Field

@@ -30,9 +30,9 @@ __all__ = (
     "Config",
     "ConfigMeta",
     "Field",
+    "FieldTypeVar",
     "FieldValidationError",
     "UnexpectedProxyUsageError",
-    "FieldTypeVar",
 )
 
 import copy

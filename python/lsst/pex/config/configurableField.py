@@ -27,7 +27,7 @@
 
 from __future__ import annotations
 
-__all__ = ("ConfigurableInstance", "ConfigurableField")
+__all__ = ("ConfigurableField", "ConfigurableInstance")
 
 import copy
 import weakref

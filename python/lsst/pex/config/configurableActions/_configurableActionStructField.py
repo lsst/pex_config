@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import annotations
 
-__all__ = ("ConfigurableActionStructField", "ConfigurableActionStruct")
+__all__ = ("ConfigurableActionStruct", "ConfigurableActionStructField")
 
 import weakref
 from collections.abc import Iterable, Iterator, Mapping

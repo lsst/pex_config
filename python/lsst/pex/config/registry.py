@@ -25,7 +25,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ("Registry", "makeRegistry", "RegistryField", "registerConfig", "registerConfigurable")
+__all__ = ("Registry", "RegistryField", "makeRegistry", "registerConfig", "registerConfigurable")
 
 import collections.abc
 import copy
