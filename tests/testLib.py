@@ -27,8 +27,9 @@
 
 import sys
 
-import lsst.pex.config
 from _testLib import *
+
+import lsst.pex.config
 
 module = sys.modules[__name__]
 InnerConfigObject = lsst.pex.config.makeConfigClass(InnerControlObject, module=module)
