@@ -55,7 +55,7 @@ class ConfigurableActionStructUpdater:
             value = value._attrs
         else:
             raise ValueError(
-                "Can only update a ConfigurableActionStruct with an instance of such, or a " "mapping"
+                "Can only update a ConfigurableActionStruct with an instance of such, or a mapping"
             )
         for name, action in value.items():
             setattr(instance, name, action)
@@ -196,7 +196,7 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         setHistory=False,
     ) -> None:
         if hasattr(self._config, "_frozen") and self._config._frozen:
-            msg = "Cannot modify a frozen Config. " f"Attempting to set item {attr} to value {value}"
+            msg = f"Cannot modify a frozen Config. Attempting to set item {attr} to value {value}"
             raise FieldValidationError(self._field, self._config, msg)
 
         # verify that someone has not passed a string with a space or leading
@@ -315,7 +315,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         label: str = "assigment",
     ):
         if instance._frozen:
-            msg = "Cannot modify a frozen Config. " f"Attempting to set field to value {value}"
+            msg = f"Cannot modify a frozen Config. Attempting to set field to value {value}"
             raise FieldValidationError(self, instance, msg)
 
         if at is None:

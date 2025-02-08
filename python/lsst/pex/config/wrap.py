@@ -118,7 +118,9 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
        import lsst.pex.config
        import myWrappedLib
 
-       InnerConfig = lsst.pex.config.makeConfigClass(myWrappedLib.InnerControl)
+       InnerConfig = lsst.pex.config.makeConfigClass(
+           myWrappedLib.InnerControl
+       )
        FooConfig = lsst.pex.config.makeConfigClass(myWrappedLib.FooControl)
 
     This does the following things:

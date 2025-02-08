@@ -443,7 +443,6 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     >>> from lsst.pex.config import Config, ConfigChoiceField, Field
     >>> class AaaConfig(Config):
     ...     somefield = Field("doc", int)
-    ...
 
     The ``MyConfig`` config has a ``ConfigChoiceField`` field called ``choice``
     that maps the ``AaaConfig`` type to the ``"AAA"`` key:
@@ -451,7 +450,6 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     >>> TYPEMAP = {"AAA", AaaConfig}
     >>> class MyConfig(Config):
     ...     choice = ConfigChoiceField("doc for choice", TYPEMAP)
-    ...
 
     Creating an instance of ``MyConfig``:
 
@@ -460,7 +458,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     Setting value of the field ``somefield`` on the "AAA" key of the ``choice``
     field:
 
-    >>> instance.choice['AAA'].somefield = 5
+    >>> instance.choice["AAA"].somefield = 5
 
     **Selecting the active configuration**
 

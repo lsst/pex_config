@@ -247,11 +247,12 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     >>> class MyConfig(Config):
     ...     field = DictField(
     ...         doc="Example string-to-int mapping field.",
-    ...         keytype=str, itemtype=int,
-    ...         default={})
-    ...
+    ...         keytype=str,
+    ...         itemtype=int,
+    ...         default={},
+    ...     )
     >>> config = MyConfig()
-    >>> config.field['myKey'] = 42
+    >>> config.field["myKey"] = 42
     >>> print(config.field)
     {'myKey': 42}
     """

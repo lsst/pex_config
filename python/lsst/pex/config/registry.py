@@ -92,14 +92,14 @@ class Registry(collections.abc.Mapping):
     >>> from lsst.pex.config import Registry, Config
     >>> class FooConfig(Config):
     ...     val = Field(dtype=int, default=3, doc="parameter for Foo")
-    ...
     >>> class Foo:
     ...     ConfigClass = FooConfig
+    ...
     ...     def __init__(self, config):
     ...         self.config = config
+    ...
     ...     def addVal(self, num):
     ...         return self.config.val + num
-    ...
 
     Next, create a ``Registry`` instance called ``registry`` and register the
     ``Foo`` configurable under the ``"foo"`` key:

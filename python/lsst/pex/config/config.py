@@ -390,7 +390,6 @@ class Field(Generic[FieldTypeVar]):
     >>> class Example(Config):
     ...     myInt = Field("An integer field.", int, default=0)
     ...     name = Field[str](doc="A string Field")
-    ...
     >>> print(config.myInt)
     0
     >>> config.myInt = 5
@@ -943,23 +942,25 @@ class Config(metaclass=ConfigMeta):  # type: ignore
     >>> from lsst.pex.config import Config, Field, ListField
     >>> class DemoConfig(Config):
     ...     intField = Field(doc="An integer field", dtype=int, default=42)
-    ...     listField = ListField(doc="List of favorite beverages.", dtype=str,
-    ...                           default=['coffee', 'green tea', 'water'])
-    ...
+    ...     listField = ListField(
+    ...         doc="List of favorite beverages.",
+    ...         dtype=str,
+    ...         default=["coffee", "green tea", "water"],
+    ...     )
     >>> config = DemoConfig()
 
     Configs support many `dict`-like APIs:
 
     >>> config.keys()
     ['intField', 'listField']
-    >>> 'intField' in config
+    >>> "intField" in config
     True
 
     Individual fields can be accessed as attributes of the configuration:
 
     >>> config.intField
     42
-    >>> config.listField.append('earl grey tea')
+    >>> config.listField.append("earl grey tea")
     >>> print(config.listField)
     ['coffee', 'green tea', 'water', 'earl grey tea']
     """
@@ -1102,30 +1103,27 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         >>> from lsst.pex.config import Config, Field
         >>> class DemoConfig(Config):
-        ...     fieldA = Field(doc='Field A', dtype=int, default=42)
-        ...     fieldB = Field(doc='Field B', dtype=bool, default=True)
-        ...     fieldC = Field(doc='Field C', dtype=str, default='Hello world')
-        ...
+        ...     fieldA = Field(doc="Field A", dtype=int, default=42)
+        ...     fieldB = Field(doc="Field B", dtype=bool, default=True)
+        ...     fieldC = Field(doc="Field C", dtype=str, default="Hello world")
         >>> config = DemoConfig()
 
         These are the default values of each field:
 
         >>> for name, value in config.iteritems():
         ...     print(f"{name}: {value}")
-        ...
         fieldA: 42
         fieldB: True
         fieldC: 'Hello world'
 
         Using this method to update ``fieldA`` and ``fieldC``:
 
-        >>> config.update(fieldA=13, fieldC='Updated!')
+        >>> config.update(fieldA=13, fieldC="Updated!")
 
         Now the values of each field are:
 
         >>> for name, value in config.iteritems():
         ...     print(f"{name}: {value}")
-        ...
         fieldA: 13
         fieldB: True
         fieldC: 'Updated!'
