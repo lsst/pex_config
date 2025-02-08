@@ -83,9 +83,9 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             try:
                 for i, x in enumerate(value):
                     self.insert(i, x, setHistory=False)
-            except TypeError:
+            except TypeError as e:
                 msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
-                raise FieldValidationError(self._field, config, msg)
+                raise FieldValidationError(self._field, config, msg) from e
         if setHistory:
             self.history.append((list(self._list), at, label))
 

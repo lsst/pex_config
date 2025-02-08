@@ -96,8 +96,8 @@ class Color:
     def __init__(self, text, category):
         try:
             color = Color.categories[category]
-        except KeyError:
-            raise RuntimeError(f"Unknown category: {category}")
+        except KeyError as e:
+            raise RuntimeError(f"Unknown category: {category}") from e
 
         self.rawText = str(text)
         x = color.lower().split(";")
@@ -109,8 +109,8 @@ class Color:
 
         try:
             self._code = "%s" % (30 + Color.colors[self.color])
-        except KeyError:
-            raise RuntimeError(f"Unknown colour: {self.color}")
+        except KeyError as e:
+            raise RuntimeError(f"Unknown colour: {self.color}") from e
 
         if bold:
             self._code += ";1"

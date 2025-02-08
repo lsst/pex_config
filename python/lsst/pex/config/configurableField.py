@@ -166,7 +166,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         try:
             ConfigClass = self._field.validateTarget(target, ConfigClass)
         except BaseException as e:
-            raise FieldValidationError(self._field, self._config, e.message)
+            raise FieldValidationError(self._field, self._config, e.message) from e
 
         if at is None:
             at = getCallStack()
@@ -304,8 +304,8 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         if ConfigClass is None:
             try:
                 ConfigClass = target.ConfigClass
-            except Exception:
-                raise AttributeError("'target' must define attribute 'ConfigClass'")
+            except Exception as e:
+                raise AttributeError("'target' must define attribute 'ConfigClass'") from e
         if not issubclass(ConfigClass, Config):
             raise TypeError(
                 f"'ConfigClass' is of incorrect type {_typeStr(ConfigClass)}. "

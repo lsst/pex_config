@@ -729,13 +729,14 @@ class Field(Generic[FieldTypeVar]):
             # try statements are almost free in python if they succeed
             try:
                 return instance._storage[self.name]
-            except AttributeError:
+            except AttributeError as e:
                 if not isinstance(instance, Config):
                     return self
                 else:
-                    raise AttributeError(
+                    e.add_note(
                         f"Config {instance} is missing _storage attribute, likely incorrectly initialized"
                     )
+                    raise
 
     def __set__(
         self, instance: Config, value: FieldTypeVar | None, at: Any = None, label: str = "assignment"
@@ -790,7 +791,7 @@ class Field(Generic[FieldTypeVar]):
             try:
                 self._validateValue(value)
             except BaseException as e:
-                raise FieldValidationError(self, instance, str(e))
+                raise FieldValidationError(self, instance, str(e)) from e
 
         instance._storage[self.name] = value
         if at is None:
@@ -1135,8 +1136,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             try:
                 field = self._fields[name]
                 field.__set__(self, value, at=at, label=label)
-            except KeyError:
-                raise KeyError(f"No field of name {name} exists in config type {_typeStr(self)}")
+            except KeyError as e:
+                e.add_note(f"No field of name {name} exists in config type {_typeStr(self)}")
+                raise
 
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
