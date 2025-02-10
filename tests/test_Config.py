@@ -217,12 +217,8 @@ class ConfigTest(unittest.TestCase):
         self.outer.i.f = 10.0
         self.outer.validate()
 
-        try:
+        with self.assertRaises(pexConfig.FieldValidationError):
             self.simple.d["failKey"] = "failValue"
-        except pexConfig.FieldValidationError:
-            pass
-        except Exception:
-            raise "Validation error Expected"
         self.simple.validate()
 
         self.outer.i = InnerConfig
@@ -326,12 +322,12 @@ class ConfigTest(unittest.TestCase):
                     inclusiveMax=inclusiveMax,
                 )
 
-        if shouldRaise:
-            self.assertRaises(pexConfig.FieldValidationError, Cfg1)
-            self.assertRaises(pexConfig.FieldValidationError, Cfg2)
-        else:
-            Cfg1()
-            Cfg2()
+            if shouldRaise:
+                self.assertRaises(pexConfig.FieldValidationError, Cfg1)
+                self.assertRaises(pexConfig.FieldValidationError, Cfg2)
+            else:
+                Cfg1()
+                Cfg2()
 
     def testSave(self):
         self.comp.r = "BBB"
@@ -601,7 +597,7 @@ except ImportError:
         self.assertIn("Hello", self.simple.values())
         self.assertEqual(len(self.simple.values()), 8)
 
-        for k, v, (k1, v1) in zip(self.simple.keys(), self.simple.values(), self.simple.items()):
+        for k, v, (k1, v1) in zip(self.simple.keys(), self.simple.values(), self.simple.items(), strict=True):
             self.assertEqual(k, k1)
             if k == "n":
                 self.assertNotEqual(v, v1)

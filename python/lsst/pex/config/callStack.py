@@ -25,7 +25,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ["getCallerFrame", "getStackFrame", "StackFrame", "getCallStack"]
+__all__ = ["StackFrame", "getCallStack", "getCallerFrame", "getStackFrame"]
 
 import inspect
 import linecache
@@ -50,7 +50,7 @@ def getCallerFrame(relative=0):
     This function is excluded from the frame.
     """
     frame = inspect.currentframe().f_back.f_back  # Our caller's caller
-    for ii in range(relative):
+    for _ in range(relative):
         frame = frame.f_back
     return frame
 

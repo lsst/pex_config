@@ -32,7 +32,7 @@ or `lsst.pex.config.Field._compare` implementation, as they take care of
 writing messages as well as floating-point comparisons and shortcuts.
 """
 
-__all__ = ("getComparisonName", "compareScalars", "compareConfigs")
+__all__ = ("compareConfigs", "compareScalars", "getComparisonName")
 
 import numpy
 

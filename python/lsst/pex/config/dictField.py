@@ -82,9 +82,9 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
                 for k in value:
                     # do not set history per-item
                     self.__setitem__(k, value[k], at=at, label=label, setHistory=False)
-            except TypeError:
+            except TypeError as e:
                 msg = f"Value {value} is of incorrect type {_typeStr(value)}. Mapping type expected."
-                raise FieldValidationError(self._field, self._config, msg)
+                raise FieldValidationError(self._field, self._config, msg) from e
         if setHistory:
             self._history.append((dict(self._dict), at, label))
 
@@ -247,11 +247,12 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
     >>> class MyConfig(Config):
     ...     field = DictField(
     ...         doc="Example string-to-int mapping field.",
-    ...         keytype=str, itemtype=int,
-    ...         default={})
-    ...
+    ...         keytype=str,
+    ...         itemtype=int,
+    ...         default={},
+    ...     )
     >>> config = MyConfig()
-    >>> config.field['myKey'] = 42
+    >>> config.field["myKey"] = 42
     >>> print(config.field)
     {'myKey': 42}
     """
@@ -321,7 +322,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
 
         check_errors = []
         for name, check in (("dictCheck", dictCheck), ("keyCheck", keyCheck), ("itemCheck", itemCheck)):
-            if check is not None and not hasattr(check, "__call__"):
+            if check is not None and not callable(check):
                 check_errors.append(name)
         if check_errors:
             raise ValueError(f"{', '.join(check_errors)} must be callable")

@@ -30,6 +30,7 @@ __all__ = ["ListField"]
 import collections.abc
 import weakref
 from collections.abc import Iterable, MutableSequence
+from itertools import zip_longest
 from typing import Any, Generic, overload
 
 from .callStack import getCallStack, getStackFrame
@@ -83,9 +84,9 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             try:
                 for i, x in enumerate(value):
                     self.insert(i, x, setHistory=False)
-            except TypeError:
+            except TypeError as e:
                 msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
-                raise FieldValidationError(self._field, config, msg)
+                raise FieldValidationError(self._field, config, msg) from e
         if setHistory:
             self.history.append((list(self._list), at, label))
 
@@ -229,7 +230,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
             if len(self) != len(other):
                 return False
 
-            for i, j in zip(self, other):
+            for i, j in zip_longest(self, other):
                 if i != j:
                     return False
             return True
@@ -338,9 +339,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
                     f"'maxLength' ({maxLength}) must be at least as large as 'minLength' ({minLength})"
                 )
 
-        if listCheck is not None and not hasattr(listCheck, "__call__"):
+        if listCheck is not None and not callable(listCheck):
             raise ValueError("'listCheck' must be callable")
-        if itemCheck is not None and not hasattr(itemCheck, "__call__"):
+        if itemCheck is not None and not callable(itemCheck):
             raise ValueError("'itemCheck' must be callable")
 
         source = getStackFrame()
@@ -506,7 +507,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         if not compareScalars(f"size for {name}", len(l1), len(l2), output=output):
             return False
         equal = True
-        for n, v1, v2 in zip(range(len(l1)), l1, l2):
+        for n, v1, v2 in zip(range(len(l1)), l1, l2, strict=False):
             result = compareScalars(
                 f"{name}[{n}]", v1, v2, dtype=self.dtype, rtol=rtol, atol=atol, output=output
             )

@@ -30,9 +30,9 @@ __all__ = (
     "Config",
     "ConfigMeta",
     "Field",
+    "FieldTypeVar",
     "FieldValidationError",
     "UnexpectedProxyUsageError",
-    "FieldTypeVar",
 )
 
 import copy
@@ -390,7 +390,6 @@ class Field(Generic[FieldTypeVar]):
     >>> class Example(Config):
     ...     myInt = Field("An integer field.", int, default=0)
     ...     name = Field[str](doc="A string Field")
-    ...
     >>> print(config.myInt)
     0
     >>> config.myInt = 5
@@ -730,13 +729,14 @@ class Field(Generic[FieldTypeVar]):
             # try statements are almost free in python if they succeed
             try:
                 return instance._storage[self.name]
-            except AttributeError:
+            except AttributeError as e:
                 if not isinstance(instance, Config):
                     return self
                 else:
-                    raise AttributeError(
+                    e.add_note(
                         f"Config {instance} is missing _storage attribute, likely incorrectly initialized"
                     )
+                    raise
 
     def __set__(
         self, instance: Config, value: FieldTypeVar | None, at: Any = None, label: str = "assignment"
@@ -791,7 +791,7 @@ class Field(Generic[FieldTypeVar]):
             try:
                 self._validateValue(value)
             except BaseException as e:
-                raise FieldValidationError(self, instance, str(e))
+                raise FieldValidationError(self, instance, str(e)) from e
 
         instance._storage[self.name] = value
         if at is None:
@@ -943,23 +943,25 @@ class Config(metaclass=ConfigMeta):  # type: ignore
     >>> from lsst.pex.config import Config, Field, ListField
     >>> class DemoConfig(Config):
     ...     intField = Field(doc="An integer field", dtype=int, default=42)
-    ...     listField = ListField(doc="List of favorite beverages.", dtype=str,
-    ...                           default=['coffee', 'green tea', 'water'])
-    ...
+    ...     listField = ListField(
+    ...         doc="List of favorite beverages.",
+    ...         dtype=str,
+    ...         default=["coffee", "green tea", "water"],
+    ...     )
     >>> config = DemoConfig()
 
     Configs support many `dict`-like APIs:
 
     >>> config.keys()
     ['intField', 'listField']
-    >>> 'intField' in config
+    >>> "intField" in config
     True
 
     Individual fields can be accessed as attributes of the configuration:
 
     >>> config.intField
     42
-    >>> config.listField.append('earl grey tea')
+    >>> config.listField.append("earl grey tea")
     >>> print(config.listField)
     ['coffee', 'green tea', 'water', 'earl grey tea']
     """
@@ -1102,30 +1104,27 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         >>> from lsst.pex.config import Config, Field
         >>> class DemoConfig(Config):
-        ...     fieldA = Field(doc='Field A', dtype=int, default=42)
-        ...     fieldB = Field(doc='Field B', dtype=bool, default=True)
-        ...     fieldC = Field(doc='Field C', dtype=str, default='Hello world')
-        ...
+        ...     fieldA = Field(doc="Field A", dtype=int, default=42)
+        ...     fieldB = Field(doc="Field B", dtype=bool, default=True)
+        ...     fieldC = Field(doc="Field C", dtype=str, default="Hello world")
         >>> config = DemoConfig()
 
         These are the default values of each field:
 
         >>> for name, value in config.iteritems():
         ...     print(f"{name}: {value}")
-        ...
         fieldA: 42
         fieldB: True
         fieldC: 'Hello world'
 
         Using this method to update ``fieldA`` and ``fieldC``:
 
-        >>> config.update(fieldA=13, fieldC='Updated!')
+        >>> config.update(fieldA=13, fieldC="Updated!")
 
         Now the values of each field are:
 
         >>> for name, value in config.iteritems():
         ...     print(f"{name}: {value}")
-        ...
         fieldA: 13
         fieldB: True
         fieldC: 'Updated!'
@@ -1137,8 +1136,9 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             try:
                 field = self._fields[name]
                 field.__set__(self, value, at=at, label=label)
-            except KeyError:
-                raise KeyError(f"No field of name {name} exists in config type {_typeStr(self)}")
+            except KeyError as e:
+                e.add_note(f"No field of name {name} exists in config type {_typeStr(self)}")
+                raise
 
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
@@ -1415,7 +1415,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         class.
         """
         self._imports.add(self.__module__)
-        for name, field in self._fields.items():
+        for field in self._fields.values():
             field._collectImports(self, self._imports)
 
     def toDict(self):

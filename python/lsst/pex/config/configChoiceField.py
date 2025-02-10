@@ -76,9 +76,9 @@ class SelectionSet(collections.abc.MutableSet):
                     if v not in self._dict:
                         # invoke __getitem__ to ensure it's present
                         self._dict.__getitem__(v, at=at)
-            except TypeError:
+            except TypeError as e:
                 msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
-                raise FieldValidationError(self._field, self._config, msg)
+                raise FieldValidationError(self._field, self._config, msg) from e
             self._set = set(value)
         else:
             self._set = set()
@@ -293,10 +293,10 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         except KeyError:
             try:
                 dtype = self.types[k]
-            except Exception:
+            except Exception as e:
                 raise FieldValidationError(
                     self._field, self._config, f"Unknown key {k!r} in Registry/ConfigChoiceField"
-                )
+                ) from e
             name = _joinNamePath(self._config._name, self._field.name, k)
             if at is None:
                 at = getCallStack()
@@ -310,8 +310,8 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
 
         try:
             dtype = self.types[k]
-        except Exception:
-            raise FieldValidationError(self._field, self._config, f"Unknown key {k!r}")
+        except Exception as e:
+            raise FieldValidationError(self._field, self._config, f"Unknown key {k!r}") from e
 
         if value != dtype and type(value) is not dtype:
             msg = (
@@ -443,7 +443,6 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     >>> from lsst.pex.config import Config, ConfigChoiceField, Field
     >>> class AaaConfig(Config):
     ...     somefield = Field("doc", int)
-    ...
 
     The ``MyConfig`` config has a ``ConfigChoiceField`` field called ``choice``
     that maps the ``AaaConfig`` type to the ``"AAA"`` key:
@@ -451,7 +450,6 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     >>> TYPEMAP = {"AAA", AaaConfig}
     >>> class MyConfig(Config):
     ...     choice = ConfigChoiceField("doc for choice", TYPEMAP)
-    ...
 
     Creating an instance of ``MyConfig``:
 
@@ -460,7 +458,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
     Setting value of the field ``somefield`` on the "AAA" key of the ``choice``
     field:
 
-    >>> instance.choice['AAA'].somefield = 5
+    >>> instance.choice["AAA"].somefield = 5
 
     **Selecting the active configuration**
 

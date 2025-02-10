@@ -25,7 +25,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ("wrap", "makeConfigClass")
+__all__ = ("makeConfigClass", "wrap")
 
 import importlib
 import inspect
@@ -118,7 +118,9 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
        import lsst.pex.config
        import myWrappedLib
 
-       InnerConfig = lsst.pex.config.makeConfigClass(myWrappedLib.InnerControl)
+       InnerConfig = lsst.pex.config.makeConfigClass(
+           myWrappedLib.InnerControl
+       )
        FooConfig = lsst.pex.config.makeConfigClass(myWrappedLib.FooControl)
 
     This does the following things:
@@ -199,8 +201,8 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
                         nestedModuleObj = importlib.import_module(nestedModuleName)
                     try:
                         dtype = getattr(nestedModuleObj, ctype).ConfigClass
-                    except AttributeError:
-                        raise AttributeError(f"'{moduleName}.{ctype}.ConfigClass' does not exist")
+                    except AttributeError as e:
+                        raise AttributeError(f"'{moduleName}.{ctype}.ConfigClass' does not exist") from e
                     fields[k] = ConfigField(doc=doc, dtype=dtype)
                 else:
                     try:

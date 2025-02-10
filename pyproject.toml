@@ -58,6 +58,7 @@ target-version = ["py310"]
 [tool.isort]
 profile = "black"
 line_length = 110
+known_first_party = ["lsst"]
 
 [tool.towncrier]
     package = "lsst.pex.config"
@@ -149,6 +150,10 @@ select = [
     "W",  # pycodestyle
     "D",  # pydocstyle
     "UP",  # pyupgrade
+    "I",  # isort
+    "RUF022",  # sort __all__
+    "C4",  # comprehensions
+    "B",  # bugbear
 ]
 extend-select = [
     "RUF100", # Warn about unused noqa
@@ -157,11 +162,19 @@ extend-select = [
 [tool.ruff.lint.per-file-ignores]
 "tests/testLib.py" = ["F403", "F405"]  # Wildcard imports.
 
+[tool.ruff.lint.isort]
+known-first-party = ["lsst"]
+
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 79
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.ruff.format]
+docstring-code-format = true
+# Formatter does not know about indenting.
+docstring-code-line-length = 69
 
 [tool.numpydoc_validation]
 checks = [
