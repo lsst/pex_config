@@ -311,7 +311,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
                 f"'ConfigClass' is of incorrect type {_typeStr(ConfigClass)}. "
                 "'ConfigClass' must be a subclass of Config"
             )
-        if not hasattr(target, "__call__"):
+        if not callable(target):
             raise ValueError("'target' must be callable")
         if not hasattr(target, "__module__") or not hasattr(target, "__name__"):
             raise ValueError(

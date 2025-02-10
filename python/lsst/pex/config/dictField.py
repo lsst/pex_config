@@ -322,7 +322,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
 
         check_errors = []
         for name, check in (("dictCheck", dictCheck), ("keyCheck", keyCheck), ("itemCheck", itemCheck)):
-            if check is not None and not hasattr(check, "__call__"):
+            if check is not None and not callable(check):
                 check_errors.append(name)
         if check_errors:
             raise ValueError(f"{', '.join(check_errors)} must be callable")

@@ -339,9 +339,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
                     f"'maxLength' ({maxLength}) must be at least as large as 'minLength' ({minLength})"
                 )
 
-        if listCheck is not None and not hasattr(listCheck, "__call__"):
+        if listCheck is not None and not callable(listCheck):
             raise ValueError("'listCheck' must be callable")
-        if itemCheck is not None and not hasattr(itemCheck, "__call__"):
+        if itemCheck is not None and not callable(itemCheck):
             raise ValueError("'itemCheck' must be callable")
 
         source = getStackFrame()
