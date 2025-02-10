@@ -729,14 +729,13 @@ class Field(Generic[FieldTypeVar]):
             # try statements are almost free in python if they succeed
             try:
                 return instance._storage[self.name]
-            except AttributeError as e:
+            except AttributeError:
                 if not isinstance(instance, Config):
                     return self
                 else:
-                    e.add_note(
+                    raise AttributeError(
                         f"Config {instance} is missing _storage attribute, likely incorrectly initialized"
-                    )
-                    raise
+                    ) from None
 
     def __set__(
         self, instance: Config, value: FieldTypeVar | None, at: Any = None, label: str = "assignment"
