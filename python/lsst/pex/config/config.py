@@ -1139,6 +1139,14 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 e.add_note(f"No field of name {name} exists in config type {_typeStr(self)}")
                 raise
 
+    def copy(self):
+        """!Return a copy of this config.
+
+        The copy is frozen if the config copied was frozen; copying should
+        occur before freezing if the copy is to be modified.
+        """
+        return copy.deepcopy(self)
+
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
         configuration file.
