@@ -68,7 +68,8 @@ def compareScalars(name, v1, v2, output, rtol=1e-8, atol=1e-8, dtype=None):
     ----------
     name : `str`
         Name to use when reporting differences, typically created by
-        `getComparisonName`.
+        `getComparisonName`.  This will always appear as the beginning of any
+        messages reported via ``output``.
     v1 : object
         Left-hand side value to compare.
     v2 : object
@@ -104,7 +105,7 @@ def compareScalars(name, v1, v2, output, rtol=1e-8, atol=1e-8, dtype=None):
     else:
         result = v1 == v2
     if not result and output is not None:
-        output(f"Inequality in {name}: {v1!r} != {v2!r}")
+        output(f"{name}: {v1!r} != {v2!r}")
     return result
 
 
@@ -117,7 +118,8 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
     ----------
     name : `str`
         Name to use when reporting differences, typically created by
-        `getComparisonName`.
+        `getComparisonName`.  This will always appear as the beginning of any
+        messages reported via ``output``.
     c1 : `lsst.pex.config.Config`
         Left-hand side config to compare.
     c2 : `lsst.pex.config.Config`
@@ -150,22 +152,24 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
     `~lsst.pex.config.ConfigChoiceField` instances, *unselected*
     `~lsst.pex.config.Config` instances will not be compared.
     """
+    from .config import _typeStr
+
     assert name is not None
     if c1 is None:
         if c2 is None:
             return True
         else:
             if output is not None:
-                output(f"LHS is None for {name}")
+                output(f"{name}: None != {c2!r}.")
             return False
     else:
         if c2 is None:
             if output is not None:
-                output(f"RHS is None for {name}")
+                output(f"{name}: {c1!r} != None.")
             return False
     if type(c1) is not type(c2):
         if output is not None:
-            output(f"Config types do not match for {name}: {type(c1)} != {type(c2)}")
+            output(f"{name}: config types do not match; {_typeStr(c1)} != {_typeStr(c2)}.")
         return False
     equal = True
     for field in c1._fields.values():

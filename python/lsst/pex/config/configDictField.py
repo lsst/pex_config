@@ -319,7 +319,7 @@ class ConfigDictField(DictField):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars(f"keys for {name}", set(d1.keys()), set(d2.keys()), output=output):
+        if not compareScalars(f"{name} (keys)", set(d1.keys()), set(d2.keys()), output=output):
             return False
         equal = True
         for k, v1 in d1.items():
