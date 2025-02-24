@@ -225,6 +225,8 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         return str(self._list)
 
     def __eq__(self, other):
+        if other is None:
+            return False
         try:
             if len(self) != len(other):
                 return False

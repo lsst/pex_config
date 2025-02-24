@@ -62,7 +62,12 @@ class Simple(pexConfig.Config):
     )
     r = pexConfig.RangeField("Range test", float, default=3.0, optional=False, min=3.0, inclusiveMin=True)
     ll = pexConfig.ListField(
-        "list test", int, default=[1, 2, 3], maxLength=5, itemCheck=lambda x: x is not None and x > 0
+        "list test",
+        int,
+        default=[1, 2, 3],
+        maxLength=5,
+        itemCheck=lambda x: x is not None and x > 0,
+        optional=True,
     )
     d = pexConfig.DictField(
         "dict test", str, str, default={"key": "value"}, itemCheck=lambda x: x.startswith("v")
@@ -572,6 +577,36 @@ except ImportError:
         self.assertFalse(self.inner.compare(self.outer))
         # Before DM-16561, this raised.
         self.assertFalse(self.outer.compare(self.inner))
+
+        outList.clear()
+        simple3 = Simple()
+        simple3.i = 2
+        simple4 = Simple()
+        self.assertFalse(simple4.compare(simple3, output=outFunc))
+        self.assertEqual(outList[-1], "i: None != 2")
+        self.assertFalse(simple3.compare(simple4, output=outFunc))
+        self.assertEqual(outList[-1], "i: 2 != None")
+        simple3.i = None
+
+        outList.clear()
+        self.assertFalse(simple4.compare(comp2, output=outFunc))
+        self.assertIn("test_Config.Simple != test_Config.Complex", outList[-1])
+
+        outList.clear()
+        self.assertFalse(pexConfig.compareConfigs("s", simple4, None, output=outFunc))
+        self.assertIn("!= None", outList[-1])
+
+        outList.clear()
+        self.assertFalse(pexConfig.compareConfigs("s", None, simple4, output=outFunc))
+        self.assertIn("None !=", outList[-1])
+
+        outList.clear()
+        simple3.ll = None
+        self.assertFalse(simple4.compare(simple3, output=outFunc))
+        self.assertIn("ll", outList[-1])
+        outList.clear()
+        self.assertFalse(simple3.compare(simple4, output=outFunc))
+        self.assertTrue(outList[-1].startswith("ll: None"))
 
     def testLoadError(self):
         """Check that loading allows errors in the file being loaded to
