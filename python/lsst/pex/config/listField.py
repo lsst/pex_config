@@ -225,6 +225,8 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         return str(self._list)
 
     def __eq__(self, other):
+        if other is None:
+            return False
         try:
             if len(self) != len(other):
                 return False
@@ -499,11 +501,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars(f"isnone for {name}", l1 is None, l2 is None, output=output):
-            return False
-        if l1 is None and l2 is None:
-            return True
-        if not compareScalars(f"size for {name}", len(l1), len(l2), output=output):
+        if l1 is None or l2 is None:
+            return compareScalars(name, l1, l2, output=output)
+        if not compareScalars(f"{name} (len)", len(l1), len(l2), output=output):
             return False
         equal = True
         for n, v1, v2 in zip(range(len(l1)), l1, l2, strict=True):

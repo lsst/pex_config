@@ -451,7 +451,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars(f"keys for {name}", set(d1.fieldNames), set(d2.fieldNames), output=output):
+        if not compareScalars(f"{name} (fields)", set(d1.fieldNames), set(d2.fieldNames), output=output):
             return False
         equal = True
         for k, v1 in d1.items():

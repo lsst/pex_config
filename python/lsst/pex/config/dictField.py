@@ -438,11 +438,9 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         name = getComparisonName(
             _joinNamePath(instance1._name, self.name), _joinNamePath(instance2._name, self.name)
         )
-        if not compareScalars(f"isnone for {name}", d1 is None, d2 is None, output=output):
-            return False
-        if d1 is None and d2 is None:
-            return True
-        if not compareScalars(f"keys for {name}", set(d1.keys()), set(d2.keys()), output=output):
+        if d1 is None or d2 is None:
+            return compareScalars(name, d1, d2, output=output)
+        if not compareScalars(f"{name} (keys)", set(d1.keys()), set(d2.keys()), output=output):
             return False
         equal = True
         for k, v1 in d1.items():

@@ -62,7 +62,12 @@ class Simple(pexConfig.Config):
     )
     r = pexConfig.RangeField("Range test", float, default=3.0, optional=False, min=3.0, inclusiveMin=True)
     ll = pexConfig.ListField(
-        "list test", int, default=[1, 2, 3], maxLength=5, itemCheck=lambda x: x is not None and x > 0
+        "list test",
+        int,
+        default=[1, 2, 3],
+        maxLength=5,
+        itemCheck=lambda x: x is not None and x > 0,
+        optional=True,
     )
     d = pexConfig.DictField(
         "dict test", str, str, default={"key": "value"}, itemCheck=lambda x: x.startswith("v")
@@ -544,9 +549,9 @@ except ImportError:
         del outList[:]
         self.assertFalse(self.simple.compare(simple2, shortcut=False, output=outFunc))
         output = "\n".join(outList)
-        self.assertIn("Inequality in b", output)
-        self.assertIn("Inequality in size for ll", output)
-        self.assertIn("Inequality in keys for d", output)
+        self.assertIn("b: ", output)
+        self.assertIn("ll (len): ", output)
+        self.assertIn("d (keys): ", output)
         del outList[:]
         self.simple.d["foo"] = "vast"
         self.simple.ll.append(5)
@@ -554,9 +559,9 @@ except ImportError:
         self.simple.f += 1e8
         self.assertFalse(self.simple.compare(simple2, shortcut=False, output=outFunc))
         output = "\n".join(outList)
-        self.assertIn("Inequality in f", output)
-        self.assertIn("Inequality in ll[3]", output)
-        self.assertIn("Inequality in d['foo']", output)
+        self.assertIn("f: ", output)
+        self.assertIn("ll[3]: ", output)
+        self.assertIn("d['foo']: ", output)
         del outList[:]
         comp2.r["BBB"].f = 1.0  # changing the non-selected item shouldn't break equality
         self.assertTrue(self.comp.compare(comp2))
@@ -564,14 +569,44 @@ except ImportError:
         comp2.c.f = 1.0
         self.assertFalse(self.comp.compare(comp2, shortcut=False, output=outFunc))
         output = "\n".join(outList)
-        self.assertIn("Inequality in c.f", output)
-        self.assertIn("Inequality in r['AAA']", output)
-        self.assertNotIn("Inequality in r['BBB']", output)
+        self.assertIn("c.f: ", output)
+        self.assertIn("r['AAA']", output)
+        self.assertNotIn("r['BBB']", output)
 
         # Before DM-16561, this incorrectly returned `True`.
         self.assertFalse(self.inner.compare(self.outer))
         # Before DM-16561, this raised.
         self.assertFalse(self.outer.compare(self.inner))
+
+        outList.clear()
+        simple3 = Simple()
+        simple3.i = 2
+        simple4 = Simple()
+        self.assertFalse(simple4.compare(simple3, output=outFunc))
+        self.assertEqual(outList[-1], "i: None != 2")
+        self.assertFalse(simple3.compare(simple4, output=outFunc))
+        self.assertEqual(outList[-1], "i: 2 != None")
+        simple3.i = None
+
+        outList.clear()
+        self.assertFalse(simple4.compare(comp2, output=outFunc))
+        self.assertIn("test_Config.Simple != test_Config.Complex", outList[-1])
+
+        outList.clear()
+        self.assertFalse(pexConfig.compareConfigs("s", simple4, None, output=outFunc))
+        self.assertIn("!= None", outList[-1])
+
+        outList.clear()
+        self.assertFalse(pexConfig.compareConfigs("s", None, simple4, output=outFunc))
+        self.assertIn("None !=", outList[-1])
+
+        outList.clear()
+        simple3.ll = None
+        self.assertFalse(simple4.compare(simple3, output=outFunc))
+        self.assertIn("ll", outList[-1])
+        outList.clear()
+        self.assertFalse(simple3.compare(simple4, output=outFunc))
+        self.assertTrue(outList[-1].startswith("ll: None"))
 
     def testLoadError(self):
         """Check that loading allows errors in the file being loaded to
