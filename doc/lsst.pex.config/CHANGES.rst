@@ -1,3 +1,13 @@
+lsst-pex-config v29.0.0 (2025-03-25)
+====================================
+
+New Features
+------------
+
+- Introduced the ``keyCheck`` callback to ``DictField`` and ``ConfigDictField``, allowing custom key validation during assignment. Added unit tests to ensure functionality. (`DM-48074 <https://rubinobs.atlassian.net/browse/DM-48074>`_)
+- Make the messages emitted by ``compareConfigs`` consistently start with the fully-qualified name of the config field. (`DM-49121 <https://rubinobs.atlassian.net/browse/DM-49121>`_)
+
+
 lsst-pex-config v28.0.0 (2024-11-21)
 ====================================
 
