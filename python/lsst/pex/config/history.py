@@ -252,7 +252,10 @@ def format(config, name=None, writeSourceLine=True, prefix="", verbose=False):
     fullname = f"{config._name}.{name}" if config._name is not None else name
     msg.append(_colorize(re.sub(r"^root\.", "", fullname), "NAME"))
     for value, output in outputs:
-        line = prefix + _colorize(f"{value:<{valueLength}}", "VALUE") + " "
+        if value is not None:
+            line = prefix + _colorize(f"{value:<{valueLength}}", "VALUE") + " "
+        else:
+            line = prefix + _colorize("None", "VALUE") + " "
         for i, vt in enumerate(output):
             if writeSourceLine:
                 vt[0][0] = f"{vt[0][0]:<{sourceLength}}"
