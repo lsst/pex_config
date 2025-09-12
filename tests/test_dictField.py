@@ -193,7 +193,7 @@ class DictFieldTest(unittest.TestCase):
         keys2 = ["X", "Y", "Z", "a", "b", "c", "d", "e"]
 
         c1 = Config1()
-        c1.d4 = {k: "" for k in keys1}
+        c1.d4 = dict.fromkeys(keys1, "")
         for k in keys2:
             c1.d4[k] = ""
 

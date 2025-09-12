@@ -111,7 +111,7 @@ class ConfigTest(unittest.TestCase):
 
     def testReplace(self):
         """Test replacement in registry (should always fail)."""
-        self.assertRaises(Exception, self.registry.register, "foo1", self.fooAlg2Class)
+        self.assertRaises(RuntimeError, self.registry.register, "foo1", self.fooAlg2Class)
         self.assertEqual(self.registry["foo1"], self.fooAlg1Class)
 
     def testNesting(self):
