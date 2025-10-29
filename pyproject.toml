@@ -6,15 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "lsst-pex-config"
 requires-python = ">=3.10.0"
 description = "A flexible configuration system using Python files."
-license = {text = "BSD 3-Clause License, GPLv3+"}
+license = "BSD-3-Clause OR GPL-3.0-or-later"
+license-files = ["COPYRIGHT", "LICENSE", "gpl-v3.0.txt", "bsd_license.txt"]
 readme = "README.rst"
 authors = [
     {name="Rubin Observatory Data Management", email="dm-admin@lists.lsst.org"},
 ]
 classifiers = [
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -43,7 +42,6 @@ where = ["python"]
 
 [tool.setuptools]
 zip-safe = true
-license-files = ["COPYRIGHT", "LICENSE", "gpl-v3.0.txt", "bsd_license.txt"]
 
 [tool.setuptools.package-data]
 "lsst.pex.config" = ["py.typed"]
