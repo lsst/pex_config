@@ -19,6 +19,13 @@ exclude_patterns = ["changes/*"]
 # concurrently.
 intersphinx_mapping["lsst"] = ("https://pipelines.lsst.io/v/daily/", None)  # noqa
 
+# As a temporary hack until we move to documenteer 2 delete scipy
+# (since it no longer works)
+try:
+    del intersphinx_mapping["scipy"]  # noqa: F405
+except KeyError:
+    pass
+
 nitpick_ignore = [
     ("py:obj", "lsst.daf.base.PropertySet"),
     ("py:obj", "lsst.pex.config.Field.doc"),  # Cannot make the doc field property appear in docs.
