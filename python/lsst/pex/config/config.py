@@ -48,7 +48,7 @@ import tempfile
 import warnings
 from collections.abc import Mapping
 from types import GenericAlias
-from typing import Any, ForwardRef, Generic, Self, TypeVar, cast, overload
+from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
 
 # if YAML is not available that's fine and we simply don't register
 # the yaml representer since we know it won't be used.
@@ -1063,7 +1063,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         instance.update(__at=at, **kw)
         return instance
 
-    def copy(self) -> Self:
+    def copy(self) -> Config:
         """Return a deep copy of this config.
 
         Notes

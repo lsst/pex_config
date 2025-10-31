@@ -22,7 +22,7 @@ from __future__ import annotations
 
 __all__ = ["ActionTypeVar", "ConfigurableAction"]
 
-from typing import Any, Self, TypeVar
+from typing import Any, TypeVar
 
 from lsst.pex.config.config import Config
 
@@ -63,7 +63,7 @@ class ConfigurableAction(Config):
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError("This method should be overloaded in subclasses")
 
-    def copy(self) -> Self:
+    def copy(self) -> ConfigurableAction:
         result = super().copy()
         result.identity = self.identity
         return result
