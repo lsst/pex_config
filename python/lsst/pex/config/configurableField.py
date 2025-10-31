@@ -94,7 +94,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     def __init__(self, config, field, at=None, label="default"):
         object.__setattr__(self, "_config_", weakref.ref(config))
         object.__setattr__(self, "_field", field)
-        object.__setattr__(self, "__doc__", config)
+        object.__setattr__(self, "__doc__", field.doc)
         object.__setattr__(self, "_target", field.target)
         object.__setattr__(self, "_ConfigClass", field.ConfigClass)
         object.__setattr__(self, "_value", None)
