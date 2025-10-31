@@ -24,10 +24,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import annotations
 
 __all__ = ["ConfigDictField"]
 
-from .callStack import getCallStack, getStackFrame
+from collections.abc import Mapping
+
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareConfigs, compareScalars, getComparisonName
 from .config import Config, FieldValidationError, _autocast, _joinNamePath, _typeStr
 from .dictField import Dict, DictField
@@ -51,11 +54,23 @@ class ConfigDict(Dict[str, Config]):
         Stack frame for history recording. Will be calculated if `None`.
     label : `str`, optional
         Label to use for history recording.
+    setHistory : `bool`, optional
+        Whether to append to the history record.
     """
 
-    def __init__(self, config, field, value, at, label):
-        Dict.__init__(self, config, field, value, at, label, setHistory=False)
-        self.history.append(("Dict initialized", at, label))
+    def __init__(
+        self,
+        config: Config,
+        field: ConfigDictField,
+        value: Mapping[str, Config] | None,
+        *,
+        at: list[StackFrame] | None,
+        label: str,
+        setHistory: bool = True,
+    ):
+        Dict.__init__(self, config, field, value, at=at, label=label, setHistory=False)
+        if setHistory:
+            self.history.append(("Dict initialized", at, label))
 
     def __setitem__(self, k, x, at=None, label="setitem", setHistory=True):
         if self._config._frozen:

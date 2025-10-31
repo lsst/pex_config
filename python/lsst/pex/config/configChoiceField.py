@@ -175,9 +175,9 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         (that is, ``typemap[name]``).
     """
 
-    def __init__(self, config, field):
+    def __init__(self, config: Config, field: ConfigChoiceField):
         collections.abc.Mapping.__init__(self)
-        self._dict = {}
+        self._dict: dict[str, Config] = {}
         self._selection = None
         self._config = config
         self._field = field

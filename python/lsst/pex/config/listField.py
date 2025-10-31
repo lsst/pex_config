@@ -25,14 +25,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 __all__ = ["ListField"]
 
 import collections.abc
 import weakref
-from collections.abc import Iterable, MutableSequence
+from collections.abc import Iterable, MutableSequence, Sequence
 from typing import Any, Generic, overload
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
 from .config import (
     Config,
@@ -73,7 +75,15 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         `ListField.itemCheck` method of the ``field`` parameter.
     """
 
-    def __init__(self, config, field, value, at, label, setHistory=True):
+    def __init__(
+        self,
+        config: Config,
+        field: ListField,
+        value: Sequence[FieldTypeVar],
+        at: list[StackFrame] | None,
+        label: str,
+        setHistory: bool = True,
+    ):
         self._field = field
         self._config_ = weakref.ref(config)
         self._history = self._config._history.setdefault(self._field.name, [])

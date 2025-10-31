@@ -34,7 +34,7 @@ import weakref
 from collections.abc import Iterator, Mapping
 from typing import Any, ForwardRef, Generic, TypeVar, cast
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
 from .config import (
     Config,
@@ -71,7 +71,16 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
         Whether to append to the history record.
     """
 
-    def __init__(self, config, field, value, at, label, setHistory=True):
+    def __init__(
+        self,
+        config: Config,
+        field: DictField,
+        value: Mapping[KeyTypeVar, ItemTypeVar],
+        *,
+        at: list[StackFrame] | None,
+        label: str,
+        setHistory: bool = True,
+    ):
         self._field = field
         self._config_ = weakref.ref(config)
         self._dict = {}

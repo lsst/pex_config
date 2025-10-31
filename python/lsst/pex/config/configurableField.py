@@ -34,7 +34,7 @@ import weakref
 from collections.abc import Mapping
 from typing import Any, Generic, overload
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareConfigs, getComparisonName
 from .config import (
     Config,
@@ -57,9 +57,9 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         Config to proxy.
     field : `~lsst.pex.config.ConfigurableField`
         Field to use.
-    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`
         Stack frame for history recording. Will be calculated if `None`.
-    label : `str`, optional
+    label : `str`
         Label to use for history recording.
 
     Notes
@@ -74,7 +74,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     using the ``target`` property.
     """
 
-    def __initValue(self, at, label):
+    def __initValue(self, at: list[StackFrame] | None, label: str, setHistory: bool = True):
         """Construct value of field.
 
         Notes
