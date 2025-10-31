@@ -72,6 +72,16 @@ class ConfigDict(Dict[str, Config]):
         if setHistory:
             self.history.append(("Dict initialized", at, label))
 
+    def _copy(self, config: Config) -> Dict:
+        return type(self)(
+            config,
+            self._field,
+            {k: v._copy() for k, v in self._dict.items()},
+            at=None,
+            label="copy",
+            setHistory=False,
+        )
+
     def __setitem__(self, k, x, at=None, label="setitem", setHistory=True):
         if self._config._frozen:
             msg = f"Cannot modify a frozen Config. Attempting to set item at key {k!r} to value {x}"

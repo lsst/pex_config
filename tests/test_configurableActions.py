@@ -251,6 +251,25 @@ class ConfigurableActionsTestCase(unittest.TestCase):
         config = configClass()
         self.assertEqual(config.toDict(), {"actions": {"test1": {"var": 0}}, "singleAction": {"var": 0}})
 
+    def test_copy(self):
+        """Test copying a Config with ConfigurableActions."""
+        config_cls = self._createConfig(default={"test1": ActionTest1}, singleDefault=ActionTest1)
+        config = config_cls()
+        copy1 = config.copy()
+        copy1.actions.test2 = ActionTest2
+        self.assertEqual(tuple(copy1.actions.fieldNames), ("test1", "test2"))
+        self.assertEqual(copy1.actions.test2.var, 1)
+        self.assertEqual(tuple(config.actions.fieldNames), ("test1",))
+        copy1.actions.test1.var = 50
+        self.assertEqual(copy1.actions.test1.var, 50)
+        self.assertEqual(config.actions.test1.var, 0)
+        copy2 = copy1.copy()
+        copy2.actions.test3 = ActionTest3()
+        self.assertEqual(tuple(copy2.actions.fieldNames), ("test1", "test2", "test3"))
+        self.assertEqual(tuple(copy1.actions.fieldNames), ("test1", "test2"))
+        self.assertEqual(tuple(config.actions.fieldNames), ("test1",))
+        self.assertEqual(copy2.actions.test3.var, 3)
+
 
 if __name__ == "__main__":
     unittest.main()

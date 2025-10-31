@@ -143,6 +143,9 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
     """Read-only history.
     """
 
+    def _copy(self, config: Config) -> List:
+        return type(self)(config, self._field, self._list.copy(), at=None, label="copy", setHistory=False)
+
     def __contains__(self, x):
         return x in self._list
 
@@ -472,6 +475,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         """
         value = self.__get__(instance)
         return list(value) if value is not None else None
+
+    def _copy_storage(self, old: Config, new: Config) -> List[FieldTypeVar] | None:
+        value: List[FieldTypeVar] | None = old._storage[self.name]
+        if value is not None:
+            return value._copy(new)
+        else:
+            return None
 
     def _compare(self, instance1, instance2, shortcut, rtol, atol, output):
         """Compare two config instances for equality with respect to this

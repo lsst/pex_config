@@ -165,11 +165,17 @@ class ConfigurableActionStruct(Generic[ActionTypeVar]):
         object.__setattr__(self, "_field", field)
         object.__setattr__(self, "_history", [])
 
-        self.history.append(("Struct initialized", at, label))
+        if at is not None:
+            self.history.append(("Struct initialized", at, label))
 
         if value is not None:
             for k, v in value.items():
                 setattr(self, k, v)
+
+    def _copy(self, config: Config) -> ConfigurableActionStruct:
+        result = ConfigurableActionStruct(config, self._field, self._attrs, at=None, label="copy")
+        result.history.extend(self.history)
+        return result
 
     @property
     def _config(self) -> Config:
@@ -390,6 +396,13 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
         dict_ = {k: v.toDict() for k, v in actionStruct.items()}
 
         return dict_
+
+    def _copy_storage(self, old: Config, new: Config) -> ConfigurableActionStruct:
+        struct: ConfigurableActionStruct | None = old._storage.get(self.name)
+        if struct is not None:
+            return struct._copy(new)
+        else:
+            return None
 
     def save(self, outfile, instance):
         actionStruct = self.__get__(instance)

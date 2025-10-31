@@ -109,6 +109,9 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
     """History (read-only).
     """
 
+    def _copy(self, config: Config) -> Dict:
+        return type(self)(config, self._field, self._dict.copy(), at=None, label="copy", setHistory=False)
+
     def __getitem__(self, k: KeyTypeVar) -> ItemTypeVar:
         return self._dict[k]
 
@@ -411,6 +414,13 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         """
         value = self.__get__(instance)
         return dict(value) if value is not None else None
+
+    def _copy_storage(self, old: Config, new: Config) -> Dict[KeyTypeVar, ItemTypeVar] | None:
+        value: Dict[KeyTypeVar, ItemTypeVar] | None = old._storage[self.name]
+        if value is not None:
+            return value._copy(new)
+        else:
+            return None
 
     def _compare(self, instance1, instance2, shortcut, rtol, atol, output):
         """Compare two fields for equality.

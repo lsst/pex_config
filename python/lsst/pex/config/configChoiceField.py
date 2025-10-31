@@ -185,6 +185,18 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         self.__doc__ = field.doc
         self._typemap = None
 
+    def _copy(self, config: Config) -> ConfigInstanceDict:
+        result = type(self)(config, self._field)
+        result._dict = {k: v.copy() for k, v in self._dict.items()}
+        result._history.extend(self._history)
+        result._typemap = self._typemap
+        if self._selection is not None:
+            if self._field.multi:
+                result._selection = SelectionSet(result._dict, self._selection._set)
+            else:
+                result._selection = self._selection
+        return result
+
     @property
     def types(self):
         return self._typemap if self._typemap is not None else self._field.typemap
@@ -541,6 +553,13 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
 
         else:
             instanceDict._setSelection(value, at=at, label=label)
+
+    def _copy_storage(self, old: Config, new: Config) -> Any:
+        instance_dict: ConfigInstanceDict | None = old._storage.get(self.name)
+        if instance_dict is not None:
+            return instance_dict._copy(new)
+        else:
+            return None
 
     def rename(self, instance):
         instanceDict = self.__get__(instance)

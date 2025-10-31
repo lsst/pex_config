@@ -243,6 +243,13 @@ class ConfigField(Field[FieldTypeVar]):
         value = self.__get__(instance)
         return value.toDict()
 
+    def _copy_storage(self, old: Config, new: Config) -> Any:
+        value: Config | None = old._storage.get(self.name)
+        if value is not None:
+            return value.copy()
+        else:
+            return None
+
     def validate(self, instance):
         """Validate the field (for internal use only).
 

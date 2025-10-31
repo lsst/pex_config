@@ -107,6 +107,14 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         history = config._history.setdefault(field.name, [])
         history.append(("Targeted and initialized from defaults", at, label))
 
+    def _copy(self, parent: Config) -> ConfigurableInstance:
+        object.__setattr__(self, "_config_", weakref.ref(parent))
+        object.__setattr__(self, "_field", self._field)
+        object.__setattr__(self, "__doc__", self.__doc__)
+        object.__setattr__(self, "_target", self._target)
+        object.__setattr__(self, "_ConfigClass", self._ConfigClass)
+        object.__setattr__(self, "_value", self._value.copy())
+
     @property
     def _config(self) -> Config:
         # Config Fields should never outlive their config class instance
@@ -429,6 +437,13 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     def toDict(self, instance):
         value = self.__get__(instance)
         return value.toDict()
+
+    def _copy_storage(self, old: Config, new: Config) -> ConfigurableInstance | None:
+        instance: ConfigurableInstance | None = old._storage.get(self.name)
+        if instance is not None:
+            return instance._copy(new)
+        else:
+            return None
 
     def validate(self, instance):
         value = self.__get__(instance)
