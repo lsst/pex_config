@@ -30,7 +30,6 @@ __all__ = ["ConfigChoiceField"]
 
 import collections.abc
 import copy
-import weakref
 from typing import Any, ForwardRef, overload
 
 from .callStack import getCallStack, getStackFrame
@@ -63,13 +62,19 @@ class SelectionSet(collections.abc.MutableSet):
     history.
     """
 
-    def __init__(self, dict_, value, at=None, label="assignment", setHistory=True):
+    def __init__(
+        self,
+        dict_: ConfigInstanceDict,
+        value: Any,
+        at=None,
+        label: str = "assignment",
+        setHistory: bool = True,
+    ):
         if at is None:
             at = getCallStack()
         self._dict = dict_
         self._field = self._dict._field
-        self._config_ = weakref.ref(self._dict._config)
-        self.__history = self._config._history.setdefault(self._field.name, [])
+        self._history = self._dict._config._history.setdefault(self._field.name, [])
         if value is not None:
             try:
                 for v in value:
@@ -78,20 +83,13 @@ class SelectionSet(collections.abc.MutableSet):
                         self._dict.__getitem__(v, at=at)
             except TypeError as e:
                 msg = f"Value {value} is of incorrect type {_typeStr(value)}. Sequence type expected"
-                raise FieldValidationError(self._field, self._config, msg) from e
+                raise FieldValidationError(self._field, self._dict._config, msg) from e
             self._set = set(value)
         else:
             self._set = set()
 
         if setHistory:
-            self.__history.append((f"Set selection to {self}", at, label))
-
-    @property
-    def _config(self) -> Config:
-        # Config Fields should never outlive their config class instance
-        # assert that as such here
-        assert self._config_() is not None
-        return self._config_()
+            self._history.append((f"Set selection to {self}", at, label))
 
     def add(self, value, at=None):
         """Add a value to the selected set.
@@ -104,7 +102,7 @@ class SelectionSet(collections.abc.MutableSet):
                 optional
             Stack frames for history recording.
         """
-        if self._config._frozen:
+        if self._dict._config._frozen:
             raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
 
         if at is None:
@@ -114,7 +112,7 @@ class SelectionSet(collections.abc.MutableSet):
             # invoke __getitem__ to make sure it's present
             self._dict.__getitem__(value, at=at)
 
-        self.__history.append((f"added {value} to selection", at, "selection"))
+        self._history.append((f"added {value} to selection", at, "selection"))
         self._set.add(value)
 
     def discard(self, value, at=None):
@@ -128,8 +126,8 @@ class SelectionSet(collections.abc.MutableSet):
                 optional
             Stack frames for history recording.
         """
-        if self._config._frozen:
-            raise FieldValidationError(self._field, self._config, "Cannot modify a frozen Config")
+        if self._dict._config._frozen:
+            raise FieldValidationError(self._field, self._dict._config, "Cannot modify a frozen Config")
 
         if value not in self._dict:
             return
@@ -137,7 +135,7 @@ class SelectionSet(collections.abc.MutableSet):
         if at is None:
             at = getCallStack()
 
-        self.__history.append((f"removed {value} from selection", at, "selection"))
+        self._history.append((f"removed {value} from selection", at, "selection"))
         self._set.discard(value)
 
     def __len__(self):
@@ -177,15 +175,27 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         (that is, ``typemap[name]``).
     """
 
-    def __init__(self, config, field):
+    def __init__(self, config: Config, field: ConfigChoiceField):
         collections.abc.Mapping.__init__(self)
-        self._dict = {}
+        self._dict: dict[str, Config] = {}
         self._selection = None
         self._config = config
         self._field = field
         self._history = config._history.setdefault(field.name, [])
         self.__doc__ = field.doc
         self._typemap = None
+
+    def _copy(self, config: Config) -> ConfigInstanceDict:
+        result = type(self)(config, self._field)
+        result._dict = {k: v.copy() for k, v in self._dict.items()}
+        result._history.extend(self._history)
+        result._typemap = self._typemap
+        if self._selection is not None:
+            if self._field.multi:
+                result._selection = SelectionSet(result._dict, self._selection._set)
+            else:
+                result._selection = self._selection
+        return result
 
     @property
     def types(self):
@@ -543,6 +553,13 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
 
         else:
             instanceDict._setSelection(value, at=at, label=label)
+
+    def _copy_storage(self, old: Config, new: Config) -> Any:
+        instance_dict: ConfigInstanceDict | None = old._storage.get(self.name)
+        if instance_dict is not None:
+            return instance_dict._copy(new)
+        else:
+            return None
 
     def rename(self, instance):
         instanceDict = self.__get__(instance)

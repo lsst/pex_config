@@ -700,6 +700,14 @@ class Field(Generic[FieldTypeVar]):
         """
         return self.__get__(instance)
 
+    def _copy_storage(self, old: Config, new: Config) -> Any:
+        """Copy the storage for this field in the given field into an object
+        suitable for storage in a new copy of that config.
+
+        Any frozen storage should be unfrozen.
+        """
+        return copy.deepcopy(old._storage[self.name])
+
     @overload
     def __get__(
         self, instance: None, owner: Any = None, at: Any = None, label: str = "default"
@@ -1053,6 +1061,30 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         instance.setDefaults()
         # set constructor overrides
         instance.update(__at=at, **kw)
+        return instance
+
+    def copy(self) -> Config:
+        """Return a deep copy of this config.
+
+        Notes
+        -----
+        The returned config object is not frozen, even if the original was.
+        If a nested config object is copied, it retains the name from its
+        original hierarchy.
+
+        Nested objects are only shared between the new and old configs if they
+        are not possible to modify via the config's interfaces (e.g. entries
+        in the the history list are not copied, but the lists themselves are,
+        so modifications to one copy do not modify the other).
+        """
+        instance = object.__new__(type(self))
+        instance._frozen = False
+        instance._name = self._name
+        instance._history = {k: list(v) for k, v in self._history.items()}
+        instance._imports = set(self._imports)
+        # Important to set up storage last, since fields sometimes store
+        # proxy objects that reference their parent (especially for history).
+        instance._storage = {k: self._fields[k]._copy_storage(self, instance) for k in self._storage}
         return instance
 
     def __reduce__(self):

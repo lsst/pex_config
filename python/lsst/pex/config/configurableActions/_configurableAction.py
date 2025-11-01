@@ -62,3 +62,8 @@ class ConfigurableAction(Config):
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError("This method should be overloaded in subclasses")
+
+    def copy(self) -> ConfigurableAction:
+        result = super().copy()
+        result.identity = self.identity
+        return result

@@ -34,7 +34,7 @@ import weakref
 from collections.abc import Mapping
 from typing import Any, Generic, overload
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareConfigs, getComparisonName
 from .config import (
     Config,
@@ -57,9 +57,9 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         Config to proxy.
     field : `~lsst.pex.config.ConfigurableField`
         Field to use.
-    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`, optional
+    at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`
         Stack frame for history recording. Will be calculated if `None`.
-    label : `str`, optional
+    label : `str`
         Label to use for history recording.
 
     Notes
@@ -74,7 +74,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     using the ``target`` property.
     """
 
-    def __initValue(self, at, label):
+    def __initValue(self, at: list[StackFrame] | None, label: str, setHistory: bool = True):
         """Construct value of field.
 
         Notes
@@ -94,7 +94,7 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
     def __init__(self, config, field, at=None, label="default"):
         object.__setattr__(self, "_config_", weakref.ref(config))
         object.__setattr__(self, "_field", field)
-        object.__setattr__(self, "__doc__", config)
+        object.__setattr__(self, "__doc__", field.doc)
         object.__setattr__(self, "_target", field.target)
         object.__setattr__(self, "_ConfigClass", field.ConfigClass)
         object.__setattr__(self, "_value", None)
@@ -106,6 +106,14 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
 
         history = config._history.setdefault(field.name, [])
         history.append(("Targeted and initialized from defaults", at, label))
+
+    def _copy(self, parent: Config) -> ConfigurableInstance:
+        object.__setattr__(self, "_config_", weakref.ref(parent))
+        object.__setattr__(self, "_field", self._field)
+        object.__setattr__(self, "__doc__", self.__doc__)
+        object.__setattr__(self, "_target", self._target)
+        object.__setattr__(self, "_ConfigClass", self._ConfigClass)
+        object.__setattr__(self, "_value", self._value.copy())
 
     @property
     def _config(self) -> Config:
@@ -429,6 +437,13 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     def toDict(self, instance):
         value = self.__get__(instance)
         return value.toDict()
+
+    def _copy_storage(self, old: Config, new: Config) -> ConfigurableInstance | None:
+        instance: ConfigurableInstance | None = old._storage.get(self.name)
+        if instance is not None:
+            return instance._copy(new)
+        else:
+            return None
 
     def validate(self, instance):
         value = self.__get__(instance)

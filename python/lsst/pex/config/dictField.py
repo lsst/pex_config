@@ -34,7 +34,7 @@ import weakref
 from collections.abc import Iterator, Mapping
 from typing import Any, ForwardRef, Generic, TypeVar, cast
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
 from .config import (
     Config,
@@ -71,7 +71,16 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
         Whether to append to the history record.
     """
 
-    def __init__(self, config, field, value, at, label, setHistory=True):
+    def __init__(
+        self,
+        config: Config,
+        field: DictField,
+        value: Mapping[KeyTypeVar, ItemTypeVar],
+        *,
+        at: list[StackFrame] | None,
+        label: str,
+        setHistory: bool = True,
+    ):
         self._field = field
         self._config_ = weakref.ref(config)
         self._dict = {}
@@ -99,6 +108,9 @@ class Dict(collections.abc.MutableMapping[KeyTypeVar, ItemTypeVar]):
     history = property(lambda x: x._history)
     """History (read-only).
     """
+
+    def _copy(self, config: Config) -> Dict:
+        return type(self)(config, self._field, self._dict.copy(), at=None, label="copy", setHistory=False)
 
     def __getitem__(self, k: KeyTypeVar) -> ItemTypeVar:
         return self._dict[k]
@@ -402,6 +414,13 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         """
         value = self.__get__(instance)
         return dict(value) if value is not None else None
+
+    def _copy_storage(self, old: Config, new: Config) -> Dict[KeyTypeVar, ItemTypeVar] | None:
+        value: Dict[KeyTypeVar, ItemTypeVar] | None = old._storage[self.name]
+        if value is not None:
+            return value._copy(new)
+        else:
+            return None
 
     def _compare(self, instance1, instance2, shortcut, rtol, atol, output):
         """Compare two fields for equality.

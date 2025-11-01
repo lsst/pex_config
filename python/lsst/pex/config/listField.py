@@ -25,14 +25,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations
+
 __all__ = ["ListField"]
 
 import collections.abc
 import weakref
-from collections.abc import Iterable, MutableSequence
+from collections.abc import Iterable, MutableSequence, Sequence
 from typing import Any, Generic, overload
 
-from .callStack import getCallStack, getStackFrame
+from .callStack import StackFrame, getCallStack, getStackFrame
 from .comparison import compareScalars, getComparisonName
 from .config import (
     Config,
@@ -73,7 +75,15 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         `ListField.itemCheck` method of the ``field`` parameter.
     """
 
-    def __init__(self, config, field, value, at, label, setHistory=True):
+    def __init__(
+        self,
+        config: Config,
+        field: ListField,
+        value: Sequence[FieldTypeVar],
+        at: list[StackFrame] | None,
+        label: str,
+        setHistory: bool = True,
+    ):
         self._field = field
         self._config_ = weakref.ref(config)
         self._history = self._config._history.setdefault(self._field.name, [])
@@ -132,6 +142,9 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
     history = property(lambda x: x._history)
     """Read-only history.
     """
+
+    def _copy(self, config: Config) -> List:
+        return type(self)(config, self._field, self._list.copy(), at=None, label="copy", setHistory=False)
 
     def __contains__(self, x):
         return x in self._list
@@ -462,6 +475,13 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
         """
         value = self.__get__(instance)
         return list(value) if value is not None else None
+
+    def _copy_storage(self, old: Config, new: Config) -> List[FieldTypeVar] | None:
+        value: List[FieldTypeVar] | None = old._storage[self.name]
+        if value is not None:
+            return value._copy(new)
+        else:
+            return None
 
     def _compare(self, instance1, instance2, shortcut, rtol, atol, output):
         """Compare two config instances for equality with respect to this

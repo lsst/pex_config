@@ -639,6 +639,61 @@ except ImportError:
             else:
                 self.assertEqual(v, v1)
 
+    def test_copy(self):
+        """Test the copy method."""
+        self.comp.freeze()
+        copy1 = self.comp.copy()
+        copy1.c.f = 6.0
+        self.assertEqual(copy1.c.f, 6.0)
+        self.assertEqual(self.comp.c.f, 0.0)
+        copy1.r["AAA"].i = 1
+        self.assertEqual(copy1.r["AAA"].i, 1)
+        self.assertIsNone(self.comp.r["AAA"].i)
+        copy1.r["AAA"].f = 2.0
+        self.assertEqual(copy1.r["AAA"].f, 2.0)
+        self.assertEqual(self.comp.r["AAA"].f, 3.0)
+        copy1.r["AAA"].c = "World"
+        self.assertEqual(copy1.r["AAA"].c, "World")
+        self.assertEqual(self.comp.r["AAA"].c, "Hello")
+        copy1.r["AAA"].r = 4.0
+        self.assertEqual(copy1.r["AAA"].r, 4.0)
+        self.assertEqual(self.comp.r["AAA"].r, 3.0)
+        copy1.r["AAA"].ll.append(4)
+        self.assertEqual(copy1.r["AAA"].ll, [1, 2, 3, 4])
+        self.assertEqual(self.comp.r["AAA"].ll, [1, 2, 3])
+        copy1.r["AAA"].d["key2"] = "value2"
+        self.assertEqual(copy1.r["AAA"].d, {"key": "value", "key2": "value2"})
+        self.assertEqual(self.comp.r["AAA"].d, {"key": "value"})
+        copy1.r.name = "BBB"
+        self.assertEqual(copy1.r.name, "BBB")
+        self.assertEqual(self.comp.r.name, "AAA")
+        copy1.p.name = None
+        self.assertIsNone(copy1.p.name)
+        self.assertEqual(self.comp.p.name, "BBB")
+        # Copy again to avoid shortcuts for default nested objects.
+        copy1.freeze()
+        copy2 = copy1.copy()
+        copy2.c.f = 7.0
+        self.assertEqual(copy2.c.f, 7.0)
+        self.assertEqual(copy1.c.f, 6.0)
+        self.assertEqual(self.comp.c.f, 0.0)
+        copy2.r["AAA"].ll.append(5)
+        self.assertEqual(copy2.r["AAA"].ll, [1, 2, 3, 4, 5])
+        self.assertEqual(copy1.r["AAA"].ll, [1, 2, 3, 4])
+        self.assertEqual(self.comp.r["AAA"].ll, [1, 2, 3])
+        del copy2.r["AAA"].d["key"]
+        self.assertEqual(copy2.r["AAA"].d, {"key2": "value2"})
+        self.assertEqual(copy1.r["AAA"].d, {"key": "value", "key2": "value2"})
+        self.assertEqual(self.comp.r["AAA"].d, {"key": "value"})
+        copy2.r.name = "AAA"
+        self.assertEqual(copy2.r.name, "AAA")
+        self.assertEqual(copy1.r.name, "BBB")
+        self.assertEqual(self.comp.r.name, "AAA")
+        copy2.p.name = "AAA"
+        self.assertEqual(copy2.p.name, "AAA")
+        self.assertIsNone(copy1.p.name)
+        self.assertEqual(self.comp.p.name, "BBB")
+
 
 if __name__ == "__main__":
     unittest.main()
