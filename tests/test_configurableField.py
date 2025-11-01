@@ -157,6 +157,21 @@ class ConfigurableFieldTest(unittest.TestCase):
         with self.assertRaises(pexConf.UnexpectedProxyUsageError):
             pickle.dumps(c.c2)
 
+    def test_copy(self):
+        """Test copying a frozen ConfigurableField."""
+        c1 = Config2()
+        c1.freeze()
+        c2 = c1.copy()
+        c2.c1.f = 6.0
+        self.assertEqual(c2.c1.f, 6.0)
+        self.assertEqual(c1.c1.f, 5.0)
+        c2.freeze()
+        c3 = c2.copy()
+        c3.c1.f = 7.0
+        self.assertEqual(c3.c1.f, 7.0)
+        self.assertEqual(c2.c1.f, 6.0)
+        self.assertEqual(c1.c1.f, 5.0)
+
 
 if __name__ == "__main__":
     unittest.main()
