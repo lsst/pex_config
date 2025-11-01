@@ -108,12 +108,14 @@ class ConfigurableInstance(Generic[FieldTypeVar]):
         history.append(("Targeted and initialized from defaults", at, label))
 
     def _copy(self, parent: Config) -> ConfigurableInstance:
-        object.__setattr__(self, "_config_", weakref.ref(parent))
-        object.__setattr__(self, "_field", self._field)
-        object.__setattr__(self, "__doc__", self.__doc__)
-        object.__setattr__(self, "_target", self._target)
-        object.__setattr__(self, "_ConfigClass", self._ConfigClass)
-        object.__setattr__(self, "_value", self._value.copy())
+        result = object.__new__(ConfigurableInstance)
+        object.__setattr__(result, "_config_", weakref.ref(parent))
+        object.__setattr__(result, "_field", self._field)
+        object.__setattr__(result, "__doc__", self.__doc__)
+        object.__setattr__(result, "_target", self._target)
+        object.__setattr__(result, "_ConfigClass", self._ConfigClass)
+        object.__setattr__(result, "_value", self._value.copy())
+        return result
 
     @property
     def _config(self) -> Config:
