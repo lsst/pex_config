@@ -207,6 +207,19 @@ class ConfigDictFieldTest(unittest.TestCase):
 
         self.assertTrue(pexConfig.compareConfigs("test", c1, c2))
 
+    def test_copy(self):
+        """Test that the copy method works on ConfigDictField instances."""
+        original = Config2()
+        original.d1 = {"a": Config1, "b": Config1(f=4.0)}
+        original.freeze()
+        copy1 = original.copy()
+        self.assertEqual(copy1.d1["a"].f, 3.0)
+        self.assertEqual(copy1.d1["b"].f, 4.0)
+        copy1.d1["a"].f = 6.0
+        self.assertEqual(copy1.d1["a"].f, 6.0)
+        self.assertEqual(copy1.d1["b"].f, 4.0)
+        self.assertEqual(original.d1["a"].f, 3.0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -76,7 +76,7 @@ class ConfigDict(Dict[str, Config]):
         return type(self)(
             config,
             self._field,
-            {k: v._copy() for k, v in self._dict.items()},
+            {k: v.copy() for k, v in self._dict.items()},
             at=None,
             label="copy",
             setHistory=False,
