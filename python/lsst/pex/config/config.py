@@ -50,6 +50,8 @@ from collections.abc import Mapping
 from types import GenericAlias
 from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
 
+from lsst.resources import ResourcePath
+
 # if YAML is not available that's fine and we simply don't register
 # the yaml representer since we know it won't be used.
 try:
@@ -1177,9 +1179,10 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        filename : `str`
-            Name of the configuration file. A configuration file is Python
-            module.
+        filename : `lsst.resources.ResourcePathExpression`
+            Name of the configuration URI. A configuration file is Python
+            module. Since configuration files are Python code, remote URIs
+            are not allowed.
         root : `str`, optional
             Name of the variable in file that refers to the config being
             overridden.
@@ -1199,9 +1202,16 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         lsst.pex.config.Config.saveToStream
         lsst.pex.config.Config.saveToString
         """
-        with open(filename) as f:
-            code = compile(f.read(), filename=filename, mode="exec")
-            self.loadFromString(code, root=root, filename=filename)
+        resource = ResourcePath(filename, forceAbsolute=True, forceDirectory=False)
+        if isinstance(filename, str):
+            file_string = filename
+        else:
+            file_string = str(resource)
+        if resource.scheme not in ("file", "eups", "resource"):
+            raise ValueError(f"Remote URI ({resource}) can not be used to load configurations.")
+        with resource.open("r") as f:
+            code = compile(f.read(), filename=file_string, mode="exec")
+        self.loadFromString(code, root=root, filename=file_string)
 
     def loadFromStream(self, stream, root="config", filename=None, extraLocals=None):
         """Modify this Config in place by executing the Python code in the

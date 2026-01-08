@@ -29,6 +29,7 @@ import os
 import unittest
 
 import lsst.pex.config as pexConf
+from lsst.resources import ResourcePath
 
 TESTDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,11 +45,19 @@ class FilenameTestCase(unittest.TestCase):
     """Check that __file__ can be used in a config file."""
 
     def test__file(self):
+        fileUri = ResourcePath(f"{TESTDIR}/config/filename.py", forceAbsolute=True, forceDirectory=False)
+        for confFile in (os.path.join(TESTDIR, "config", "filename.py"), fileUri, str(fileUri)):
+            c = FileConfig()
+            c.load(confFile)
+            self.assertEqual(c.filename, str(confFile))
+            self.assertEqual(c.number, 5)
+
         c = FileConfig()
-        confFile = os.path.join(TESTDIR, "config", "filename.py")
-        c.load(confFile)
-        self.assertEqual(c.filename, confFile)
-        self.assertEqual(c.number, 5)
+        with self.assertRaises(ValueError):
+            # Use mem scheme because we do not support it for config
+            # loading and it does not require additional dependencies
+            # such as requests or boto3 to be available.
+            c.load("mem://not_there.py")
 
 
 if __name__ == "__main__":
