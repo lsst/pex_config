@@ -31,6 +31,7 @@ nitpick_ignore = [
     ("py:obj", "lsst.pex.config.Field.doc"),  # Cannot make the doc field property appear in docs.
     ("py:obj", "lsst.pex.config.List"),  # Private class.
     ("py:obj", "RegistryInstanceDict"),  # Private class.
+    ("py:obj", "lsst.resources.ResourcePathExpression"),
     ("py:class", "lsst.pex.config.dictField.Dict"),
     ("py:class", "lsst.pex.config.listField.List"),
     ("py:class", "ActionTypeVar"),
