@@ -47,6 +47,8 @@ import sys
 import tempfile
 import warnings
 from collections.abc import Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from types import GenericAlias
 from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
 
@@ -75,6 +77,26 @@ if yaml:
 else:
     YamlLoaders = ()
     doImport = None
+
+
+# Holds a *stack* of "current config directories" for the current context.
+# This is used to keep track of relative paths when configs load other configs.
+_config_dir_stack: ContextVar[tuple[ResourcePath, ...]] = ContextVar("_config_dir_stack", default=())
+
+
+def _get_config_root() -> ResourcePath | None:
+    stack = _config_dir_stack.get()
+    return stack[-1] if stack else None
+
+
+@contextmanager
+def _push_config_root(dirname: ResourcePath):
+    stack = _config_dir_stack.get()
+    token = _config_dir_stack.set(stack + (dirname,))
+    try:
+        yield
+    finally:
+        _config_dir_stack.reset(token)
 
 
 class _PexConfigGenericAlias(GenericAlias):
@@ -1202,16 +1224,27 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         lsst.pex.config.Config.saveToStream
         lsst.pex.config.Config.saveToString
         """
-        resource = ResourcePath(filename, forceAbsolute=True, forceDirectory=False)
-        if isinstance(filename, str):
-            file_string = filename
+        base = _get_config_root()
+        resource = ResourcePath(filename, forceAbsolute=True, forceDirectory=False, root=base)
+
+        # Preferred definition of __file__ is the full OS path. If a config
+        # is loaded with a relative path it must be converted to the absolute
+        # path to avoid confusion with later relative paths referenced inside
+        # the config.
+        if resource.scheme == "file":
+            file_string = resource.ospath
         else:
             file_string = str(resource)
+
         if resource.scheme not in ("file", "eups", "resource"):
             raise ValueError(f"Remote URI ({resource}) can not be used to load configurations.")
-        with resource.open("r") as f:
-            code = compile(f.read(), filename=file_string, mode="exec")
-        self.loadFromString(code, root=root, filename=file_string)
+
+        # Push the directory of the file we are now reading onto the stack
+        # so that nested loads are relative to this file.
+        with _push_config_root(resource.dirname()):
+            with resource.open("r") as f:
+                code = compile(f.read(), filename=file_string, mode="exec")
+            self.loadFromString(code, root=root, filename=file_string)
 
     def loadFromStream(self, stream, root="config", filename=None, extraLocals=None):
         """Modify this Config in place by executing the Python code in the
