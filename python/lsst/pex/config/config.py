@@ -52,7 +52,7 @@ from contextvars import ContextVar
 from types import GenericAlias
 from typing import Any, ForwardRef, Generic, TypeVar, cast, overload
 
-from lsst.resources import ResourcePath
+from lsst.resources import ResourcePath, ResourcePathExpression
 
 # if YAML is not available that's fine and we simply don't register
 # the yaml representer since we know it won't be used.
@@ -1195,6 +1195,41 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 e.add_note(f"No field of name {name} exists in config type {_typeStr(self)}")
                 raise
 
+    def _filename_to_resource(
+        self, filename: ResourcePathExpression | None = None
+    ) -> tuple[ResourcePath | None, str]:
+        """Create resource path from filename.
+
+        Parameters
+        ----------
+        filename : `lsst.resources.ResourcePathExpression` or `None`
+            The URI expression associated with this config. Can be `None`
+            if no file URI is known.
+
+        Returns
+        -------
+        resource : `lsst.resources.ResourcePath` or `None`
+            The resource version of the filename. Returns `None` if no filename
+            was given or refers to unspecified value.
+        file_string : `str`
+            String form of the resource for use in ``__file__``
+        """
+        if filename is None or filename in ("?", "<unknown>"):
+            return None, "<unknown>"
+        base = _get_config_root()
+        resource = ResourcePath(filename, forceAbsolute=True, forceDirectory=False, root=base)
+
+        # Preferred definition of __file__ is the full OS path. If a config
+        # is loaded with a relative path it must be converted to the absolute
+        # path to avoid confusion with later relative paths referenced inside
+        # the config.
+        if resource.scheme == "file":
+            file_string = resource.ospath
+        else:
+            file_string = str(resource)
+
+        return resource, file_string
+
     def load(self, filename, root="config"):
         """Modify this config in place by executing the Python code in a
         configuration file.
@@ -1224,17 +1259,10 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         lsst.pex.config.Config.saveToStream
         lsst.pex.config.Config.saveToString
         """
-        base = _get_config_root()
-        resource = ResourcePath(filename, forceAbsolute=True, forceDirectory=False, root=base)
-
-        # Preferred definition of __file__ is the full OS path. If a config
-        # is loaded with a relative path it must be converted to the absolute
-        # path to avoid confusion with later relative paths referenced inside
-        # the config.
-        if resource.scheme == "file":
-            file_string = resource.ospath
-        else:
-            file_string = str(resource)
+        resource, file_string = self._filename_to_resource(filename)
+        if resource is None:
+            # A filename is required.
+            raise ValueError(f"Undefined URI provided to load command: {filename}.")
 
         if resource.scheme not in ("file", "eups", "resource"):
             raise ValueError(f"Remote URI ({resource}) can not be used to load configurations.")
@@ -1244,7 +1272,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         with _push_config_root(resource.dirname()):
             with resource.open("r") as f:
                 code = compile(f.read(), filename=file_string, mode="exec")
-            self.loadFromString(code, root=root, filename=file_string)
+            self._loadFromString(code, root=root, filename=file_string)
 
     def loadFromStream(self, stream, root="config", filename=None, extraLocals=None):
         """Modify this Config in place by executing the Python code in the
@@ -1267,7 +1295,8 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             Then this config's field ``myField`` is set to ``5``.
         filename : `str`, optional
             Name of the configuration file, or `None` if unknown or contained
-            in the stream. Used for error reporting.
+            in the stream. Used for error reporting and to set ``__file__``
+            variable in config.
         extraLocals : `dict` of `str` to `object`, optional
             Any extra variables to include in local scope when loading.
 
@@ -1287,7 +1316,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         """
         if hasattr(stream, "read"):
             if filename is None:
-                filename = getattr(stream, "name", "?")
+                filename = getattr(stream, "name", "<unknown>")
             code = compile(stream.read(), filename=filename, mode="exec")
         else:
             code = stream
@@ -1311,9 +1340,11 @@ class Config(metaclass=ConfigMeta):  # type: ignore
                 config.myField = 5
 
             Then this config's field ``myField`` is set to ``5``.
-        filename : `str`, optional
-            Name of the configuration file, or `None` if unknown or contained
-            in the stream. Used for error reporting.
+        filename : `lsst.resources.ResourcePathExpression`, optional
+            URI of the configuration file, or `None` if unknown or contained
+            in the stream. Used for error reporting and to set ``__file__``
+            variable. Required to be set if the string config attempts to
+            load other configs using either relative path or ``__file__``.
         extraLocals : `dict` of `str` to `object`, optional
             Any extra variables to include in local scope when loading.
 
@@ -1334,7 +1365,24 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         if filename is None:
             # try to determine the file name; a compiled string
             # has attribute "co_filename",
-            filename = getattr(code, "co_filename", "?")
+            filename = getattr(code, "co_filename", "<unknown>")
+
+        resource, file_string = self._filename_to_resource(filename)
+        if resource is None:
+            # No idea where this config came from so no ability to deal with
+            # relative paths. No reason to use context.
+            self._loadFromString(code, root=root, filename=filename, extraLocals=extraLocals)
+        else:
+            # Push the directory of the file we are now reading onto the stack
+            # so that nested loads are relative to this file.
+            with _push_config_root(resource.dirname()):
+                self._loadFromString(code, root=root, filename=file_string, extraLocals=extraLocals)
+
+    def _loadFromString(self, code, root="config", filename=None, extraLocals=None):
+        """Update config from string.
+
+        Assumes relative directory path context has been setup by caller.
+        """
         with RecordingImporter() as importer:
             globals = {"__file__": filename}
             local = {root: self}
