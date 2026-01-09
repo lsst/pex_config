@@ -54,6 +54,20 @@ class FilenameTestCase(unittest.TestCase):
             self.assertEqual(c.number, 5)
 
         c = FileConfig()
+        with fileUri.open("r") as fh:
+            c.loadFromStream(fh)
+            self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
+            self.assertEqual(c.number, 5)
+
+        c = FileConfig()
+        data = fileUri.read()
+        c.loadFromString(data)
+        self.assertEqual(c.filename, "<unknown>")
+
+        c.loadFromString(data, filename=fileUri.ospath)
+        self.assertEqual(c.filename, fileUri.ospath)
+
+        c = FileConfig()
         with self.assertRaises(ValueError):
             # Use mem scheme because we do not support it for config
             # loading and it does not require additional dependencies
@@ -69,6 +83,20 @@ class FilenameTestCase(unittest.TestCase):
             # loaded by the config.
             self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
             self.assertEqual(c.number, 5)
+
+        c = FileConfig()
+        with fileUri.open("r") as fh:
+            c.loadFromStream(fh)
+            self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
+            self.assertEqual(c.number, 5)
+
+        c = FileConfig()
+        data = fileUri.read()
+        with self.assertRaises(FileNotFoundError):
+            c.loadFromString(data)
+
+        c.loadFromString(data, filename=fileUri.ospath)
+        self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
 
 
 if __name__ == "__main__":
