@@ -49,7 +49,8 @@ class FilenameTestCase(unittest.TestCase):
         for confFile in (os.path.join(TESTDIR, "config", "filename.py"), fileUri, str(fileUri)):
             c = FileConfig()
             c.load(confFile)
-            self.assertEqual(c.filename, str(confFile))
+            # The __file__ is always the ospath form.
+            self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
             self.assertEqual(c.number, 5)
 
         c = FileConfig()
@@ -58,6 +59,16 @@ class FilenameTestCase(unittest.TestCase):
             # loading and it does not require additional dependencies
             # such as requests or boto3 to be available.
             c.load("mem://not_there.py")
+
+    def test_relative(self):
+        fileUri = ResourcePath(f"{TESTDIR}/config/relfilename.py", forceAbsolute=True, forceDirectory=False)
+        for confFile in (os.path.join(TESTDIR, "config", "relfilename.py"), fileUri, str(fileUri)):
+            c = FileConfig()
+            c.load(confFile)
+            # The __file__ is always the ospath form and should be the file
+            # loaded by the config.
+            self.assertEqual(c.filename, os.path.join(TESTDIR, "config", "filename.py"))
+            self.assertEqual(c.number, 5)
 
 
 if __name__ == "__main__":
