@@ -38,6 +38,7 @@ __all__ = (
 import copy
 import importlib
 import io
+import logging
 import math
 import numbers
 import os
@@ -78,6 +79,7 @@ else:
     YamlLoaders = ()
     doImport = None
 
+_LOG = logging.getLogger(__name__)
 
 # Holds a *stack* of "current config directories" for the current context.
 # This is used to keep track of relative paths when configs load other configs.
@@ -1270,6 +1272,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         # Push the directory of the file we are now reading onto the stack
         # so that nested loads are relative to this file.
         with _push_config_root(resource.dirname()):
+            _LOG.debug("Updating config from URI %s", str(resource))
             with resource.open("r") as f:
                 code = compile(f.read(), filename=file_string, mode="exec")
             self._loadFromString(code, root=root, filename=file_string)
