@@ -1180,7 +1180,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
         Parameters
         ----------
         filename : `lsst.resources.ResourcePathExpression`
-            Name of the configuration URI. A configuration file is Python
+            Name of the configuration URI. A configuration file is a Python
             module. Since configuration files are Python code, remote URIs
             are not allowed.
         root : `str`, optional
