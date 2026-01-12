@@ -81,20 +81,18 @@ else:
 
 _LOG = logging.getLogger(__name__)
 
-# Holds a *stack* of "current config directories" for the current context.
-# This is used to keep track of relative paths when configs load other configs.
-_config_dir_stack: ContextVar[tuple[ResourcePath, ...]] = ContextVar("_config_dir_stack", default=())
+
+# Tracks the current config directory for the current context.
+_config_dir_stack: ContextVar[ResourcePath | None] = ContextVar("_config_dir_stack", default=None)
 
 
 def _get_config_root() -> ResourcePath | None:
-    stack = _config_dir_stack.get()
-    return stack[-1] if stack else None
+    return _config_dir_stack.get()
 
 
 @contextmanager
 def _push_config_root(dirname: ResourcePath):
-    stack = _config_dir_stack.get()
-    token = _config_dir_stack.set(stack + (dirname,))
+    token = _config_dir_stack.set(dirname)
     try:
         yield
     finally:
