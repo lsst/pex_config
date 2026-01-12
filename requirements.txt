@@ -1,2 +1,3 @@
 pyyaml >= 5.1
 numpy >= 1.17
+lsst-resources @ git+https://github.com/lsst/resources@main
