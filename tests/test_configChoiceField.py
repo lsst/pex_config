@@ -165,6 +165,20 @@ class ConfigChoiceFieldTest(unittest.TestCase):
         with self.assertRaises(pexConfig.UnexpectedProxyUsageError):
             pickle.dumps(self.config.c.names)
 
+    def test_copy(self):
+        """Test the copy method on a ConfigChoiceField."""
+        copy1: Config3 = self.config.copy()
+        copy1.a["AAA"].f = 1
+        copy1.a["BBB"].f = 1.0
+        copy1.a = "BBB"
+        self.assertEqual(self.config.a.name, "AAA")
+        self.assertEqual(self.config.a.active.f, 4)
+        self.assertEqual(self.config.a["AAA"].f, 4)
+        self.assertEqual(self.config.a["BBB"].f, 0.5)
+        self.assertEqual(copy1.a.name, "BBB")
+        self.assertEqual(copy1.a["AAA"].f, 1)
+        self.assertEqual(copy1.a["BBB"].f, 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

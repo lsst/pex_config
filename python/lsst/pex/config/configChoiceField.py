@@ -192,7 +192,7 @@ class ConfigInstanceDict(collections.abc.Mapping[str, Config]):
         result._typemap = self._typemap
         if self._selection is not None:
             if self._field.multi:
-                result._selection = SelectionSet(result._dict, self._selection._set)
+                result._selection = SelectionSet(self, self._selection._set)
             else:
                 result._selection = self._selection
         return result
