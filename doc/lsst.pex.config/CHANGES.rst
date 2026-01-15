@@ -1,3 +1,26 @@
+lsst-pex-config v30.0.0 (2026-01-15)
+====================================
+
+Python 3.11 is now the minimum supported version.
+Tested on Python 3.14.
+
+New Features
+------------
+
+- Added a ``copy`` method that unfreezes. (`DM-16523 <https://rubinobs.atlassian.net/browse/DM-16523>`_)
+- * Changed the config loader method such that if a relative path is specified inside another config it is treated as being relative to that original config file.
+  * Modified the config loader to support URI schemes ``file``, ``resource``, and ``eups`` supported by ``lsst-resources``.
+    This change means that in some cases ``__file__`` can be a URI string and not a simple path. (`DM-33226 <https://rubinobs.atlassian.net/browse/DM-33226>`_)
+
+
+Bug Fixes
+---------
+
+- Fixed a bug that caused history-printing to fail when the initial value for a field was `None`. (`DM-51850 <https://rubinobs.atlassian.net/browse/DM-51850>`_)
+- Fixed copying of ``ConfigDictField``. (`DM-53767 <https://rubinobs.atlassian.net/browse/DM-53767>`_)
+- Fixed copying of ``ConfigChoiceField`` and ``RegistryField``. (`DM-53791 <https://rubinobs.atlassian.net/browse/DM-53791>`_)
+
+
 lsst-pex-config v29.0.0 (2025-03-25)
 ====================================
 
