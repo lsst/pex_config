@@ -1,3 +1,0 @@
-* Changed the config loader method such that if a relative path is specified inside another config it is treated as being relative to that original config file.
-* Modified the config loader to support URI schemes ``file``, ``resource``, and ``eups`` supported by ``lsst-resources``.
-  This change means that in some cases ``__file__`` can be a URI string and not a simple path.
