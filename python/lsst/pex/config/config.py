@@ -321,7 +321,7 @@ class FieldValidationError(ValueError):
         error = (
             f"{self.fieldType.__name__} '{self.fullname}' failed validation: {msg}\n"
             f"For more information see the Field definition at:\n{self.fieldSource.format()}"
-            f" and the Config definition at:\n{self.configSource.format()}"
+            f" and the Config definition for {_typeStr(config)} at:\n{self.configSource.format()}"
         )
         super().__init__(error)
 
