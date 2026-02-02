@@ -30,3 +30,4 @@ nitpick_ignore_regex = [
 [sphinx.intersphinx.projects]
 python = "https://docs.python.org/3"
 lsst = "https://pipelines.lsst.io/v/daily/"
+numpy = "https://numpy.org/doc/stable/"
