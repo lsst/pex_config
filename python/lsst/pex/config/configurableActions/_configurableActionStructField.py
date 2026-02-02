@@ -446,7 +446,7 @@ class ConfigurableActionStructField(Field[ActionTypeVar]):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 

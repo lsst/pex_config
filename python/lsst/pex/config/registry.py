@@ -42,7 +42,7 @@ class ConfigurableWrapper:
 
     Parameters
     ----------
-    target : configurable class
+    target : `lsst.pipe.base.Task` or other configurable class
         Target class.
     ConfigClass : `type`
         Config class.
@@ -135,7 +135,7 @@ class Registry(collections.abc.Mapping):
             Name that the ``target`` is registered under. The target can
             be accessed later with `dict`-like patterns using ``name`` as
             the key.
-        target : obj
+        target : `lsst.pipe.base.Task` or other configurable type
             A configurable type, usually a subclass of `lsst.pipe.base.Task`.
         ConfigClass : `lsst.pex.config.Config`-type, optional
             A subclass of `lsst.pex.config.Config` used to configure the
@@ -188,7 +188,7 @@ class Registry(collections.abc.Mapping):
         ----------
         doc : `str`
             A description of the field.
-        default : object, optional
+        default : `object`, optional
             The default target for the field.
         optional : `bool`, optional
             When `False`, `lsst.pex.config.Config.validate` fails if the
@@ -456,7 +456,7 @@ def registerConfig(name, registry, target):
         Name of the ``target`` in the ``registry``.
     registry : `Registry`
         The registry containing the ``target``.
-    target : obj
+    target : `lsst.pipe.base.Task` or other configurable type
         A configurable type, such as a subclass of `lsst.pipe.base.Task`.
 
     See Also

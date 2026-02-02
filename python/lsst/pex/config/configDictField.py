@@ -148,7 +148,7 @@ class ConfigDictField(DictField):
     itemtype : `lsst.pex.config.Config`-type
         The type of the values in the mapping. This must be
         `~lsst.pex.config.Config` or a subclass.
-    default : optional
+    default : `typing.Any`, optional
         Unknown.
     default : ``itemtype``-dtype, optional
         Default value of this field.
@@ -161,9 +161,9 @@ class ConfigDictField(DictField):
         Callable to check a key.
     itemCheck : `~collections.abc.Callable` or `None`, optional
         Callable to check an item.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     Raises
     ------
@@ -171,7 +171,7 @@ class ConfigDictField(DictField):
         Raised if the inputs are invalid:
 
         - ``keytype`` or ``itemtype`` arguments are not supported types
-          (members of `ConfigDictField.supportedTypes`.
+          (members of `Field.supportedTypes`.
         - ``dictCheck``, ``keyCheck`` or ``itemCheck`` is not a callable
           function.
 
@@ -326,7 +326,7 @@ class ConfigDictField(DictField):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 

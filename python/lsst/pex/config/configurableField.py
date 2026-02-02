@@ -247,7 +247,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
     ----------
     doc : `str`
         A description of the configuration field.
-    target : configurable class
+    target : `lsst.pipe.base.Task` or other configurable class
         The configurable target. Configurables have a ``ConfigClass``
         attribute. Within the task framework, configurables are
         `lsst.pipe.base.Task` subclasses).
@@ -255,16 +255,16 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
         The subclass of `lsst.pex.config.Config` expected as the configuration
         class of the ``target``. If ``ConfigClass`` is unset then
         ``target.ConfigClass`` is used.
-    default : ``ConfigClass``-type, optional
+    default : `type`, optional
         The default configuration class. Normally this parameter is not set,
         and defaults to ``ConfigClass`` (or ``target.ConfigClass``).
-    check : callable, optional
+    check : `collections.abc.Callable`, optional
         Callable that takes the field's value (the ``target``) as its only
         positional argument, and returns `True` if the ``target`` is valid (and
         `False` otherwise).
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------
@@ -289,7 +289,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
 
         Parameters
         ----------
-        target : configurable class
+        target : `type`
             The configurable being verified.
         ConfigClass : `lsst.pex.config.Config`-type or `None`
             The configuration class associated with the ``target``. This can
@@ -486,7 +486,7 @@ class ConfigurableField(Field[ConfigurableInstance[FieldTypeVar]]):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities. For example: `print`.
 

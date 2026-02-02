@@ -52,12 +52,12 @@ class ConfigField(Field[FieldTypeVar]):
         considered equivalent to assigning a default-constructed sub-config.
         This means that the argument default can be ``dtype``, as well as an
         instance of ``dtype``.
-    check : callable, optional
+    check : `collections.abc.Callable`, optional
         A callback function that validates the field's value, returning `True`
         if the value is valid, and `False` otherwise.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------
@@ -178,7 +178,7 @@ class ConfigField(Field[FieldTypeVar]):
 
         Parameters
         ----------
-        outfile : file-like object
+        outfile : `typing.IO`
             A writeable field handle.
         instance : `~lsst.pex.config.Config`
             The `~lsst.pex.config.Config` instance that contains this field.
@@ -226,7 +226,7 @@ class ConfigField(Field[FieldTypeVar]):
 
         Returns
         -------
-        value : object
+        value : `object`
             The field's value. See *Notes*.
 
         Notes
@@ -299,7 +299,7 @@ class ConfigField(Field[FieldTypeVar]):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 

@@ -70,18 +70,18 @@ def compareScalars(name, v1, v2, output, rtol=1e-8, atol=1e-8, dtype=None):
         Name to use when reporting differences, typically created by
         `getComparisonName`.  This will always appear as the beginning of any
         messages reported via ``output``.
-    v1 : object
+    v1 : `object`
         Left-hand side value to compare.
-    v2 : object
+    v2 : `object`
         Right-hand side value to compare.
-    output : callable or `None`
+    output : `collections.abc.Callable` or `None`
         A callable that takes a string, used (possibly repeatedly) to report
         inequalities (for example, `print`). Set to `None` to disable output.
     rtol : `float`, optional
         Relative tolerance for floating point comparisons.
     atol : `float`, optional
         Absolute tolerance for floating point comparisons.
-    dtype : class, optional
+    dtype : `type`, optional
         Data type of values for comparison. May be `None` if values are not
         floating-point.
 
@@ -130,7 +130,7 @@ def compareConfigs(name, c1, c2, shortcut=True, rtol=1e-8, atol=1e-8, output=Non
         Relative tolerance for floating point comparisons.
     atol : `float`, optional
         Absolute tolerance for floating point comparisons.
-    output : callable, optional
+    output : `collections.abc.Callable`, optional
         A callable that takes a string, used (possibly repeatedly) to report
         inequalities. For example: `print`.
 

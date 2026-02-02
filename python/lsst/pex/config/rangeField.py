@@ -56,9 +56,9 @@ class RangeField(Field):
         If `True`, the ``min`` value is included in the allowed range.
     inclusiveMax : `bool`, optional
         If `True`, the ``max`` value is included in the allowed range.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------

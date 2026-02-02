@@ -148,14 +148,14 @@ def _autocast(x, dtype):
 
     Parameters
     ----------
-    x : object
+    x : `object`
         A value.
     dtype : type
         Data type, such as `float`, `int`, or `str`.
 
     Returns
     -------
-    values : object
+    values : `object`
         If appropriate, the returned value is ``x`` cast to the given type
         ``dtype``. If the cast cannot be performed the original value of
         ``x`` is returned.
@@ -300,7 +300,7 @@ class FieldValidationError(ValueError):
 
         See also
         --------
-        lsst.pex.config.Field.name
+        ``lsst.pex.config.Field.name``
         """
 
         self.fullname = _joinNamePath(config._name, field.name)
@@ -334,14 +334,14 @@ class Field(Generic[FieldTypeVar]):
     ----------
     doc : `str`
         A description of the field for users.
-    dtype : type, optional
+    dtype : `type`, optional
         The field's data type. ``Field`` only supports basic data types:
         `int`, `float`, `complex`, `bool`, and `str`. See
         `Field.supportedTypes`. Optional if supplied as a typing argument to
         the class.
-    default : object, optional
+    default : `object`, optional
         The field's default value.
-    check : callable, optional
+    check : `collections.abc.Callable`, optional
         A callable that is called with the field's value. This callable should
         return `False` if the value is invalid. More complex inter-field
         validation can be written as part of the
@@ -350,7 +350,7 @@ class Field(Generic[FieldTypeVar]):
         This sets whether the field is considered optional, and therefore
         doesn't need to be set by the user. When `False`,
         `lsst.pex.config.Config.validate` fails if the field's value is `None`.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
         If not None, the string is appended to the docstring for this Field.
 
@@ -374,7 +374,7 @@ class Field(Generic[FieldTypeVar]):
 
     Notes
     -----
-    ``Field`` instances (including those of any subclass of ``Field``) are used
+    `Field` instances (including those of any subclass of `Field`) are used
     as class attributes of `~lsst.pex.config.Config` subclasses (see the
     example, below). ``Field`` attributes work like the `property` attributes
     of classes that implement custom setters and getters. `Field` attributes
@@ -385,15 +385,15 @@ class Field(Generic[FieldTypeVar]):
     When you access a `Field` attribute on a `Config` instance, you don't
     get the `Field` instance itself. Instead, you get the value of that field,
     which might be a simple type (`int`, `float`, `str`, `bool`) or a custom
-    container type (like a `lsst.pex.config.List`) depending on the field's
-    type. See the example, below.
+    container type (like a `lsst.pex.config.ListField`) depending on the
+    field's type. See the example, below.
 
     Fields can be annotated with a type similar to other python classes (python
     specification `here <https://peps.python.org/pep-0484/#generics>`_ ).
     See the name field in the Config example below for an example of this.
     Unlike most other uses in python, this has an effect at type checking *and*
     runtime. If the type is specified with a class annotation, it will be used
-    as the value of the ``dtype`` in the ``Field`` and there is no need to
+    as the value of the ``dtype`` in the `Field` and there is no need to
     specify it as an argument during instantiation.
 
     There are Some notes on dtype through type annotation syntax. Type
@@ -401,19 +401,20 @@ class Field(Generic[FieldTypeVar]):
     name. i.e. "float", but this cannot be used to resolve circular references.
     Type annotation syntax can be used on an identifier in addition to Class
     assignment i.e. ``variable: Field[str] = Config.someField`` vs
-    ``someField = Field[str](doc="some doc"). However, this syntax is only
+    ``someField = Field[str](doc="some doc")``. However, this syntax is only
     useful for annotating the type of the identifier (i.e. variable in previous
-    example) and does nothing for assigning the dtype of the ``Field``.
+    example) and does nothing for assigning the dtype of the `Field`.
 
     Examples
     --------
-    Instances of ``Field`` should be used as class attributes of
+    Instances of `Field` should be used as class attributes of
     `lsst.pex.config.Config` subclasses:
 
     >>> from lsst.pex.config import Config, Field
     >>> class Example(Config):
     ...     myInt = Field("An integer field.", int, default=0)
     ...     name = Field[str](doc="A string Field")
+    >>> config = Example()
     >>> print(config.myInt)
     0
     >>> config.myInt = 5
@@ -624,7 +625,7 @@ class Field(Generic[FieldTypeVar]):
 
         Parameters
         ----------
-        value : object
+        value : `object`
             The value being validated.
 
         Raises
@@ -666,8 +667,8 @@ class Field(Generic[FieldTypeVar]):
 
         Parameters
         ----------
-        outfile : file-like object
-            A writeable field handle.
+        outfile : `typing.IO`
+            A writeable file handle.
         instance : `~lsst.pex.config.Config`
             The `~lsst.pex.config.Config` instance that contains this field.
 
@@ -708,7 +709,7 @@ class Field(Generic[FieldTypeVar]):
 
         Returns
         -------
-        value : object
+        value : `object`
             The field's value. See *Notes*.
 
         Notes
@@ -867,7 +868,7 @@ class Field(Generic[FieldTypeVar]):
             Relative tolerance for floating point comparisons.
         atol : `float`, optional
             Absolute tolerance for floating point comparisons.
-        output : callable, optional
+        output : `collections.abc.Callable`, optional
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 
@@ -1281,7 +1282,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        stream : file-like object, `str`, `bytes`, or `~types.CodeType`
+        stream : `typing.IO`, `str`, `bytes`, or `~types.CodeType`
             Stream containing configuration override code.  If this is a
             code object, it should be compiled with ``mode="exec"``.
         root : `str`, optional
@@ -1466,7 +1467,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        outfile : file-like object
+        outfile : `typing.TextIO`
             Destination file object write the config into. Accepts strings not
             bytes.
         root : `str`, optional
@@ -1520,7 +1521,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
 
         Parameters
         ----------
-        outfile : file-like object
+        outfile : `typing.TextIO`
             Destination file object write the config into. Accepts strings not
             bytes.
         """
@@ -1755,7 +1756,7 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             Relative tolerance for floating point comparisons.
         atol : `float`, optional
             Absolute tolerance for floating point comparisons.
-        output : callable, optional
+        output : `collections.abc.Callable`, optional
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 
@@ -1876,7 +1877,7 @@ def unreduceConfig(cls_, stream):
     cls_ : `lsst.pex.config.Config`-type
         A `lsst.pex.config.Config` type (not an instance) that is instantiated
         with configurations in the ``stream``.
-    stream : file-like object, `str`, or `~types.CodeType`
+    stream : `typing.IO`, `str`, or `~types.CodeType`
         Stream containing configuration override code.
 
     Returns
