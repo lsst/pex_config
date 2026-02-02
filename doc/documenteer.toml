@@ -1,0 +1,32 @@
+[project]
+title = "lsst-pex-config"
+
+[project.python]
+package = "lsst-pex-config"
+
+[build]
+clean = true
+
+[sphinx]
+nitpick_ignore = [
+    ["py:obj", "lsst.daf.base.PropertySet"],
+    ["py:obj", "lsst.pex.config.Field.doc"],  # Cannot make the doc field property appear in docs.
+    ["py:obj", "lsst.pex.config.List"],  # Private class.
+    ["py:obj", "RegistryInstanceDict"],  # Private class.
+    ["py:obj", "lsst.resources.ResourcePathExpression"],
+    ["py:class", "lsst.pex.config.dictField.Dict"],
+    ["py:class", "lsst.pex.config.listField.List"],
+    ["py:class", "ActionTypeVar"],
+]
+nitpick_ignore_regex = [
+    ['py:class', 'a set-like.*'],  # collections.abc.Mapping inheritance.
+    ['py:class', 'D\[k\] if k .*'],  # collections.abc.Mapping inheritance.
+    ['py:class', 'an object providing.*'],  # collections.abc.Mapping inheritance.
+    ['py:(obj|class)', 'lsst.pex.config..*TypeVar'],  # Sphinx does not like TypeVar.
+    ['py:obj', 'ConfigField.(item|dict)Check'],  # Cannot make the check properties appear in docs.
+    ['py:(obj|class)', '.*ConfigInstanceDict'],  # Private class.
+]
+
+[sphinx.intersphinx.projects]
+python = "https://docs.python.org/3"
+lsst = "https://pipelines.lsst.io/v/daily/"
