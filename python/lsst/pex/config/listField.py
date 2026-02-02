@@ -57,7 +57,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         Config instance that contains the ``field``.
     field : `ListField`
         Instance of the `ListField` using this ``List``.
-    value : sequence
+    value : `collections.abc.Sequence`
         Sequence of values that are inserted into this ``List``.
     at : `list` of `~lsst.pex.config.callStack.StackFrame`
         The call stack (created by `lsst.pex.config.callStack.getCallStack`).
@@ -114,7 +114,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         ----------
         i : `int`
             Index of the item in the `list`.
-        x : object
+        x : `object`
             Item in the `list`.
 
         Raises
@@ -215,7 +215,7 @@ class List(collections.abc.MutableSequence[FieldTypeVar]):
         ----------
         i : `int`
             Index where the item is inserted.
-        x : object
+        x : `object`
             Item that is inserted.
         at : `list` of `~lsst.pex.config.callStack.StackFrame` or `None`,\
                 optional
@@ -283,18 +283,18 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
     ----------
     doc : `str`
         A description of the field.
-    dtype : class, optional
+    dtype : `type`, optional
         The data type of items in the list. Optional if supplied as typing
         argument to the class.
-    default : sequence, optional
+    default : `collections.abc.Sequence`, optional
         The default items for the field.
     optional : `bool`, optional
         Set whether the field is *optional*. When `False`,
         `lsst.pex.config.Config.validate` will fail if the field's value is
         `None`.
-    listCheck : callable, optional
+    listCheck : `collections.abc.Callable`, optional
         A callable that validates the list as a whole.
-    itemCheck : callable, optional
+    itemCheck : `collections.abc.Callable`, optional
         A callable that validates individual items in the list.
     length : `int`, optional
         If set, this field must contain exactly ``length`` number of items.
@@ -304,9 +304,9 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
     maxLength : `int`, optional
         If set, this field must contain *no more than* ``maxLength`` number of
         items.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------
@@ -503,7 +503,7 @@ class ListField(Field[List[FieldTypeVar]], Generic[FieldTypeVar]):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             If not None, a callable that takes a `str`, used (possibly
             repeatedly) to report inequalities.
 

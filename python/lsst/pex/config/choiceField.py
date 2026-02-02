@@ -42,7 +42,7 @@ class ChoiceField(Field[FieldTypeVar]):
     ----------
     doc : `str`
         Documentation string that describes the configuration field.
-    dtype : class
+    dtype : `type`
         The type of the field's choices. For example, `str` or `int`.
     allowed : `dict`
         The allowed values. Keys are the allowed choices (of ``dtype``-type).
@@ -52,9 +52,9 @@ class ChoiceField(Field[FieldTypeVar]):
         choices.
     optional : `bool`, optional
         If `True`, this configuration field is *optional*. Default is `True`.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------

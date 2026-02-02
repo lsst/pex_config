@@ -412,9 +412,9 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
         If `False`, the field allows only a single selection. In this case,
         set the active config by assigning the config's key from the
         ``typemap`` to the field's ``name`` attribute (see *Examples*).
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------
@@ -650,7 +650,7 @@ class ConfigChoiceField(Field[ConfigInstanceDict]):
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 

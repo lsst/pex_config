@@ -229,15 +229,15 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
         The default mapping.
     optional : `bool`, optional
         If `True`, the field doesn't need to have a set value.
-    dictCheck : callable
+    dictCheck : `collections.abc.Callable`
         A function that validates the dictionary as a whole.
-    keyCheck : callable
+    keyCheck : `collections.abc.Callable`
         A function that validates individual mapping keys.
-    itemCheck : callable
+    itemCheck : `collections.abc.Callable`
         A function that validates individual mapping values.
-    deprecated : None or `str`, optional
+    deprecated : `None` or `str`, optional
         A description of why this Field is deprecated, including removal date.
-        If not None, the string is appended to the docstring for this Field.
+        If not `None`, the string is appended to the docstring for this Field.
 
     See Also
     --------
@@ -439,7 +439,7 @@ class DictField(Field[Dict[KeyTypeVar, ItemTypeVar]], Generic[KeyTypeVar, ItemTy
             Relative tolerance for floating point comparisons.
         atol : `float`
             Absolute tolerance for floating point comparisons.
-        output : callable
+        output : `collections.abc.Callable`
             A callable that takes a string, used (possibly repeatedly) to
             report inequalities.
 

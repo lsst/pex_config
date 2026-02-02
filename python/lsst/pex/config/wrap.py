@@ -61,7 +61,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
 
     Parameters
     ----------
-    ctrl : class
+    ctrl : `type`
         C++ control class to wrap.
     name : `str`, optional
         Name of the new config class; defaults to the ``__name__`` of the
@@ -70,7 +70,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
         Base class for the config class.
     doc : `str`, optional
         Docstring for the config class.
-    module : object, `str`, `int`, or `None` optional
+    module : `object`, `str`, `int`, or `None` optional
         Either a module object, a string specifying the name of the module, or
         an integer specifying how far back in the stack to look for the module
         to use: 0 is the immediate caller of `~lsst.pex.config.wrap`. This will
@@ -78,7 +78,7 @@ def makeConfigClass(ctrl, name=None, base=Config, doc=None, module=None, cls=Non
         will also be added to the module. Ignored if `None` or if ``cls`` is
         not `None`. Defaults to None in which case module is looked up from the
         module of ctrl.
-    cls : class
+    cls : `type` [`lsst.pex.config.Config`]
         An existing config class to use instead of creating a new one; name,
         base doc, and module will be ignored if this is not `None`.
 
@@ -316,7 +316,7 @@ def wrap(ctrl):
 
     Parameters
     ----------
-    ctrl : object
+    ctrl : `object`
         The C++ control class.
 
     Notes
