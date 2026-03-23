@@ -1689,7 +1689,8 @@ class Config(metaclass=ConfigMeta):  # type: ignore
             if self._fields[attr].deprecated is not None:
                 fullname = _joinNamePath(self._name, self._fields[attr].name)
                 warnings.warn(
-                    f"Config field {fullname} is deprecated: {self._fields[attr].deprecated}",
+                    f"Config field {_typeStr(type(self))}.{fullname} is deprecated: "
+                    f"{self._fields[attr].deprecated}",
                     FutureWarning,
                     stacklevel=2,
                 )
