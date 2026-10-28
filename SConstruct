@@ -1,3 +1,3 @@
 # -*- python -*-
 from lsst.sconsUtils import scripts
-scripts.BasicSConstruct("pex_config")
+scripts.BasicSConstruct("pex_config", noCfgFile=True)
