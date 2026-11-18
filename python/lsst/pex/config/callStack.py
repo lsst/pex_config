@@ -102,13 +102,15 @@ class StackFrame:
     getStackFrame
     """
 
-    _STRIP = "/python/"
-    """String to strip from the ``filename`` in the constructor."""
+    _STRIP = ["/python/", "/DRAGONS/"]
+    """Strings to strip from the ``filename`` in the constructor."""
 
     def __init__(self, filename, lineno, function, content=None):
-        loc = filename.rfind(self._STRIP)
-        if loc > 0:
-            filename = filename[loc + len(self._STRIP) :]
+        for to_strip in self._STRIP:
+            loc = filename.rfind(to_strip)
+            if loc > 0:
+                filename = filename[loc + len(to_strip) :]
+                break
         self.filename = filename
         self.lineno = lineno
         self.function = function
